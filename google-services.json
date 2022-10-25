@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "837207271086",
+    "firebase_url": "https://project-2674363050409365994.firebaseio.com",
+    "project_id": "project-2674363050409365994",
+    "storage_bucket": "project-2674363050409365994.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837207271086:android:e204910871ec8a33",
+        "android_client_info": {
+          "package_name": "org.toptaxi.taximeter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "837207271086-levuifvhhm1d3t5iknekjcrdd1tg7afh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.toptaxi.taximeter",
+            "certificate_hash": "44381070de0c74b36a7232fc027d4cd3416041d2"
+          }
+        },
+        {
+          "client_id": "837207271086-kvhm5sjmmhf5ljkcvdruflegnu2p8veo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8NgVCDrTayRJYS7MxQJSoQeKeCOIAVgE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "837207271086-kvhm5sjmmhf5ljkcvdruflegnu2p8veo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

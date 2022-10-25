@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:yourapp="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_driver_offline"
+        android:icon="@drawable/ic_driver_offline"
+        yourapp:showAsAction="always"
+        android:title="" />
+    <item
+        android:id="@+id/action_driver_on_order"
+        android:icon="@drawable/ic_driver_on_order"
+        yourapp:showAsAction="always"
+        android:title="" />
+    <item
+        android:id="@+id/action_driver_online"
+        android:icon="@drawable/ic_driver_online"
+        yourapp:showAsAction="always"
+        android:title="" />
+    <item
+        android:id="@+id/action_gps_fixed"
+        android:icon="@drawable/ic_gps_fixed"
+        yourapp:showAsAction="always"
+        android:title="" />
+    <item
+        android:id="@+id/action_gps_not_fixed"
+        android:icon="@drawable/ic_gps_not_fixed"
+        yourapp:showAsAction="always"
+        android:title="" />
+    <item
+        android:id="@+id/action_gps_off"
+        android:icon="@drawable/ic_gps_off"
+        yourapp:showAsAction="always"
+        android:title="" />
+
+</menu>

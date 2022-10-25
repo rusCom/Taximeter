@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">aTaxi.Водитель</string>
+
+    <string name="onCloseDriverOnOrder">Вы на заказе. Не надо закрывать программу</string>
+    <string name="onCloseTaximeterStart">Сначала закройте таксометр</string>
+
+    <string name="errorConnection">Что-то пошло не так, возможно нет интеренета. Проверьте интернет и повторите попытку.</string>
+    <string name="errorRest">Что-то пошло не так, но мы уже разбираемся. Повторите попытку попозже</string>
+    <string name="errorPhoneWrong">Не корректный номер телефона</string>>
+    <string name="errorPasswordWrong">Не верные авторизационные данные</string>
+    <string name="errorDriverWrong">Водитель с данным номером не зарегестрирован</string>
+    <string name="errorIdentification">Ошибка идентификации приложения</string>
+    <string name="errorNewVersion">Для дальнейшей работы необходимо обновить версию</string>
+    <string name="errorGPSNotFixed">Ожидание GPS данных &#8230;</string>
+    <string name="errorGPSOff">Для работы программы необходимо включить GPS &#8230;</string>
+    <string name="errorDriverBalanceOnLine">Не достаточный баланс для выход на линию.</string>
+
+    <string name="gps_network_not_enabled">Для корректной работы программы необходимо включить GPS приемник</string>
+    <string name="checkNewVersionCaption">Доступна новая версия программы. Рекомендуем обновить Вашу версию программы.</string>
+    <string name="checkNewVersionOk">Обновить</string>
+    <string name="checkNewVersionCancel">Позже</string>
+    <!-- UserAgreementDialog -->
+    <string name="tvUserAgreementCaption">Условия использование</string>
+    <string name="tvUserAgreementText">Что бы продолжить, пожалуйста, ознакомьтесь и примите наши Условия и Политику конфиденциальности.</string>
+    <!-- Надписи стандартных кнопок -->
+    <string name="btnOK">Хорошо</string>
+    <string name="btnCancel">Отмена</string>
+    <!-- ActivityLogin -->
+    <string name="edActivityLoginPhone">Номер телефона</string>
+    <string name="edActivityLoginPassword">Код для входа</string>
+    <string name="btnActivityLoginGetToken">Вход</string>
+    <string name="btnActivityLoginGetPassword">Получить код</string>
+    <string name="errorPhoneNotEntered">Не введен номер телефона</string>>
+    <string name="errorPasswordNotEntered">Не введен код из Звонка</string>>
+    <string name="smsWait">Ожидаем Звонок от робота. Повторный запрос доступен через</string>>
+    <!-- TaximeterFragment -->
+    <string name="tvTaximeterTimeCaption">Время заказа, мин</string>
+    <string name="tvTaximeterDistanceCaption">Пробег GPS, км</string>
+    <string name="tvTaximeterDistanceSpeedCaption">Пробег Speed, км</string>
+    <string name="tvTaximeterIdleTimeCaption">Простой, мин</string>
+    <string name="tvTaximeterCurIdleTimeCaption">Текущий простой, мин</string>
+    <string name="tvTaximeterGPSStatusNotFixed">Плохой уровень приема GPS. Корректная работа не гарантируется.</string>
+    <string name="tvTaximeterGPSStatusOff">GPS приемник не доступен. Корректная работа не гарантируется.</string>
+    <string name="tvTaximeterCurSpeedCaption">Скорость, км/ч</string>
+    <!-- SplashActivity -->
+    <string name="tvSplashActionConnect">Подключение к серверу &#8230;</string>
+    <string name="tvSplashActionGetData">Получение данных &#8230;</string>
+    <string name="tvSplashActionPlayConnect">Подключение к Play сервису &#8230;</string>
+    <!-- ShareDriverActivity -->
+    <string name="btnShareDriverSendSMS">Отправить смс на выбранный номер</string>
+    <string name="btnShareDriverSendLink">Отправить приглашение</string>
+    <string name="btnShareDriverPickContact">Контакты</string>
+
+    <!-- Основные сокращения -->
+    <string name="reductionSek">сек</string>
+    <string name="doubleExit">Нажмите еще раз для выхода из приложения</string>
+    <string name="tvCurOrdersListRoutePoint">В заказе есть промежуточные точки</string>
+    <string name="dlgSendData">Передача данных &#8230;</string>
+    <string name="dlgGetData">Получение данных &#8230;</string>
+    <string name="dlgButtonCaptionOK">OK</string>
+    <string name="dlgAlert">Внимание</string>
+
+    <!-- Drawer -->
+    <string name="drawerHisOrders">История заказов</string>
+
+    <string-array name="OrderPayType">
+        <item>Безнал</item>
+        <item>Нал</item>
+        <item>Карта</item>
+        <item>Бонусы</item>
+    </string-array>
+    <string-array name="OrderCalcType">
+        <item>Фиксированный</item>
+        <item>Почасовой</item>
+        <item>Таксометр</item>
+    </string-array>
+    <string name="title_activity_maps">Map</string>
+    <string name="btnViewOrderApplyOrder">Взять заказ</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2">
+            <include layout="@layout/inc_cur_order_info"/>
+        </ScrollView>
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1">
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/buttons_margin"
+            android:layout_weight="1">
+            <org.toptaxi.taximeter.tools.FontFitTextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:id="@+id/tvCurOrderClientPrice"
+                android:textSize="2000dp"
+                android:text="sad" />
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Принять"
+                android:id="@+id/btnCurOrderMainAction"
+                android:singleLine="true"
+                style="@style/ButtonRoundGreen"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_weight="1" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Отказ"
+                android:id="@+id/btnCurOrderAction"
+                android:singleLine="true"
+                style="@style/ButtonRoundRed"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_weight="1" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Заказы по выполнению"
+                android:id="@+id/btnCurOrderCompleteOrders"
+                style="@style/ButtonRoundYellow"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

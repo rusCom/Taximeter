@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimary"
+            android:id="@+id/llCurOrderTitleEx">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/tvCurOrderStateName"
+                android:layout_margin="@dimen/tv_route_point_margin"
+                android:maxLines="1"
+                android:layout_weight="1"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="end|center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/tvCurOrderTimer"
+                    android:layout_margin="@dimen/tv_route_point_margin"
+                    android:maxLines="1"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/llCurOrderTitle">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvCurOrderPayType"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_margin="@dimen/tv_route_point_margin"
+                android:maxLines="1"
+                android:layout_weight="1" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvCurOrderPayPercent"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_margin="@dimen/tv_route_point_margin"
+                android:maxLines="1"
+                android:layout_weight="1" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="3dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="end|center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/tvCurOrderCalcType"
+                    android:layout_margin="@dimen/tv_route_point_margin"
+                    android:maxLines="1"/>
+            </LinearLayout>
+        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_margin="@dimen/tv_route_point_margin"
+            android:id="@+id/tvCurOrderDate"
+            app:drawableStartCompat="@mipmap/ic_conformation_time" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rvCurOrderRoutePoints"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_margin="@dimen/tv_route_point_margin"
+            android:id="@+id/tvCurOrderNote"
+            app:drawableStartCompat="@mipmap/ic_conformation_note" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_margin="@dimen/tv_route_point_margin"
+            android:id="@+id/tvCurOrderPhone"
+            app:drawableStartCompat="@mipmap/ic_conformation_phone" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_margin="@dimen/tv_route_point_margin"
+            android:id="@+id/tvCurOrderDispatchingName"
+            app:drawableStartCompat="@mipmap/ic_conformation_dispatching" />
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

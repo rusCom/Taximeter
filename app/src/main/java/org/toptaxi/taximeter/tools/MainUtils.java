@@ -141,9 +141,22 @@ public class MainUtils {
     }
 
     public static void TextViewSetTextOrGone(TextView textView, String text){
-        if (text.equals("")){textView.setVisibility(View.GONE);}
+        if (text == null){textView.setVisibility(View.GONE);}
+        else if (text.equals("")){textView.setVisibility(View.GONE);}
         else{
             textView.setVisibility(View.VISIBLE);
+            textView.setText(text);
+        }
+    }
+
+    public static void TextViewSetTextOrGone(TextView textView, View divider,String text){
+        if (text.equals("")){
+            textView.setVisibility(View.GONE);
+            divider.setVisibility(View.GONE);
+        }
+        else{
+            textView.setVisibility(View.VISIBLE);
+            divider.setVisibility(View.VISIBLE);
             textView.setText(text);
         }
     }

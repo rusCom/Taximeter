@@ -55,7 +55,7 @@ public class RVCurOrdersAdapter extends RecyclerView.Adapter<RVCurOrdersAdapter.
             orderViewHolder.tvDistance.setText(curOrder.getDistanceString());
             orderViewHolder.tvFirstPointInfo.setText(curOrder.getFirstPointInfo());
 
-            MainUtils.TextViewSetTextOrGone(orderViewHolder.tvDispPay, curOrder.getDispPay());
+            MainUtils.TextViewSetTextOrGone(orderViewHolder.tvDispPay, curOrder.getDispatchingCommission());
 
             orderViewHolder.tvPointInfo.setVisibility(View.GONE);
             orderViewHolder.tvLastPointInfo.setVisibility(View.GONE);
@@ -71,10 +71,6 @@ public class RVCurOrdersAdapter extends RecyclerView.Adapter<RVCurOrdersAdapter.
             if (curOrder.getRouteCount() > 3){
                 orderViewHolder.tvPointInfo.setVisibility(View.VISIBLE);
             }
-
-            MainUtils.TextViewSetTextOrGone(orderViewHolder.tvNote, curOrder.getNote());
-
-
             if (curOrder.isNew() & mOrderType == 0){orderViewHolder.llTitle.setBackgroundResource(R.color.primaryRed);}
             else {
                 switch (curOrder.getCheck()){
@@ -85,7 +81,9 @@ public class RVCurOrdersAdapter extends RecyclerView.Adapter<RVCurOrdersAdapter.
             }
 
             MainUtils.TextViewSetTextOrGone(orderViewHolder.tvPrior, curOrder.getPriorInfo());
-            MainUtils.TextViewSetTextOrGone(orderViewHolder.tvDispName, curOrder.getDispatchingName());
+
+            MainUtils.TextViewSetTextOrGone(orderViewHolder.tvOrderNote,  orderViewHolder.tvOrderNoteDivider, curOrder.getNote());
+            MainUtils.TextViewSetTextOrGone(orderViewHolder.tvDispatchingName, orderViewHolder.tvDispatchingNameDivider, curOrder.dispatchingName);
         }
     }
 
@@ -96,25 +94,29 @@ public class RVCurOrdersAdapter extends RecyclerView.Adapter<RVCurOrdersAdapter.
 
     static class OrderViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
-        TextView tvPayType, tvCalcType, tvDistance, tvFirstPointInfo, tvLastPointInfo, tvPointInfo, tvNote, tvPrior, tvDispName, tvDispPay;
+        TextView tvPayType, tvCalcType, tvDistance, tvFirstPointInfo, tvLastPointInfo, tvPointInfo, tvOrderNote, tvPrior, tvDispatchingName, tvDispPay;
         LinearLayout llTitle;
+        View tvDispatchingNameDivider, tvOrderNoteDivider;
 
 
 
         OrderViewHolder(View itemView) {
             super(itemView);
-            cv = (CardView)itemView.findViewById(R.id.cvCurOrdersList);
-            tvPayType           = (TextView)itemView.findViewById(R.id.tvCurOrdersListPayType);
-            tvDispPay           = (TextView)itemView.findViewById(R.id.tvCurOrdersListPayPercent);
-            tvCalcType          = (TextView)itemView.findViewById(R.id.tvCurOrdersListCalcType);
-            tvDistance          = (TextView)itemView.findViewById(R.id.tvCurOrdersListDistance);
-            tvFirstPointInfo    = (TextView)itemView.findViewById(R.id.tvCurOrdersListRouteFirstPoint);
-            tvLastPointInfo     = (TextView)itemView.findViewById(R.id.tvCurOrdersListRouteLastPoint);
-            tvPointInfo         = (TextView)itemView.findViewById(R.id.tvCurOrdersListRoutePoint);
-            tvNote              = (TextView)itemView.findViewById(R.id.tvOrderNote);
-            tvPrior             = (TextView)itemView.findViewById(R.id.tvCurOrdersListPriorInfo);
-            tvDispName          = (TextView)itemView.findViewById(R.id.tvOrderDispatching);
-            llTitle             = (LinearLayout)itemView.findViewById(R.id.llCurOrdersListTitle);
+            cv = itemView.findViewById(R.id.cvCurOrdersList);
+            tvPayType           = itemView.findViewById(R.id.tvCurOrdersListPayType);
+            tvDispPay           = itemView.findViewById(R.id.tvCurOrdersListPayPercent);
+            tvCalcType          = itemView.findViewById(R.id.tvCurOrdersListCalcType);
+            tvDistance          = itemView.findViewById(R.id.tvCurOrdersListDistance);
+            tvFirstPointInfo    = itemView.findViewById(R.id.tvCurOrdersListRouteFirstPoint);
+            tvLastPointInfo     = itemView.findViewById(R.id.tvCurOrdersListRouteLastPoint);
+            tvPointInfo         = itemView.findViewById(R.id.tvCurOrdersListRoutePoint);
+            tvPrior             = itemView.findViewById(R.id.tvCurOrdersListPriorInfo);
+            llTitle             = itemView.findViewById(R.id.llCurOrdersListTitle);
+
+            tvDispatchingName           = itemView.findViewById(R.id.tvDispatchingName);
+            tvDispatchingNameDivider    = itemView.findViewById(R.id.tvDispatchingNameDivider);
+            tvOrderNote                 = itemView.findViewById(R.id.tvOrderNote);
+            tvOrderNoteDivider          = itemView.findViewById(R.id.tvOrderNoteDivider);
         }
     }
 }

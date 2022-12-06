@@ -44,7 +44,7 @@ public class LogService {
             case "LoginActivity":
                 return false;
             case "Payment":
-                return true;
+                return false;
             case "BalanceActivity":
                 return false;
             case "MainActivity":

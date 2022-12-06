@@ -40,6 +40,10 @@ public class RestService {
         restIndex = 0;
     }
 
+    public String getRestHost(){
+        return restHost.get(0);
+    }
+
     public void setRestHost(JSONArray hosts) {
         LogService.getInstance().log(this, "setRestHost", hosts.toString());
         restHost.clear();
@@ -95,9 +99,6 @@ public class RestService {
                 if (request.getString("status").equals("OK")) {
                     if (request.has("result")) {
                         MainApplication.getInstance().parseData(request.getJSONObject("result"));
-                    } else {
-                        JSONObject requestData = httpGet("/last/data");
-                        MainApplication.getInstance().parseData(requestData.getJSONObject("result"));
                     }
                 } else {
                     if (request.has("result")) {

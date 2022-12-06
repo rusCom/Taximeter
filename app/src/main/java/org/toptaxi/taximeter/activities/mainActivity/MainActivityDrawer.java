@@ -100,8 +100,8 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
 
         // Если у нас есть телефон диспетчера, то занчит ему можно и писать
-        if (!MainApplication.getInstance().getPreferences().getDispatcherPhone().equals("")) {
-            messagesItem = new PrimaryDrawerItem().withName("Сообщения диспетчеру").withIcon(FontAwesome.Icon.faw_commenting_o).withSelectable(false).withBadge(String.valueOf(MainApplication.getInstance().getMainAccount().getNotReadMessageCount())).withIdentifier(Constants.MENU_MESSAGES);
+        if (MainApplication.getInstance().getPreferences().dispatcherMessages) {
+            messagesItem = new PrimaryDrawerItem().withName("Чат с диспетчером").withIcon(FontAwesome.Icon.faw_commenting_o).withSelectable(false).withBadge(String.valueOf(MainApplication.getInstance().getMainAccount().getNotReadMessageCount())).withIdentifier(Constants.MENU_MESSAGES);
             drawer.addItem(messagesItem);
         }
 

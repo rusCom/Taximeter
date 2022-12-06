@@ -100,15 +100,17 @@ public class MainApplication extends Application {
         return restService;
     }
 
-    public void setDataRestService(JSONArray restHosts){
-        if (dataRestService == null){
+    public void setDataRestService(JSONArray restHosts) {
+        if (dataRestService == null) {
             dataRestService = new RestService(this);
         }
         dataRestService.setRestHost(restHosts);
     }
 
-    public RestService getDataRestService(){
-        if (dataRestService == null){return restService;}
+    public RestService getDataRestService() {
+        if (dataRestService == null) {
+            return restService;
+        }
         return dataRestService;
     }
 
@@ -239,33 +241,39 @@ public class MainApplication extends Application {
 
     public List<MainActionItem> getMainActions() {
         List<MainActionItem> mainActionItems = new ArrayList<>();
-
-        if (getMainAccount().getStatus() != Constants.DRIVER_ON_ORDER) { // водитель не на заказе
-            if (getMainAccount().getStatus() == Constants.DRIVER_OFFLINE)
-                mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_GO_ONLINE, "Встать на автораздачу"));
-            if (getMainAccount().getStatus() == Constants.DRIVER_ONLINE)
-                mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_GO_OFFLINE, "Сняться с автораздачи"));
-            if (getPreferences().useUnlimitedTariffPlans()) {
-                if (getMainAccount().UnlimInfo.equals(""))
-                    mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_ACTIVATE_UNLIM, "Активировать безлимит"));
+        if (getMainAccount().getStatus() != null) {
+            if (getMainAccount().getStatus() != Constants.DRIVER_ON_ORDER) { // водитель не на заказе
+                if (getMainAccount().getStatus() == Constants.DRIVER_OFFLINE)
+                    mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_GO_ONLINE, "Встать на автораздачу"));
+                if (getMainAccount().getStatus() == Constants.DRIVER_ONLINE)
+                    mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_GO_OFFLINE, "Сняться с автораздачи"));
+                if (getPreferences().useUnlimitedTariffPlans()) {
+                    if (getMainAccount().UnlimInfo.equals(""))
+                        mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_ACTIVATE_UNLIM, "Активировать безлимит"));
+                }
+                mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_PRIOR_ORDER, "Предварительные заказы"));
             }
-            mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_PRIOR_ORDER, "Предварительные заказы"));
-        }
 
-        // Если водитель на заказе и есть шаблоны сообщений, то показываем шаблоны
-        if ((getMainAccount().getStatus() == Constants.DRIVER_ON_ORDER) && (getPreferences().getDispatcherTemplateMessages().size() > 0)) {
-            for (int itemID = 0; itemID < getPreferences().getDispatcherTemplateMessages().size(); itemID++) {
-                mainActionItems.add(new MainActionItem(Constants.MENU_TEMPLATE_MESSAGE, getPreferences().getDispatcherTemplateMessages().get(itemID)));
+            // Если водитель на заказе и есть шаблоны сообщений, то показываем шаблоны
+            if ((getMainAccount().getStatus() == Constants.DRIVER_ON_ORDER) && (getPreferences().getDispatcherTemplateMessages().size() > 0)) {
+                for (int itemID = 0; itemID < getPreferences().getDispatcherTemplateMessages().size(); itemID++) {
+                    mainActionItems.add(new MainActionItem(Constants.MENU_TEMPLATE_MESSAGE, getPreferences().getDispatcherTemplateMessages().get(itemID)));
+                }
             }
+
+            // Чат с диспетчером
+            if (MainApplication.getInstance().getPreferences().dispatcherMessages) {
+                mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_SEND_MESSAGE, "Написать диспетчеру"));
+            }
+
+
+            if (getMainAccount().getStatus() != Constants.DRIVER_ON_ORDER) { // водитель не на заказе
+                mainActionItems.add(new MainActionItem(Constants.MENU_CLOSE_APPLICATION, "Сняться с линии"));
+            }
+
         }
 
-        // Если телефон диспетчера указан, то значит можно и сообщения отправлять, т.к. диспетчер есть
-        if (!MainApplication.getInstance().getPreferences().getDispatcherPhone().equals(""))
-            mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_SEND_MESSAGE, "Отправить сообщение"));
 
-        if (getMainAccount().getStatus() != Constants.DRIVER_ON_ORDER) { // водитель не на заказе
-            mainActionItems.add(new MainActionItem(Constants.MENU_CLOSE_APPLICATION, "Сняться с линиии"));
-        }
         return mainActionItems;
     }
 
@@ -384,7 +392,7 @@ public class MainApplication extends Application {
     }
 
     public FirebaseService getFirebaseService() {
-        if (firebaseService == null){
+        if (firebaseService == null) {
             firebaseService = new FirebaseService();
         }
         return firebaseService;
@@ -396,13 +404,13 @@ public class MainApplication extends Application {
         }
     }
 
-    public void showProgressDialog(){
+    public void showProgressDialog() {
         if (mainActivity != null) {
             mainActivity.runOnUiThread(() -> mainActivity.showProgressDialog());
         }
     }
 
-    public void dismissProgressDialog(){
+    public void dismissProgressDialog() {
         if (mainActivity != null) {
             mainActivity.runOnUiThread(() -> mainActivity.dismissProgressDialog());
         }

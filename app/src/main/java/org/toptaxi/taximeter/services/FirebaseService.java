@@ -2,9 +2,9 @@ package org.toptaxi.taximeter.services;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.toptaxi.taximeter.MainApplication;
@@ -17,7 +17,7 @@ public class FirebaseService {
     public FirebaseService() {
         sharedPreferences = MainApplication.getInstance().getSharedPreferences("firebase", Context.MODE_PRIVATE);
         String pushToken = sharedPreferences.getString("pushToken", "");
-        if (pushToken != null && pushToken.equals("")) {
+        if (pushToken.equals("")) {
             getNewPushToken();
         }
     } // public FirebaseService()
@@ -29,7 +29,6 @@ public class FirebaseService {
                         LogService.getInstance().log("FirebaseService", "Fetching FCM registration token failed " + task.getException());
                         return;
                     }
-                    // Get new FCM registration token
                     String token = task.getResult();
                     onNewPushToken(token);
                 });
@@ -38,7 +37,8 @@ public class FirebaseService {
     public void clearData() {
         FirebaseMessaging.getInstance().deleteToken();
         SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-        sharedPreferencesEditor.putString("pushTopics", "[]");
+        sharedPreferencesEditor.remove("pushTopics");
+        sharedPreferencesEditor.remove("pushToken");
         sharedPreferencesEditor.apply();
         LogService.getInstance().log("FirebaseService", "clear PushToken");
     }
@@ -47,9 +47,9 @@ public class FirebaseService {
     void onNewPushToken(String token) {
         LogService.getInstance().log("FirebaseService", "onNewPushToken", token);
         MainApplication.getInstance().getRestService().httpGetThread("/push?push_token=" + token);
-        FirebaseMessaging.getInstance().subscribeToTopic("allDevices");
         SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
         sharedPreferencesEditor.putString("pushToken", token);
+        sharedPreferencesEditor.remove("pushTopics");
         sharedPreferencesEditor.apply();
     }
 

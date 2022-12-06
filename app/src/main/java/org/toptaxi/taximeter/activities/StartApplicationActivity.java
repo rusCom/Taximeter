@@ -14,10 +14,13 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +68,7 @@ public class StartApplicationActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void checkPermissions() {
+        Boolean startApplication = true;
         tvAction.setText("Проверка подключения к Сети Интернет");
         if (!isNetworkAvailable()) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -72,10 +76,11 @@ public class StartApplicationActivity extends AppCompatActivity {
             alertDialog.setPositiveButton("Ok", (dialogInterface, i) -> onBackPressed());
             alertDialog.create();
             alertDialog.show();
+            startApplication = false;
         }
         tvAction.setText("Проверка доступа к GPS");
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         Constants.MY_PERMISSIONS_REQUEST_LOCATION);
                 return;
@@ -91,16 +96,49 @@ public class StartApplicationActivity extends AppCompatActivity {
                 onBackPressed();
             });
             dialog.show();
+            startApplication = false;
         }
+
+
+        /*
+
+        if (startApplication) {
+            Intent intent = new Intent();
+            String packageName = this.getPackageName();
+            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                    LogService.getInstance().log(this, "isIgnoringBatteryOptimizations");
+                    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                    this.startActivity(intent);
+                    startApplication = false;
+                }
+            }
+
+        }
+
+         */
+
 
         LogService.getInstance().log(this, "checkPermissions", "startInit");
 
-        if (MainApplication.getInstance().isMainServiceStart()) { // Если сервис уже запущен, значит само приложение так же уже работает, пожтому просто запускаем
-            startApplication();
-        } else {
-            auth();
-        }
+        if (startApplication) {
+            if (MainApplication.getInstance().isMainServiceStart()) { // Если сервис уже запущен, значит само приложение так же уже работает, пожтому просто запускаем
+                if (!MainApplication.getInstance().getMainAccount().isParsedData) {
+                    try {
+                        JSONObject result = MainApplication.getInstance().getRestService().httpGet("/profile/auth");
+                        JSONObject authData = result.getJSONObject("result");
+                        MainApplication.getInstance().parseData(authData);
+                    } catch (JSONException ignored) {
+                    }
+                }
+                startApplication();
+            } else {
+                auth();
+            }
 
+        }
     }
 
     private void auth() {
@@ -128,8 +166,7 @@ public class StartApplicationActivity extends AppCompatActivity {
                         if (MainApplication.getInstance().getAppVersionCode() < necessaryVersion) {
                             runOnUiThread(this::showNewNecessaryVersionDialog);
                             isFinished = true;
-                        }
-                        else if (MainApplication.getInstance().getAppVersionCode() < desirableVersion && !isShowNewVersionDialog) {
+                        } else if (MainApplication.getInstance().getAppVersionCode() < desirableVersion && !isShowNewVersionDialog) {
                             runOnUiThread(this::showNewDesirableVersionDialog);
                             isFinished = true;
                         }
@@ -319,8 +356,6 @@ public class StartApplicationActivity extends AppCompatActivity {
         alertDialog.create();
         alertDialog.show();
     }
-
-
 
 
     @Override

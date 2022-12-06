@@ -29,7 +29,7 @@ public class OrdersOnCompleteActivity extends AppCompatActivity implements OnCom
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders);
         setTitle("Заказы по выполнению");
-        rvOrders = (RecyclerView)findViewById(R.id.rvActivityOrders);
+        rvOrders = findViewById(R.id.rvActivityOrders);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvOrders.setLayoutManager(llm);
         ordersAdapter = new RVCurOrdersAdapter(2);
@@ -102,7 +102,7 @@ public class OrdersOnCompleteActivity extends AppCompatActivity implements OnCom
 
         @Override
         protected JSONObject doInBackground(Order... orders) {
-            return MainApplication.getInstance().getRestService().httpGet("/last/orders/check?order_id" + orders[0].getID());
+            return MainApplication.getInstance().getRestService().httpGet("/last/orders/check?order_id=" + orders[0].getID());
         }
 
         @Override

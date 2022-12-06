@@ -63,12 +63,6 @@
     <!-- Drawer -->
     <string name="drawerHisOrders">История заказов</string>
 
-    <string-array name="OrderPayType">
-        <item>Безнал</item>
-        <item>Нал</item>
-        <item>Карта</item>
-        <item>Бонусы</item>
-    </string-array>
     <string-array name="OrderCalcType">
         <item>Фиксированный</item>
         <item>Почасовой</item>

@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
+import org.toptaxi.taximeter.services.FirebaseService;
 import org.toptaxi.taximeter.services.LogService;
 
 
@@ -288,5 +289,8 @@ public class SettingsAlarmFragment extends Fragment {
         super.onPause();
         LogService.getInstance().log(this, "onPause");
         MainApplication.getInstance().getProfile().setData(switchPushNotifications.isChecked(), seekBarFreeOrderCountValue);
+        if (!switchPushNotifications.isChecked()){
+            MainApplication.getInstance().getFirebaseService().getNewPushToken();
+        }
     }
 }

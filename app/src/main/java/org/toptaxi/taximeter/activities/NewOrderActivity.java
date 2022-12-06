@@ -2,7 +2,6 @@ package org.toptaxi.taximeter.activities;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -11,7 +10,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +26,7 @@ import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.adapters.RoutePointsAdapter;
 import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.tools.LockOrientation;
+import org.toptaxi.taximeter.tools.MainUtils;
 
 public class NewOrderActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static String TAG = "#########" + NewOrderActivity.class.getName();
@@ -70,9 +69,8 @@ public class NewOrderActivity extends AppCompatActivity implements OnMapReadyCal
             finish();
         });
 
-        RecyclerView rvViewOrderRoutePoints = (RecyclerView) findViewById(R.id.rvViewOrderRoutePoints);
+        RecyclerView rvViewOrderRoutePoints = findViewById(R.id.rvViewOrderRoutePoints);
         rvViewOrderRoutePoints.setLayoutManager(new LinearLayoutManager(this));
-        //RVCurOrderRoutePointsAdapter viewOrderPointsAdapter = new RVCurOrderRoutePointsAdapter(Constants.ORDER_VIEW_NEW_ORDER);
         RoutePointsAdapter viewOrderPointsAdapter = new RoutePointsAdapter();
         rvViewOrderRoutePoints.setAdapter(viewOrderPointsAdapter);
         viewOrderPointsAdapter.setOrder(MainApplication.getInstance().getNewOrder());
@@ -84,8 +82,7 @@ public class NewOrderActivity extends AppCompatActivity implements OnMapReadyCal
         ((TextView) findViewById(R.id.tvViewOrderDistance)).setText(viewOrder.getDistanceString());
         ((TextView) findViewById(R.id.tvViewOrderPayType)).setText(viewOrder.getPayTypeName());
         ((TextView) findViewById(R.id.tvViewOrderCalcType)).setText(viewOrder.getCalcType());
-        ((TextView) findViewById(R.id.tvViewOrderDispatchingName)).setText(viewOrder.getDispatchingName());
-        ((TextView) findViewById(R.id.tvViewOrderPayPercent)).setText(viewOrder.getDispPay());
+        MainUtils.TextViewSetTextOrGone(findViewById(R.id.tvViewOrderDispatchingName), viewOrder.dispatchingName);
 
         if (viewOrder.getPriorInfo().equals("")) {
             (findViewById(R.id.llViewOrderPriorInfo)).setVisibility(View.GONE);

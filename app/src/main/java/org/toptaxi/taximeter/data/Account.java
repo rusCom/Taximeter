@@ -22,11 +22,12 @@ public class Account {
     public Double balanceCorporateTaxi;
     private String Name;
     private String serName;
-    private Integer status, lastStatus = -1;
+    private Integer status = 0, lastStatus = -1;
     private String NotReadMessageCount;
     public String UnlimInfo = "";
     private Boolean isCheckPriorOrder = true;
     private Boolean isGetOnLine = false;
+    public boolean isParsedData = false;
 
 
 
@@ -39,7 +40,7 @@ public class Account {
         Balance = JSONGetDouble(data, "balance");
         Name = JSONGetString(data, "name");
         serName = JSONGetString(data, "ser_name");
-        status = JSONGetInteger(data, "status");
+        status = JSONGetInteger(data, "status", 0);
         NotReadMessageCount = JSONGetString(data, "nrmc");
         UnlimInfo = JSONGetString(data, "unlim");
         isCheckPriorOrder = JSONGetBool(data, "check_prior");
@@ -57,6 +58,7 @@ public class Account {
         }
 
         MainApplication.getInstance().onAccountDataChange();
+        isParsedData = true;
     }
 
     public String getUnlimitedTariffInfo() {

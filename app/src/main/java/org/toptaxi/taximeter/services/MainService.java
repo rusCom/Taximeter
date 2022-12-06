@@ -50,7 +50,7 @@ public class MainService extends Service {
         LogService.getInstance().log(this, "onStartCommand");
         MainApplication.getInstance().getLocationService().startLocationListener();
         isRunning = true;
-        sendNotification("");
+        sendNotification("aTaxi.Водитель");
         getDataTask();
         if (m_powerManager == null) {
             m_powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -85,13 +85,13 @@ public class MainService extends Service {
 
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        String NOTIFICATION_CHANNEL_ID = "aTaxi.Taximeter";
+        String NOTIFICATION_CHANNEL_ID = "aTaxi.Водитель";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "aTaxi.Водитель", NotificationManager.IMPORTANCE_HIGH);
 
             // Configure the notification channel.
-            notificationChannel.setDescription("Channel description");
+            notificationChannel.setDescription("aTaxi.Водитель");
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
@@ -118,7 +118,7 @@ public class MainService extends Service {
         LogService.getInstance().log(this, "onDestroy");
         isRunning = false;
         MainApplication.getInstance().getMainAccount().setNullStatus();
-        MainApplication.getInstance().getRestService().httpGetThread("/last/driver/offline");
+        MainApplication.getInstance().getRestService().httpGetThread("/driver/offline");
         MainApplication.getInstance().getLocationService().stopLocationListener();
         if (m_wakeLock != null) {
             m_wakeLock.release();
@@ -160,7 +160,7 @@ public class MainService extends Service {
             //Removing any notifications
             notificationManager.cancel(DEFAULT_NOTIFICATION_ID);
             MainApplication.getInstance().getMainAccount().setNullStatus();
-            MainApplication.getInstance().getRestService().httpGetThread("/last/driver/offline");
+            MainApplication.getInstance().getRestService().httpGetThread("/driver/offline");
             MainApplication.getInstance().onTerminate();
             stopSelf();
         }).start();

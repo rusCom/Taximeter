@@ -1,21 +1,18 @@
 package org.toptaxi.taximeter.dialogs;
 
-
 import android.app.Dialog;
 import android.content.Context;
-import android.view.View;
 import android.widget.TextView;
 
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.data.Order;
 
-
-
 public class CheckOrderOnCompleteDialog extends Dialog {
     public interface OnCheckOrderOnComplete {
         void OnCheckOrder(Order curOrder);
     }
+
     private Order curOrder;
 
     private OnCheckOrderOnComplete onCheckOrderOnComplete;
@@ -24,13 +21,10 @@ public class CheckOrderOnCompleteDialog extends Dialog {
         super(context);
         this.setContentView(R.layout.dialog_check_order_on_complite);
         this.setCanceledOnTouchOutside(false);
-        findViewById(R.id.btnCheckOrderOnComplete).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (onCheckOrderOnComplete != null){
-                    onCheckOrderOnComplete.OnCheckOrder(curOrder);
-                    dismiss();
-                }
+        findViewById(R.id.btnCheckOrderOnComplete).setOnClickListener(view -> {
+            if (onCheckOrderOnComplete != null) {
+                onCheckOrderOnComplete.OnCheckOrder(curOrder);
+                dismiss();
             }
         });
     }
@@ -39,11 +33,11 @@ public class CheckOrderOnCompleteDialog extends Dialog {
         this.onCheckOrderOnComplete = onCheckOrderOnComplete;
     }
 
-    public void SetOrderInfo(Order order){
+    public void SetOrderInfo(Order order) {
         curOrder = order;
-        TextView tvOrder = (TextView)findViewById(R.id.tvCheckOrderOnCompleteOrderInfo);
+        TextView tvOrder = findViewById(R.id.tvCheckOrderOnCompleteOrderInfo);
         String text = "Принять заказ по маршруту:<br><b>" + order.getRoute() + "</b>";
-        if (!order.getNote().equals(""))text += "<br>" + order.getNote();
+        if (!order.getNote().equals("")) text += "<br>" + order.getNote();
         text += "<br>на сумму <b>" + order.getCalcType() + "</b>";
         text += "<br><b><i>Убедитесь, что клиент не продолжает маршрут</i></b>";
         tvOrder.setText(MainApplication.fromHtml(text));

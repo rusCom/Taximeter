@@ -77,27 +77,40 @@ public class Orders {
         } catch (Throwable ignored) {
         }
 
-        if (onOrdersChangeListener != null) {
-            uiHandler.post(() -> onOrdersChangeListener.OnOrdersChange());
+        // Если по какой-либо причине данные по водителю не загружены, то загружаем их. Бывает такое, когда из спящего режима востанавливается приложение
+        if (!MainApplication.getInstance().getMainAccount().isParsedData) {
+            JSONObject result = MainApplication.getInstance().getRestService().httpGet("/profile/auth");
+            JSONObject authData = result.getJSONObject("result");
+            MainApplication.getInstance().parseData(authData);
         }
-        // Если водитель не на заказе и включено, что надо озвучивать поступление заказа
-        if ((MainApplication.getInstance().getMainAccount().getStatus() != 2) & (MainApplication.getInstance().getPreferences().getNewOrderAlarmCheck())) {
-            // Провеяем "новые" заказы на необходимость озвучивать
-            boolean isNewOrderAlarm = false;
-            for (int itemID = 0; itemID < orderList.size(); itemID++) {
-                Order order = orderList.get(itemID);
-                if (order.isNew()) {
-                    if ((order.getCost() >= MainApplication.getInstance().getPreferences().getNewOrderAlarmCost()) &
-                            (
-                                    MainApplication.getInstance().getPreferences().getNewOrderAlarmDistance() == -1 |
-                                            order.getDistance() <= (MainApplication.getInstance().getPreferences().getNewOrderAlarmDistance() * 1000)
-                            )
-                    ) {
-                        isNewOrderAlarm = true;
+
+
+        if (MainApplication.getInstance().getMainAccount().getStatus() != null) {
+            // Если водитель не на заказе и включено, что надо озвучивать поступление заказа
+            if ((MainApplication.getInstance().getMainAccount().getStatus() != 2) & (MainApplication.getInstance().getPreferences().getNewOrderAlarmCheck())) {
+                // Провеяем "новые" заказы на необходимость озвучивать
+                boolean isNewOrderAlarm = false;
+                for (int itemID = 0; itemID < orderList.size(); itemID++) {
+                    Order order = orderList.get(itemID);
+                    if (order.isNew()) {
+                        if ((order.getCost() >= MainApplication.getInstance().getPreferences().getNewOrderAlarmCost()) &
+                                (
+                                        MainApplication.getInstance().getPreferences().getNewOrderAlarmDistance() == -1 |
+                                                order.getDistance() <= (MainApplication.getInstance().getPreferences().getNewOrderAlarmDistance() * 1000)
+                                )
+                        ) {
+                            isNewOrderAlarm = true;
+                        }
                     }
                 }
+                if (isNewOrderAlarm) mp.start();
             }
-            if (isNewOrderAlarm) mp.start();
+
+        }
+
+
+        if (onOrdersChangeListener != null) {
+            uiHandler.post(() -> onOrdersChangeListener.OnOrdersChange());
         }
     }
 

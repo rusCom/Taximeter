@@ -124,12 +124,12 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
                 })
         );
 
-        RecyclerView rvViewOrderRoutePoints = (RecyclerView) findViewById(R.id.rvViewOrderRoutePoints);
+        RecyclerView rvViewOrderRoutePoints = findViewById(R.id.rvViewOrderRoutePoints);
         rvViewOrderRoutePoints.setLayoutManager(new LinearLayoutManager(this));
         viewOrderPointsAdapter = new RoutePointsAdapter();
         rvViewOrderRoutePoints.setAdapter(viewOrderPointsAdapter);
 
-        RecyclerView rvCurOrderRoutePoints = (RecyclerView) findViewById(R.id.rvCurOrderRoutePoints);
+        RecyclerView rvCurOrderRoutePoints = findViewById(R.id.rvCurOrderRoutePoints);
         rvCurOrderRoutePoints.setLayoutManager(new LinearLayoutManager(this));
         curOrderPointsAdapter = new RoutePointsAdapter();
         rvCurOrderRoutePoints.setAdapter(curOrderPointsAdapter);
@@ -265,20 +265,23 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
         if (MainApplication.getInstance().getMainActivityCurView() == Constants.CUR_VIEW_VIEW_ORDER) {
             MainApplication.getInstance().setMainActivityCurView(Constants.CUR_VIEW_CUR_ORDERS);
         } else {
-            if (MainApplication.getInstance().getMainAccount().getStatus() == Constants.DRIVER_ON_ORDER)
-                MainApplication.getInstance().showToast(getString(R.string.onCloseDriverOnOrder));
-            else {
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("Внимание");
-                alertDialog.setMessage("При закрытие программы Вы будете сняты с линии");
-                alertDialog.setPositiveButton("Сняться", (dialogInterface, i) -> {
-                    MainApplication.getInstance().stopMainService();
-                    finish();
-                });
-                alertDialog.setNegativeButton("Остаться", null);
-                alertDialog.create();
-                alertDialog.show();
+            if (MainApplication.getInstance().getMainAccount().getStatus() != null) {
+                if (MainApplication.getInstance().getMainAccount().getStatus() == Constants.DRIVER_ON_ORDER)
+                    MainApplication.getInstance().showToast(getString(R.string.onCloseDriverOnOrder));
+                else {
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+                    alertDialog.setTitle("Внимание");
+                    alertDialog.setMessage("При закрытие программы Вы будете сняты с линии");
+                    alertDialog.setPositiveButton("Сняться", (dialogInterface, i) -> {
+                        MainApplication.getInstance().stopMainService();
+                        finish();
+                    });
+                    alertDialog.setNegativeButton("Остаться", null);
+                    alertDialog.create();
+                    alertDialog.show();
+                }
             }
+
         }
 
     }
@@ -361,11 +364,11 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
             switch (MainApplication.getInstance().getMainAccount().getStatus()) {
                 case Constants.DRIVER_OFFLINE:
                     alertText = "Встать на автораздачу?";
-                    action = "/last/driver/online";
+                    action = "/driver/free";
                     break;
                 case Constants.DRIVER_ONLINE:
                     alertText = "Сняться с автораздачи?";
-                    action = "/last/driver/offline";
+                    action = "/driver/busy";
                     break;
             }
             if (!alertText.equals("")) {
@@ -616,15 +619,16 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
             ((TextView) findViewById(R.id.tvViewOrderDistance)).setText(viewOrder.getDistanceString());
             ((TextView) findViewById(R.id.tvViewOrderPayType)).setText(viewOrder.getPayTypeName());
             ((TextView) findViewById(R.id.tvViewOrderCalcType)).setText(viewOrder.getCalcType());
-            ((TextView) findViewById(R.id.tvViewOrderDispatchingName)).setText(viewOrder.getDispatchingName());
-            ((TextView) findViewById(R.id.tvViewOrderPayPercent)).setText(viewOrder.getDispPay());
+            MainUtils.TextViewSetTextOrGone(findViewById(R.id.tvViewOrderPayPercent), viewOrder.getDispatchingCommission());
 
+            MainUtils.TextViewSetTextOrGone(findViewById(R.id.tvViewOrderPayPercent), viewOrder.getDispatchingCommission());
+            MainUtils.TextViewSetTextOrGone(findViewById(R.id.tvViewOrderDispatchingName), viewOrder.dispatchingName);
 
             findViewById(R.id.btnOrderAction).setVisibility(View.GONE);
             viewOrderPointsAdapter.setOrder(MainApplication.getInstance().getViewOrder());
             viewOrderPointsAdapter.notifyItemRangeInserted(0, MainApplication.getInstance().getViewOrder().getRouteCount());
             viewOrderPointsAdapter.notifyDataSetChanged();
-            Button btnOrderMainAction = (Button) findViewById(R.id.btnOrderMainAction);
+            Button btnOrderMainAction = findViewById(R.id.btnOrderMainAction);
             switch (viewOrder.getCheck()) {
                 case 0:
                     btnOrderMainAction.setText("Взять заказ");

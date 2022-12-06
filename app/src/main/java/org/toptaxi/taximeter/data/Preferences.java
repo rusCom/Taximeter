@@ -1,5 +1,6 @@
 package org.toptaxi.taximeter.data;
 
+import static org.toptaxi.taximeter.tools.MainUtils.JSONGetBool;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
 
 import android.content.SharedPreferences;
@@ -46,6 +47,7 @@ public class Preferences {
     public String corporateTaxiCheckOrderDialog;
     public String corporateTaxiContactPhone;
     public Long corporateTaxiCheckOrderDialogLastShow;
+    public Boolean dispatcherMessages = false;
 
 
 
@@ -82,6 +84,7 @@ public class Preferences {
         this.driverInviteCaption = JSONGetString(data, "driver_invite_caption");
         this.driverInviteText = JSONGetString(data, "driver_invite_text");
         this.useRating = MainUtils.JSONGetBool(data, "use_rating");
+        this.dispatcherMessages = JSONGetBool(data, "dispatcher_messages");
 
         dispatcherTemplateMessages.clear();
         unlimitedTariffPlans.clear();

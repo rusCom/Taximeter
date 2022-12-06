@@ -29,14 +29,16 @@ import java.util.Locale;
 
 public class Order {
     protected static String TAG = "#########" + Order.class.getName();
-    private Integer PayType, IsFree = 0,CalcType = 0, Timer, ID, lastRequestUID = 0, State, Check;
-    private String Note = "", ClientPhone = "", DispatchingName = "", MainAction = "", StateName = "", DispPay = "";
+    private Integer IsFree = 0,CalcType = 0, Timer, ID, lastRequestUID = 0, State, Check;
+    private String Note = "", ClientPhone = "", MainAction = "", StateName = "";
     private Double Cost, Distance;
     private Boolean IsNew = false;
     private Calendar WorkDate;
     private long NewOrderTimer = 15000;
     String GUID;
     public Boolean corporateTaxi = false;
+    public String payment = "", dispatchingName;
+    public Integer dispatchingCommission;
 
     private List<RoutePoint> routePoints;
 
@@ -48,18 +50,18 @@ public class Order {
 
         GUID = JSONGetString(data, "guid");
         ID = JSONGetInteger(data, "id");
-        PayType = JSONGetInteger(data, "pay");
         CalcType = JSONGetInteger(data, "calc", 0);
         corporateTaxi = JSONGetBool(data, "corporate_taxi");
+        payment = JSONGetString(data, "payment");
+        dispatchingName = JSONGetString(data, "dispatching_name");
+        dispatchingCommission = JSONGetInteger(data, "dispatching_commission");
 
         if (data.has("phone"))this.ClientPhone = data.getString("phone");
         if (data.has("cost"))this.Cost = data.getDouble("cost");
         if (data.has("state"))this.State = data.getInt("state");
-        if (data.has("disp"))this.DispatchingName = data.getString("disp");
         if (data.has("dist"))this.Distance = data.getDouble("dist");
         if (data.has("check"))this.Check = data.getInt("check");
         if (data.has("note"))this.Note = data.getString("note");
-        if (data.has("disp_pay"))this.DispPay = data.getString("disp_pay");
         if (data.has("main_action"))this.MainAction = data.getString("main_action");
         if (data.has("state_name"))this.StateName = data.getString("state_name");
         if (data.has("timer"))this.Timer = data.getInt("timer");
@@ -80,6 +82,11 @@ public class Order {
                 routePoints.add(routePoint);
             }
         }
+    }
+
+    public String getDispatchingCommission() {
+        if (dispatchingCommission == null){return "";}
+        return dispatchingCommission + "%";
     }
 
     public Double getCost() {
@@ -105,11 +112,6 @@ public class Order {
         return Note;
     }
 
-    public String getDispatchingName() {
-        if (DispatchingName == null){return "";}
-        return DispatchingName;
-    }
-
     Integer getLastRequestUID() {
         return lastRequestUID;
     }
@@ -118,12 +120,10 @@ public class Order {
         this.lastRequestUID = lastRequestUID;
     }
 
-
-
     public int getCaptionColor(){
         int result = R.color.orderFree;
         if (IsFree == 1)result = R.color.orderFreePercent;
-        if (PayType == 0)result = R.color.orderCashless;
+        if (payment.equals("corporation"))result = R.color.orderCashless;
         return result;
     }
 
@@ -140,11 +140,9 @@ public class Order {
             view.findViewById(R.id.tvCurOrderPhone).setVisibility(View.VISIBLE);
             ((TextView)view.findViewById(R.id.tvCurOrderPhone)).setText(ClientPhone);
         }
-        if (DispatchingName.trim().equals("")){view.findViewById(R.id.tvCurOrderDispatchingName).setVisibility(View.GONE);}
-        else {
-            view.findViewById(R.id.tvCurOrderDispatchingName).setVisibility(View.VISIBLE);
-            ((TextView)view.findViewById(R.id.tvCurOrderDispatchingName)).setText(DispatchingName);
-        }
+
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrderDispatchingName), dispatchingName);
+
         if (WorkDate == null){view.findViewById(R.id.tvCurOrderDate).setVisibility(View.GONE);}
         else {
             view.findViewById(R.id.tvCurOrderDate).setVisibility(View.VISIBLE);
@@ -152,7 +150,9 @@ public class Order {
         }
         ((TextView)view.findViewById(R.id.tvCurOrderPayType)).setText(getPayTypeName());
         ((TextView)view.findViewById(R.id.tvCurOrderCalcType)).setText(getCalcType());
-        ((TextView)view.findViewById(R.id.tvCurOrderPayPercent)).setText(DispPay);
+
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrderPayPercent), getDispatchingCommission());
+
     }
 
 
@@ -196,11 +196,6 @@ public class Order {
         return MainAction;
     }
 
-    public String getDispPay() {
-        return DispPay;
-    }
-
-
 
     public String getDate(){
         return new SimpleDateFormat("HH:mm dd.MM", Locale.getDefault()).format(WorkDate.getTime());
@@ -230,9 +225,9 @@ public class Order {
     }
 
     public String getPayTypeName(){
-        return MainApplication.getInstance().getResources().getStringArray(R.array.OrderPayType)[PayType];
+        if (payment.equals("corporation"))return "Безнал";
+        return  "Нал";
     }
-
 
     public String getCalcType(){
         if (CalcType == 0){

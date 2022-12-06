@@ -15,11 +15,27 @@
       },
       "oauth_client": [
         {
+          "client_id": "837207271086-a3dob4rjp3e9qihf4qhc9ucu6rbdjroj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.toptaxi.taximeter",
+            "certificate_hash": "0d88238ed494b9ca1d114299f5aa8c78a777ade7"
+          }
+        },
+        {
           "client_id": "837207271086-levuifvhhm1d3t5iknekjcrdd1tg7afh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "org.toptaxi.taximeter",
             "certificate_hash": "44381070de0c74b36a7232fc027d4cd3416041d2"
+          }
+        },
+        {
+          "client_id": "837207271086-pu12kdum3ttkr437ukb5k4h8ech3lljh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.toptaxi.taximeter",
+            "certificate_hash": "f2e31528dd31a6df5b327e6a609ba68b159d04b1"
           }
         },
         {

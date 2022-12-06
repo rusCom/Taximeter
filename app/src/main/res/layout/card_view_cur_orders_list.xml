@@ -97,20 +97,18 @@
             <View style="@style/Divider" />
 
 
-
-                <TextView
-                    android:id="@+id/tvCurOrdersListRoutePoint"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:text="@string/tvCurOrdersListRoutePoint"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:padding="@dimen/card_view_margin"
-                    app:drawableLeftCompat="@mipmap/ic_conformation_address"/>
+            <TextView
+                android:id="@+id/tvCurOrdersListRoutePoint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/card_view_margin"
+                android:singleLine="true"
+                android:text="@string/tvCurOrdersListRoutePoint"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                app:drawableLeftCompat="@mipmap/ic_conformation_address" />
 
 
             <View style="@style/Divider" />
-
 
             <TextView
                 android:id="@+id/tvCurOrdersListRouteLastPoint"
@@ -121,8 +119,9 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 app:drawableLeftCompat="@mipmap/ic_conformation_destination" />
 
-            <View style="@style/Divider" />
-
+            <View
+                android:id="@+id/tvOrderNoteDivider"
+                style="@style/Divider" />
 
             <TextView
                 android:id="@+id/tvOrderNote"
@@ -133,12 +132,12 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 app:drawableLeftCompat="@mipmap/ic_conformation_note" />
 
-
-            <View style="@style/Divider" />
-
+            <View
+                android:id="@+id/tvDispatchingNameDivider"
+                style="@style/Divider" />
 
             <TextView
-                android:id="@+id/tvOrderDispatching"
+                android:id="@+id/tvDispatchingName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/card_view_margin"

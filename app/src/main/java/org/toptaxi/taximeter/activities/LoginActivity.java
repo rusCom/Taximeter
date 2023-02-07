@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
         Button btnActivityLoginProfileRegistration = findViewById(R.id.btnActivityLoginProfileRegistration);
-        btnActivityLoginProfileRegistration.setTextSize((float) (btnActivityLoginProfileRegistration.getTextSize() * 1.5));
+        // btnActivityLoginProfileRegistration.setTextSize((float) (btnActivityLoginProfileRegistration.getTextSize() * 1.5));
 
 
 
@@ -80,13 +80,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void setDocumentsText(){
-        if (!MainApplication.getInstance().getPreferences().privacyPolicyLink.equals("")
-            && !MainApplication.getInstance().getPreferences().publicOfferLink.equals(""))
+        if (!MainApplication.getInstance().getPreferences().getLicenseAgreementLink().equals(""))
         {
             String text = "<html>Нажимая кнопку \"Получить код\" и “Вход”,  Вы соглашаетесь с " +
-                    "\"<a href=\"" + MainApplication.getInstance().getPreferences().publicOfferLink + "\">Лицензионным соглашением</a>\"" +
-                    ", а также с обработкой персональной информации на условиях " +
-                    "\"<a href=\"" + MainApplication.getInstance().getPreferences().privacyPolicyLink + "\">Политики конфиденциальности</a>\".</html>";
+                    "\"<a href=\"" + MainApplication.getInstance().getPreferences().getLicenseAgreementLink() + "\">Лицензионным соглашением</a>\"";
+            if (!MainApplication.getInstance().getPreferences().getPrivacyPolicyLink().equals("")){
+                text += ", а также с обработкой персональной информации на условиях " +
+                "\"<a href=\"" + MainApplication.getInstance().getPreferences().getPrivacyPolicyLink() + "\">Политики конфиденциальности</a>\"";
+            }
+            text += "</html>";
             tvActivityLoginDocuments.setText(Html.fromHtml(text));
             tvActivityLoginDocuments.setVisibility(View.VISIBLE);
             tvActivityLoginDocuments.setMovementMethod(LinkMovementMethod.getInstance());
@@ -189,6 +191,7 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(this::dismissLoadingDialog);
                 LogService.getInstance().log("LoginActivity", data.toString());
                 if (JSONGetString(data, "status").equals("OK")) {
+                    /* Вернуть, если придеться делать, что у каджой организации своя ссылка на licenseAgreementLink
                     boolean changeDocumentsLink = false;
                     if (!JSONGetString(data, "result_privacy_policy_link").equals("")){
                         MainApplication.getInstance().getPreferences().privacyPolicyLink = JSONGetString(data, "result_privacy_policy_link");
@@ -201,6 +204,8 @@ public class LoginActivity extends AppCompatActivity {
                     if (changeDocumentsLink){
                         runOnUiThread(this::setDocumentsText);
                     }
+
+                     */
 
                     executorService.execute(()->{
                         String waitType = "Повторный запрос доступен через ";

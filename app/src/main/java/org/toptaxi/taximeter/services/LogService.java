@@ -23,11 +23,12 @@ public class LogService {
         this.log(className, method, data);
 
     }
-    public void log(String className, String method){
+
+    public void log(String className, String method) {
         this.log(className, method, "");
     }
 
-    public void log(String className, String method, String data){
+    public void log(String className, String method, String data) {
         if (isLog(className)) {
             if (data.equals("")) {
                 Log.d("##### " + className, method);
@@ -40,6 +41,8 @@ public class LogService {
     private boolean isLog(String className) {
         switch (className) {
             case "SettingsAlarmFragment":
+                return false;
+            case "Preferences":
                 return false;
             case "LoginActivity":
                 return false;

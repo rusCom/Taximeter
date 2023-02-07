@@ -3,7 +3,6 @@ package org.toptaxi.taximeter;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONObject;
 import org.toptaxi.taximeter.activities.OrdersOnCompleteActivity;
 import org.toptaxi.taximeter.activities.mainActivity.MainActivityDrawer;
 import org.toptaxi.taximeter.adapters.MainActionAdapter;
@@ -50,7 +50,6 @@ import org.toptaxi.taximeter.tools.MainUtils;
 import org.toptaxi.taximeter.tools.OnMainDataChangeListener;
 
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
     TextView tvGPSStatus, tvNullCurOrderInfo;
     Button btnCurOrderMainAction, btnCurOrderAction, btnCompleteOrders;
     private boolean isShowGPSData = false;
-    protected Toolbar mToolbar;
+    protected Toolbar mainToolbar;
     MenuItem miGPSFixed, miGPSNotFixed, miGPSOff, miDriverOffline, miDriverOnOrder, miDriverOnLine;
     RVCurOrdersAdapter curOrdersAdapter;
     RoutePointsAdapter viewOrderPointsAdapter, curOrderPointsAdapter;
@@ -102,17 +101,17 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
 
 
         btnCompleteOrders.setVisibility(View.GONE);
-        tvGPSStatus = (TextView) findViewById(R.id.tvGPSInfo);
-        tvNullCurOrderInfo = (TextView) findViewById(R.id.tvNullCurOrderInfo);
+        tvGPSStatus = findViewById(R.id.tvGPSInfo);
+        tvNullCurOrderInfo = findViewById(R.id.tvNullCurOrderInfo);
         tvNullCurOrderInfo.setVisibility(View.GONE);
 
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        mainToolbar = findViewById(R.id.mainToolbar);
+        setSupportActionBar(mainToolbar);
 
-        fabMainActions = (FloatingActionButton) findViewById(R.id.fabMainActions);
+        fabMainActions = findViewById(R.id.fabMainActions);
         fabMainActions.setOnClickListener(view -> fabMainActionsClick());
 
-        rvCurOrders = (RecyclerView) findViewById(R.id.rvCurOrders);
+        rvCurOrders = findViewById(R.id.rvCurOrders);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvCurOrders.setLayoutManager(llm);
         curOrdersAdapter = new RVCurOrdersAdapter(0);
@@ -159,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
                 })
         );
 
-        tvCurOrderClientCost = (FontFitTextView) findViewById(R.id.tvCurOrderClientPrice);
+        tvCurOrderClientCost = findViewById(R.id.tvCurOrderClientPrice);
         (findViewById(R.id.tvCurOrderPhone)).setOnClickListener(view -> callIntent(((TextView) findViewById(R.id.tvCurOrderPhone)).getText().toString()));
 
 
@@ -175,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
 
         btnCompleteOrders.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, OrdersOnCompleteActivity.class)));
 
-        mainActivityDrawer = new MainActivityDrawer(this, mToolbar);
+        mainActivityDrawer = new MainActivityDrawer(this, mainToolbar);
 
 
     }
@@ -260,6 +259,10 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
     public void onBackPressed() {
         if (mainActivityDrawer.closeDrawer()) {
             return;
+        }
+        // Если по какой-либо причине данные по водителю не загружены, то загружаем их. Бывает такое, когда из спящего режима востанавливается приложение
+        if (!MainApplication.getInstance().getMainAccount().isParsedData) {
+            MainApplication.getInstance().getRestService().httpGetResult("/profile/auth");
         }
 
         if (MainApplication.getInstance().getMainActivityCurView() == Constants.CUR_VIEW_VIEW_ORDER) {
@@ -566,7 +569,6 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
 
                     btnCurOrderAction.setVisibility(View.VISIBLE);
                     btnCurOrderAction.setText("Отказаться");
-                    btnCurOrderAction.setBackgroundResource(R.drawable.btn_yellow);
                     btnCurOrderAction.setOnClickListener(view -> MainApplication.getInstance().getRestService().httpGetResult("/last/orders/deny"));
                     break;
                 case "set_driver_at_client":
@@ -625,10 +627,13 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
             MainUtils.TextViewSetTextOrGone(findViewById(R.id.tvViewOrderDispatchingName), viewOrder.dispatchingName);
 
             findViewById(R.id.btnOrderAction).setVisibility(View.GONE);
+            findViewById(R.id.tvOrderTimer).setVisibility(View.GONE);
+
             viewOrderPointsAdapter.setOrder(MainApplication.getInstance().getViewOrder());
             viewOrderPointsAdapter.notifyItemRangeInserted(0, MainApplication.getInstance().getViewOrder().getRouteCount());
             viewOrderPointsAdapter.notifyDataSetChanged();
             Button btnOrderMainAction = findViewById(R.id.btnOrderMainAction);
+
             switch (viewOrder.getCheck()) {
                 case 0:
                     btnOrderMainAction.setText("Взять заказ");

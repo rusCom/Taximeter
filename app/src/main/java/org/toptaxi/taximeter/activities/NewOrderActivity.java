@@ -47,14 +47,13 @@ public class NewOrderActivity extends AppCompatActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
 
         Order viewOrder = MainApplication.getInstance().getNewOrder();
-        btnApplyOrder = (Button) findViewById(R.id.btnOrderMainAction);
-        btnDenyOrder = (Button) findViewById(R.id.btnOrderAction);
-        tvTimer = (TextView) findViewById(R.id.tvOrderTimer);
-        tvTimer.setText("!!!!");
+        btnApplyOrder = findViewById(R.id.btnOrderMainAction);
+        btnDenyOrder = findViewById(R.id.btnOrderAction);
+        tvTimer = findViewById(R.id.tvOrderTimer);
+
         tvTimer.setVisibility(View.VISIBLE);
         btnApplyOrder.setText("Принять");
         btnDenyOrder.setText("Отказаться");
-        btnDenyOrder.setBackgroundResource(R.drawable.btn_yellow);
 
         btnApplyOrder.setVisibility(View.VISIBLE);
         btnDenyOrder.setVisibility(View.VISIBLE);

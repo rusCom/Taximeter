@@ -61,7 +61,7 @@ public class Messages {
                 messages.add(message);
 
             }
-            MainApplication.getInstance().getRestService().httpGetThread("/last/messages/deliver?message_id=" + message.ID);
+            MainApplication.getInstance().getRestService().httpGetThread("/messages/delivered?message_id=" + message.ID);
             if (isNewMessage(message)) {
                 if (message.Type.equals("new_order")) {
                     JSONArray dataArray = new JSONArray(message.Text);
@@ -173,7 +173,7 @@ public class Messages {
     }
 
     public void setRead(int MessageID) {
-        MainApplication.getInstance().getRestService().httpGetThread("/last/messages/read?message_id=" + MessageID);
+        MainApplication.getInstance().getRestService().httpGetThread("/messages/read?message_id=" + MessageID);
     }
 
     public int getLastID() {

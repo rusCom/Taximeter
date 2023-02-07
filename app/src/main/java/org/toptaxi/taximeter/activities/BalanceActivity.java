@@ -49,7 +49,22 @@ public class BalanceActivity extends AppCompatActivity implements AbsListView.On
         updateDataAsync();
 
         if (viewType.equals("main")){
-            findViewById(R.id.btnPaymentInstruction).setVisibility(View.VISIBLE);
+            /*
+            if (MainApplication.getInstance().getPreferences().getPaymentsAvailable()){
+                findViewById(R.id.btnPaymentInstruction).setVisibility(View.VISIBLE);
+                findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> {
+                    if (!MainApplication.getInstance().getPreferences().paymentInstructionLink.equals("")) {
+                        Uri paymentInstructionLink = Uri.parse(MainApplication.getInstance().getPreferences().paymentInstructionLink);
+                        Intent paymentInstructionLinkIntent = new Intent(Intent.ACTION_VIEW, paymentInstructionLink);
+                        startActivity(paymentInstructionLinkIntent);
+                    }
+                });
+            }
+            else {
+                findViewById(R.id.btnPaymentInstruction).setVisibility(View.GONE);
+            }
+
+             */
             findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> {
                 if (!MainApplication.getInstance().getPreferences().paymentInstructionLink.equals("")) {
                     Uri paymentInstructionLink = Uri.parse(MainApplication.getInstance().getPreferences().paymentInstructionLink);
@@ -57,6 +72,7 @@ public class BalanceActivity extends AppCompatActivity implements AbsListView.On
                     startActivity(paymentInstructionLinkIntent);
                 }
             });
+
             findViewById(R.id.btnPaymentInstructionCorporate).setVisibility(View.GONE);
         }
         if (viewType.equals("corporate")){

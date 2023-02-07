@@ -214,6 +214,7 @@ public class RestService {
     }
 
     private Response restCallGet(String url) {
+        LogService.getInstance().log(this, "restCallGet", url);
         Response response = null;
         try {
 

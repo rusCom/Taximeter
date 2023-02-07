@@ -30,24 +30,21 @@ import org.toptaxi.taximeter.activities.SettingsActivity;
 import org.toptaxi.taximeter.activities.StatisticsActivity;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
+import org.toptaxi.taximeter.tools.PaymentService;
 
 public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
     MainActivity mainActivity;
     Toolbar toolbar;
     protected AccountHeader accountHeader;
-
     PrimaryDrawerItem balanceItem, themeItem, messagesItem, unlimInfo;
     PrimaryDrawerItem balanceCorporateTaxiItem;
     ProfileDrawerItem profile;
     Drawer drawer;
-
     String fullName = "", carName = "";
 
     public MainActivityDrawer(MainActivity mainActivity, Toolbar toolbar) {
         this.mainActivity = mainActivity;
         this.toolbar = toolbar;
-
-
     }
 
     private void generateDrawer() {
@@ -84,7 +81,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
         balanceItem = new PrimaryDrawerItem().withName("Баланс").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getMainAccount().getBalanceString()).withIdentifier(Constants.MENU_BALANCE);
         drawer.addItem(balanceItem);
 
-        if (MainApplication.getInstance().getPreferences().corporateTaxi){
+        if (MainApplication.getInstance().getPreferences().corporateTaxi) {
             balanceCorporateTaxiItem = new PrimaryDrawerItem().withName("Баланс Корпоративное такси").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getMainAccount().getBalanceCorporateTaxiString()).withIdentifier(Constants.MENU_BALANCE_CORPORATE);
             drawer.addItem(balanceCorporateTaxiItem);
         }
@@ -115,6 +112,9 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
 
         drawer.addItem(new DividerDrawerItem());
+        if (MainApplication.getInstance().getPreferences().getPaymentsAvailable()){
+            drawer.addItem(new PrimaryDrawerItem().withName("Пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT));
+        }
         if (!MainApplication.getInstance().getPreferences().getPaymentInstructionLink().equals("")) {
             drawer.addItem(new PrimaryDrawerItem().withName("Как пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT_INSTRUCTION));
         }
@@ -151,7 +151,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 balanceItem.withBadge(MainApplication.getInstance().getMainAccount().getBalanceString());
                 drawer.updateItem(balanceItem);
 
-                if (MainApplication.getInstance().getPreferences().corporateTaxi){
+                if (MainApplication.getInstance().getPreferences().corporateTaxi) {
                     balanceCorporateTaxiItem.withBadge(MainApplication.getInstance().getMainAccount().getBalanceCorporateTaxiString());
                     drawer.updateItem(balanceCorporateTaxiItem);
                 }
@@ -222,6 +222,10 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 Uri address = Uri.parse(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
                 Intent openLinkIntent = new Intent(Intent.ACTION_VIEW, address);
                 mainActivity.startActivity(openLinkIntent);
+                // PaymentService.showPaymentDialog(mainActivity);
+                break;
+            case Constants.MENU_PAYMENT:
+                PaymentService.showPaymentDialog(mainActivity);
                 break;
             case Constants.MENU_INSTRUCTION:
                 Uri instructionLink = Uri.parse(MainApplication.getInstance().getPreferences().instructionLink);

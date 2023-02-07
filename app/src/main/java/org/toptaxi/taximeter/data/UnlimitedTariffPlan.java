@@ -6,7 +6,7 @@ import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
 import org.json.JSONObject;
 
 public class UnlimitedTariffPlan {
-    Integer ID;
+    public Integer ID;
     public String Name;
     Integer Cost;
     public Integer lastID;

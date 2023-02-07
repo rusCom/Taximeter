@@ -6,12 +6,14 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.toptaxi.taximeter.services.LogService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -73,14 +75,16 @@ public class MainUtils {
                 result = data.getBoolean(field);
             } catch (JSONException ignored) {
             }
-            if (result == null) {
-                String fieldValue = JSONGetString(data, field);
-                if (fieldValue.equals("true")) {
-                    result = true;
-                }
-                if (fieldValue.equals("1")) {
-                    result = true;
-                }
+        }
+
+        if (result == null) {
+            String fieldValue = JSONGetString(data, field);
+            LogService.getInstance().log("sys", fieldValue);
+            if (fieldValue.equals("true")) {
+                result = true;
+            }
+            if (fieldValue.equals("1")) {
+                result = true;
             }
         }
         return result;

@@ -21,10 +21,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/tvShareDriverInfo"
                 android:textAlignment="center" />
-
         </LinearLayout>
-
-
     </ScrollView>
 
     <LinearLayout
@@ -38,9 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btnShareDriverActivityShare"
-            android:background="@drawable/btn_round_green"
-            android:layout_margin="@dimen/buttons_margin"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            style="@style/MainButton"
             android:onClick="btnShareClick"/>
     </LinearLayout>
 </RelativeLayout>

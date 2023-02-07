@@ -6,11 +6,12 @@
 
     <Button
         android:id="@+id/btnChangeProfileButton"
-        style="@style/ButtonRoundRed"
+        android:backgroundTint="@color/primaryRedDark"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true"
         android:text="Выйти из программы"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        style="@style/MainButton"
+        android:layout_margin="@dimen/button_margin"
+         />
 
 </LinearLayout>

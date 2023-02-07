@@ -21,17 +21,14 @@ import java.util.List;
 
 public class Preferences {
     protected static String TAG = "#########" + Preferences.class.getName();
-
     private final SharedPreferences sPref;
     private Integer curTheme;
     private final List<String> dispatcherTemplateMessages;
-
     private Boolean newOrderAlarmCheck;
     private Integer newOrderAlarmDistance, newOrderAlarmCost;
-
     private String supportPhone = "";
-    public String privacyPolicyLink = "";
-    public String publicOfferLink = "";
+    private String licenseAgreementLink = "";
+    private String privacyPolicyLink = "";
     public String paymentInstructionLink = "";
     public String instructionLink = "";
     public String vkGroupLink = "";
@@ -48,7 +45,9 @@ public class Preferences {
     public String corporateTaxiContactPhone;
     public Long corporateTaxiCheckOrderDialogLastShow;
     public Boolean dispatcherMessages = false;
-
+    private Boolean paymentSBPAvailable = false;
+    private Boolean paymentSBPQiwiAvailable = false;
+    private String paymentQiwiNote;
 
 
     private final List<UnlimitedTariffPlan> unlimitedTariffPlans;
@@ -73,8 +72,8 @@ public class Preferences {
     public void parseData(JSONObject data) throws JSONException {
         this.supportPhone = JSONGetString(data, "support_phone");
         this.dispatcherPhone = JSONGetString(data, "dispatcher_phone");
+        this.licenseAgreementLink = JSONGetString(data, "license_agreement_link");
         this.privacyPolicyLink = JSONGetString(data, "privacy_policy_link");
-        this.publicOfferLink = JSONGetString(data, "public_offer_link");
         this.systemDataTimer = MainUtils.JSONGetInteger(data, "system_data_timer", 5);
         this.systemTemplateMessagesTimeout = MainUtils.JSONGetInteger(data, "system_template_messages_timeout", 60);
         this.paymentInstructionLink = JSONGetString(data, "payment_instruction_link");
@@ -96,26 +95,26 @@ public class Preferences {
             }
         }
 
-        if (data.has("unlimited_tariff_plans")){
+        if (data.has("unlimited_tariff_plans")) {
             JSONArray unlimitedTariffPlansJSONArray = data.getJSONArray("unlimited_tariff_plans");
             for (int itemID = 0; itemID < unlimitedTariffPlansJSONArray.length(); itemID++) {
                 unlimitedTariffPlans.add(new UnlimitedTariffPlan(unlimitedTariffPlansJSONArray.getJSONObject(itemID)));
             }
         }
 
-        if (data.has("rest_hosts")){
+        if (data.has("rest_hosts")) {
             MainApplication.getInstance().getRestService().setRestHost(data.getJSONArray("rest_hosts"));
         }
 
-        if (data.has("data_rest_hosts")){
+        if (data.has("data_rest_hosts")) {
             MainApplication.getInstance().setDataRestService(data.getJSONArray("data_rest_hosts"));
         }
 
-        if (data.has("push_topics")){
+        if (data.has("push_topics")) {
             MainApplication.getInstance().getFirebaseService().checkTopics(data.getJSONArray("push_topics"));
         }
 
-        if (data.has("corporate_taxi")){
+        if (data.has("corporate_taxi")) {
             this.corporateTaxi = true;
             JSONObject corporateTaxi = data.getJSONObject("corporate_taxi");
             this.corporateTaxiBalanceButtonDialog = JSONGetString(corporateTaxi, "balance_button_dialog");
@@ -123,20 +122,51 @@ public class Preferences {
             this.corporateTaxiCheckOrderDialog = JSONGetString(corporateTaxi, "check_order_dialog");
             corporateTaxiCheckOrderDialogLastShow = sPref.getLong("corporateTaxiCheckOrderDialogLastShow", 0);
         }
+
+        if (data.has("available_payments")) {
+            JSONObject availablePayments = data.getJSONObject("available_payments");
+            paymentSBPAvailable = JSONGetBool(availablePayments, "sbp");
+            paymentSBPQiwiAvailable = JSONGetBool(availablePayments, "qiwi");
+            paymentQiwiNote = JSONGetString(availablePayments, "qiwi_note");
+        }
     }
 
-    public boolean isShowCorporateTaxiCheckOrderDialog(){
+    public boolean getPaymentsAvailable() {
+        return paymentSBPAvailable || paymentSBPQiwiAvailable;
+    }
+
+    public Boolean getPaymentSBPAvailable() {
+        return paymentSBPAvailable;
+    }
+
+    public Boolean getPaymentSBPQiwiAvailable() {
+        return paymentSBPQiwiAvailable;
+    }
+
+    public String getPaymentQiwiNote() {
+        return paymentQiwiNote;
+    }
+
+    public boolean isShowCorporateTaxiCheckOrderDialog() {
         boolean result = false;
-        if (corporateTaxi && !corporateTaxiCheckOrderDialog.equals("")){
+        if (corporateTaxi && !corporateTaxiCheckOrderDialog.equals("")) {
             // Проверяем, что с поледенго показа прошло более 24 часов
-            if (MainUtils.passedTimeHour(corporateTaxiCheckOrderDialogLastShow) > 24){
+            if (MainUtils.passedTimeHour(corporateTaxiCheckOrderDialogLastShow) > 24) {
                 result = true;
             }
         }
         return result;
     }
 
-    public void setLastShowCorporateTaxiCheckOrderDialog(){
+    public String getLicenseAgreementLink() {
+        return licenseAgreementLink;
+    }
+
+    public String getPrivacyPolicyLink() {
+        return privacyPolicyLink;
+    }
+
+    public void setLastShowCorporateTaxiCheckOrderDialog() {
         corporateTaxiCheckOrderDialogLastShow = System.currentTimeMillis();
         SharedPreferences.Editor editor = sPref.edit();
         editor.putLong("corporateTaxiCheckOrderDialogLastShow", this.corporateTaxiCheckOrderDialogLastShow);
@@ -147,7 +177,7 @@ public class Preferences {
         return unlimitedTariffPlans;
     }
 
-    public boolean useUnlimitedTariffPlans(){
+    public boolean useUnlimitedTariffPlans() {
         return unlimitedTariffPlans.size() != 0;
     }
 
@@ -176,8 +206,8 @@ public class Preferences {
     }
 
     public Boolean isDriverInvite() {
-        if (driverInviteText.equals(""))return false;
-        if (driverInviteCaption.equals(""))return false;
+        if (driverInviteText.equals("")) return false;
+        if (driverInviteCaption.equals("")) return false;
         return true;
     }
 

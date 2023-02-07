@@ -1,7 +1,6 @@
 package org.toptaxi.taximeter.adapters;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,7 +14,6 @@ public class OnMainActionUnlimClickListener implements AdapterView.OnItemClickLi
     protected static String TAG = "#########" + OnMainActionUnlimClickListener.class.getName();
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Context context = view.getContext();
         TextView textViewItem = ((TextView) view.findViewById(R.id.tvMainActionUnlimTitle));
         final UnlimitedTariffPlan unlimTariff = (UnlimitedTariffPlan)textViewItem.getTag();
         Log.d(TAG,  "onItemClick " + unlimTariff.Name);
@@ -25,7 +23,7 @@ public class OnMainActionUnlimClickListener implements AdapterView.OnItemClickLi
         alertDialog.setTitle("Внимание");
         alertDialog.setMessage("Активировать безлимит: " + unlimTariff.Name);
         alertDialog.setPositiveButton("Да", (dialogInterface, i1) -> {
-            MainApplication.getInstance().getRestService().httpGetResult("/last/unlimited_tariff/activate?tariff_id=" + unlimTariff.lastID);
+            MainApplication.getInstance().getRestService().httpGetResult("/tariff/activate?tariff_id=" + unlimTariff.ID);
             MainApplication.getInstance().getMainActivity().mainActionsUnlimDialog.cancel();
         });
         alertDialog.setNegativeButton("Нет" , null);

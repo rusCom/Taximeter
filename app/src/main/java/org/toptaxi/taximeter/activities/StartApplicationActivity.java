@@ -292,7 +292,7 @@ public class StartApplicationActivity extends AppCompatActivity {
         String doc_name = MainUtils.JSONGetString(data, "doc_name");
         String link = MainUtils.JSONGetString(data, "doc_link");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        String Text = "Для продолжения работы необходимо ознакомиться и подтвердить принятие слудующего документа: \n\"" + doc_name + "\".\n" +
+        String Text = "Для продолжения работы необходимо ознакомиться и подтвердить принятие следующего документа: \n\"" + doc_name + "\".\n" +
                 "С полным текстом документа можно ознакомиться по адресу в сети интернет: \n" + link;
 
         builder.setTitle(doc_name);

@@ -27,7 +27,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="@dimen/buttons_margin"
+            android:layout_margin="@dimen/button_margin"
             android:layout_weight="1">
             <org.toptaxi.taximeter.tools.FontFitTextView
                 android:layout_width="match_parent"
@@ -49,8 +49,7 @@
                 android:text="Принять"
                 android:id="@+id/btnCurOrderMainAction"
                 android:singleLine="true"
-                style="@style/ButtonRoundGreen"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:backgroundTint="@color/primaryGreenDark"
                 android:layout_weight="1" />
             <Button
                 android:layout_width="match_parent"
@@ -58,16 +57,14 @@
                 android:text="Отказ"
                 android:id="@+id/btnCurOrderAction"
                 android:singleLine="true"
-                style="@style/ButtonRoundRed"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:backgroundTint="@color/primaryRedDark"
                 android:layout_weight="1" />
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Заказы по выполнению"
                 android:id="@+id/btnCurOrderCompleteOrders"
-                style="@style/ButtonRoundYellow"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:backgroundTint="@color/primaryYellowDark"
                 android:layout_weight="1"/>
 
         </LinearLayout>

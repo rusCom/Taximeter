@@ -36,22 +36,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edActivityLoginPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/edActivityLoginPhone"
                     android:importantForAutofill="no"
-                    android:inputType="phone" />
+                    android:inputType="phone"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/ilActivityLoginPassword"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/button_margin">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edActivityLoginCode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -63,19 +64,21 @@
 
             <Button
                 android:id="@+id/btnActivityLoginProfileRegistration"
+                style="@style/MainButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:background="@drawable/btn_green"
+                android:layout_margin="@dimen/button_margin"
                 android:text="@string/btnActivityLoginGetToken" />
 
             <Button
                 android:id="@+id/btnActivityLoginProfileLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:background="@drawable/btn_yellow"
+
+                android:layout_marginStart="@dimen/button_margin"
+                android:layout_marginEnd="@dimen/button_margin"
+                style="@style/MainButton"
+                android:backgroundTint="@color/primaryYellowDark"
                 android:text="@string/btnActivityLoginGetPassword" />
 
             <LinearLayout

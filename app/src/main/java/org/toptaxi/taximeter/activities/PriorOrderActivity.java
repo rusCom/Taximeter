@@ -4,18 +4,18 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.adapters.RVCurOrdersAdapter;
 import org.toptaxi.taximeter.adapters.RecyclerItemClickListener;
 import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.services.LogService;
-import org.toptaxi.taximeter.tools.Constants;
-import org.toptaxi.taximeter.tools.LockOrientation;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
+import org.toptaxi.taximeter.tools.MainUtils;
 import org.toptaxi.taximeter.tools.OnPriorOrdersChange;
 
 import java.text.SimpleDateFormat;
@@ -23,8 +23,10 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class PriorOrderActivity extends AppCompatActivity implements RecyclerItemClickListener.OnItemClickListener, OnPriorOrdersChange {
+public class PriorOrderActivity extends MainAppCompatActivity implements RecyclerItemClickListener.OnItemClickListener, OnPriorOrdersChange {
     RecyclerView rvPriorOrders;
     RVCurOrdersAdapter curOrdersAdapter;
     Calendar ServerDate;
@@ -34,8 +36,6 @@ public class PriorOrderActivity extends AppCompatActivity implements RecyclerIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Утановка текущего поворота экрана
-        new LockOrientation(this).lock();
         setContentView(R.layout.activity_prior_order);
 
         rvPriorOrders = (RecyclerView)findViewById(R.id.rvPriorOrders);
@@ -63,14 +63,23 @@ public class PriorOrderActivity extends AppCompatActivity implements RecyclerIte
             alertDialog.setTitle("Внимание");
             alertDialog.setMessage(alertText);
             alertDialog.setPositiveButton("Да", (dialogInterface, i) -> {
-                MainApplication.getInstance().setMainActivityCurView(Constants.CUR_VIEW_CUR_ORDERS);
-                MainApplication.getInstance().getRestService().httpGetResult("/last/orders/check?order_id=" + curOrder.getID());
-                finish();
+                checkOrder(curOrder.getID());
             });
             alertDialog.setNegativeButton("Нет" , null);
             alertDialog.create();
             alertDialog.show();
         }
+    }
+
+    private void checkOrder(Integer orderID){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            JSONObject response = MainApplication.getInstance().getRestService().httpGet(this, "/last/orders/check?order_id=" + orderID);
+            if (MainUtils.JSONGetString(response, "status").equals("OK")){
+                this.finish();
+            }
+        });
+
     }
 
     @Override

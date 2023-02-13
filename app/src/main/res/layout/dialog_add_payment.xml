@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/modalBottomAddPayment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -30,7 +31,7 @@
         android:clickable="true"
         android:focusableInTouchMode="true"
         android:ems="10"
-        android:inputType="number" />
+        android:inputType="numberSigned" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -78,9 +79,10 @@
         style="@style/MainButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/acq_colorFpsBackground"
         android:layout_marginTop="@dimen/button_margin"
-        android:text="СБП" />
+        android:backgroundTint="@color/acq_colorFpsBackground"
+        android:text="Оплата через"
+        android:drawableBottom="@mipmap/logo_sbp" />
 
     <Button
         android:id="@+id/btnQiwiPayment"
@@ -91,11 +93,28 @@
         android:layout_marginTop="@dimen/button_margin"
         android:text="Mир/Visa/MasterCard" />
 
-    <TextView
-        android:id="@+id/textView8"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Другие способы..."
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/colorAccent"/>
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvAnotherPayments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Другие способы..."
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/colorAccent"
+            android:layout_gravity="left"/>
+        <TextView
+            android:id="@+id/tvDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Подробнее..."
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/colorAccent"
+            android:clickable="true"
+            android:layout_gravity="right"/>
+
+    </FrameLayout>
+
+
 </LinearLayout>

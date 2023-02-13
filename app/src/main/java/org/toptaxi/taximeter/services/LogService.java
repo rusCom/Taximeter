@@ -31,9 +31,9 @@ public class LogService {
     public void log(String className, String method, String data) {
         if (isLog(className)) {
             if (data.equals("")) {
-                Log.d("##### " + className, method);
+                Log.d("####### " + className, method);
             } else {
-                Log.d("##### " + className + ": " + method, data);
+                Log.d("####### " + className + ": " + method, data);
             }
         }
     }
@@ -67,7 +67,7 @@ public class LogService {
             case "MainService":
                 return false;
             case "sys":
-                return false;
+                return true;
         }
         return false;
     }

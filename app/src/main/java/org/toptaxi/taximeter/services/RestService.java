@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -125,6 +126,52 @@ public class RestService {
 
     public void httpPostThread(final String path, JSONObject data) {
         new Thread(() -> httpPost(path, data)).start();
+    }
+
+    public JSONObject httpGet(MainAppCompatActivity mainAppCompatActivity, String path) {
+        if (mainAppCompatActivity != null){
+            mainAppCompatActivity.runOnUiThread(mainAppCompatActivity::showProgressDialog);
+        }
+        JSONObject response = httpGetHost(path);
+        if (response == null) {
+            response = new JSONObject();
+            try {
+                response.put("status_code", "500");
+                response.put("status", "Internal Server Error");
+                response.put("result", "Ошибка связи с сервером. Попробуйте попозже. (response is null)");
+            } catch (JSONException ignored) {
+            }
+        }
+        LogService.getInstance().log(this, "httpGet", "path = '" + path + "'; response = '" + response + "'");
+        if (mainAppCompatActivity != null){
+            mainAppCompatActivity.runOnUiThread(mainAppCompatActivity::dismissProgressDialog);
+        }
+
+        try {
+            if (response.getString("status").equals("OK")){
+                if (response.has("result")) {
+                    MainApplication.getInstance().parseData(response.getJSONObject("result"));
+                }
+            }
+            else {
+                if (mainAppCompatActivity != null){
+                    if (response.has("result")){
+                        String errorText = response.getString("result");
+                        mainAppCompatActivity.runOnUiThread(()->mainAppCompatActivity.showToast(errorText));
+                    }
+                    else {
+                        JSONObject finalResponse = response;
+                        mainAppCompatActivity.runOnUiThread(()->mainAppCompatActivity.showToast(finalResponse.toString()));
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            if (mainAppCompatActivity != null){
+                mainAppCompatActivity.runOnUiThread(()->mainAppCompatActivity.showToast(e.getMessage()));
+            }
+        }
+
+        return response;
     }
 
     public JSONObject httpGet(String path) {

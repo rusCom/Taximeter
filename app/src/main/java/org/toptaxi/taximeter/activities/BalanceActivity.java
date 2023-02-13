@@ -8,25 +8,24 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.adapters.ListViewPaymentAdapter;
 import org.toptaxi.taximeter.data.Payment;
 import org.toptaxi.taximeter.services.LogService;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
+import org.toptaxi.taximeter.tools.PaymentService;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class BalanceActivity extends AppCompatActivity implements AbsListView.OnScrollListener {
+public class BalanceActivity extends MainAppCompatActivity implements AbsListView.OnScrollListener {
     ListViewPaymentAdapter adapter;
     ListView listView;
     private View footer;
     Boolean isLoadData = false;
     private String viewType = "main";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,42 +47,27 @@ public class BalanceActivity extends AppCompatActivity implements AbsListView.On
         listView.setOnScrollListener(this);
         updateDataAsync();
 
-        if (viewType.equals("main")){
-            /*
-            if (MainApplication.getInstance().getPreferences().getPaymentsAvailable()){
-                findViewById(R.id.btnPaymentInstruction).setVisibility(View.VISIBLE);
-                findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> {
-                    if (!MainApplication.getInstance().getPreferences().paymentInstructionLink.equals("")) {
-                        Uri paymentInstructionLink = Uri.parse(MainApplication.getInstance().getPreferences().paymentInstructionLink);
-                        Intent paymentInstructionLinkIntent = new Intent(Intent.ACTION_VIEW, paymentInstructionLink);
-                        startActivity(paymentInstructionLinkIntent);
-                    }
-                });
-            }
-            else {
-                findViewById(R.id.btnPaymentInstruction).setVisibility(View.GONE);
-            }
-
-             */
-            findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> {
-                if (!MainApplication.getInstance().getPreferences().paymentInstructionLink.equals("")) {
-                    Uri paymentInstructionLink = Uri.parse(MainApplication.getInstance().getPreferences().paymentInstructionLink);
-                    Intent paymentInstructionLinkIntent = new Intent(Intent.ACTION_VIEW, paymentInstructionLink);
-                    startActivity(paymentInstructionLinkIntent);
-                }
-            });
-
+        if (viewType.equals("main")) {
+            findViewById(R.id.btnPaymentInstruction).setVisibility(View.GONE);
             findViewById(R.id.btnPaymentInstructionCorporate).setVisibility(View.GONE);
+
+            if (PaymentService.getInstance().getPaymentsAvailable()) {
+                findViewById(R.id.btnPaymentInstruction).setVisibility(View.VISIBLE);
+                findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> PaymentService.getInstance().showPaymentDialog(this));
+            } else if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink() != null) {
+                findViewById(R.id.btnPaymentInstruction).setVisibility(View.VISIBLE);
+                findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> goToURL(MainApplication.getInstance().getPreferences().getPaymentInstructionLink()));
+            }
         }
-        if (viewType.equals("corporate")){
+
+        if (viewType.equals("corporate")) {
             findViewById(R.id.btnPaymentInstruction).setVisibility(View.GONE);
             findViewById(R.id.btnPaymentInstructionCorporate).setVisibility(View.VISIBLE);
-            findViewById(R.id.btnPaymentInstructionCorporate).setOnClickListener(view ->showBalanceCorporateDialog());
+            findViewById(R.id.btnPaymentInstructionCorporate).setOnClickListener(view -> showBalanceCorporateDialog());
         }
-
     }
 
-    public void  showBalanceCorporateDialog() {
+    public void showBalanceCorporateDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setMessage(MainApplication.getInstance().getPreferences().corporateTaxiBalanceButtonDialog);
         alertDialog.setPositiveButton("Позвонить", (dialog, which) -> {

@@ -43,7 +43,6 @@ public class HisOrdersAdapters extends BaseAdapter {
                 JSONArray hisOrdersArray = response.getJSONArray("result");
                 for (int itemID = 0; itemID < hisOrdersArray.length(); itemID++) {
                     Order order = new Order();
-                    // LogService.getInstance().log("sys", hisOrdersArray.getJSONObject(itemID).toString());
                     order.setFromJSON(hisOrdersArray.getJSONObject(itemID));
                     results.add(order);
                     LastID = order.getID();

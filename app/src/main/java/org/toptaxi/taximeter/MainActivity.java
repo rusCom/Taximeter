@@ -46,6 +46,7 @@ import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
 import org.toptaxi.taximeter.tools.FontFitTextView;
 import org.toptaxi.taximeter.tools.LockOrientation;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 import org.toptaxi.taximeter.tools.MainUtils;
 import org.toptaxi.taximeter.tools.OnMainDataChangeListener;
 
@@ -53,7 +54,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity implements OnMainDataChangeListener, Orders.OnOrdersChangeListener, OnMapReadyCallback {
+public class MainActivity extends MainAppCompatActivity implements OnMainDataChangeListener, Orders.OnOrdersChangeListener, OnMapReadyCallback {
     FrameLayout viewCurOrders, viewViewOrder, viewCurOrder, viewGPSError, viewMainData;
     TextView tvGPSStatus, tvNullCurOrderInfo;
     Button btnCurOrderMainAction, btnCurOrderAction, btnCompleteOrders;
@@ -65,12 +66,10 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
     public AlertDialog mainActionsDialog, mainActionsUnlimDialog;
     GoogleMap googleMap;
     FontFitTextView tvCurOrderClientCost;
-
     int viewOrderLastState;
     MediaPlayer mpOrderStateChange;
     RecyclerView rvCurOrders;
     FloatingActionButton fabMainActions;
-    ProgressDialog progressDialog;
     MainActivityDrawer mainActivityDrawer;
 
     boolean isShowNullBalanceDialog = false;
@@ -84,8 +83,6 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogService.getInstance().log(this, "onCreate");
-        // Утановка текущего поворота экрана
-        new LockOrientation(this).lock();
         setContentView(R.layout.activity_main);
         LogService.getInstance().log(this, "onCreate");
 
@@ -173,32 +170,13 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
         }
 
         btnCompleteOrders.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, OrdersOnCompleteActivity.class)));
-
         mainActivityDrawer = new MainActivityDrawer(this, mainToolbar);
-
-
     }
 
     public void callIntent(String phone) {
         Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone));
         dialIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(dialIntent);
-    }
-
-    public void showProgressDialog() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Получение данных ...");
-        }
-        progressDialog.show();
-    }
-
-    public void dismissProgressDialog() {
-        if (progressDialog != null) {
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
-        }
     }
 
 
@@ -216,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
         MainApplication.getInstance().getCurOrders().setOnOrdersChangeListener(this);
         onLocationDataChange();
 
-        if (!MainApplication.getInstance().getPreferences().getPaymentInstructionLink().equals("")
+        if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink() != null
                 && MainApplication.getInstance().getMainAccount().getBalance() <= 0
                 && (!isShowNullBalanceDialog)) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -356,12 +334,7 @@ public class MainActivity extends AppCompatActivity implements OnMainDataChangeL
 
     public void driverGoOffLine() {
         if (!MainApplication.getInstance().getMainAccount().getOnLine()) {
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-            alertDialog.setTitle(getString(R.string.dlgAlert));
-            alertDialog.setMessage(getString(R.string.errorDriverBalanceOnLine));
-            alertDialog.setPositiveButton(getString(R.string.dlgButtonCaptionOK), null);
-            alertDialog.create();
-            alertDialog.show();
+            showSimpleDialog(getString(R.string.errorDriverBalanceOnLine));
         } else {
             String alertText = "", action = "";
             switch (MainApplication.getInstance().getMainAccount().getStatus()) {

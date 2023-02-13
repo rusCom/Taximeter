@@ -79,7 +79,6 @@ public class MainUtils {
 
         if (result == null) {
             String fieldValue = JSONGetString(data, field);
-            LogService.getInstance().log("sys", fieldValue);
             if (fieldValue.equals("true")) {
                 result = true;
             }

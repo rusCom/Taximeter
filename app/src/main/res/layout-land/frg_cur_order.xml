@@ -49,7 +49,7 @@
                 android:text="Принять"
                 android:id="@+id/btnCurOrderMainAction"
                 android:singleLine="true"
-                android:backgroundTint="@color/primaryGreenDark"
+                style="@style/MainButton"
                 android:layout_weight="1" />
             <Button
                 android:layout_width="match_parent"
@@ -58,6 +58,7 @@
                 android:id="@+id/btnCurOrderAction"
                 android:singleLine="true"
                 android:backgroundTint="@color/primaryRedDark"
+                style="@style/MainButton"
                 android:layout_weight="1" />
             <Button
                 android:layout_width="match_parent"
@@ -65,6 +66,7 @@
                 android:text="Заказы по выполнению"
                 android:id="@+id/btnCurOrderCompleteOrders"
                 android:backgroundTint="@color/primaryYellowDark"
+                style="@style/MainButton"
                 android:layout_weight="1"/>
 
         </LinearLayout>

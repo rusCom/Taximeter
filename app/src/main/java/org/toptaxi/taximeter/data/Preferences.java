@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.MainUtils;
+import org.toptaxi.taximeter.tools.PaymentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class Preferences {
     private String supportPhone = "";
     private String licenseAgreementLink = "";
     private String privacyPolicyLink = "";
-    public String paymentInstructionLink = "";
+    private String paymentInstructionLink;
     public String instructionLink = "";
     public String vkGroupLink = "";
     private String checkPriorErrorText = "";
@@ -45,10 +46,6 @@ public class Preferences {
     public String corporateTaxiContactPhone;
     public Long corporateTaxiCheckOrderDialogLastShow;
     public Boolean dispatcherMessages = false;
-    private Boolean paymentSBPAvailable = false;
-    private Boolean paymentSBPQiwiAvailable = false;
-    private String paymentQiwiNote;
-
 
     private final List<UnlimitedTariffPlan> unlimitedTariffPlans;
 
@@ -124,27 +121,8 @@ public class Preferences {
         }
 
         if (data.has("available_payments")) {
-            JSONObject availablePayments = data.getJSONObject("available_payments");
-            paymentSBPAvailable = JSONGetBool(availablePayments, "sbp");
-            paymentSBPQiwiAvailable = JSONGetBool(availablePayments, "qiwi");
-            paymentQiwiNote = JSONGetString(availablePayments, "qiwi_note");
+            PaymentService.getInstance().setPreferences(data.getJSONObject("available_payments"));
         }
-    }
-
-    public boolean getPaymentsAvailable() {
-        return paymentSBPAvailable || paymentSBPQiwiAvailable;
-    }
-
-    public Boolean getPaymentSBPAvailable() {
-        return paymentSBPAvailable;
-    }
-
-    public Boolean getPaymentSBPQiwiAvailable() {
-        return paymentSBPQiwiAvailable;
-    }
-
-    public String getPaymentQiwiNote() {
-        return paymentQiwiNote;
     }
 
     public boolean isShowCorporateTaxiCheckOrderDialog() {
@@ -190,6 +168,7 @@ public class Preferences {
     }
 
     public String getPaymentInstructionLink() {
+        if (paymentInstructionLink.equals(""))return null;
         return paymentInstructionLink;
     }
 

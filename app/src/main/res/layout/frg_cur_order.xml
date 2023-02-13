@@ -36,16 +36,18 @@ android:layout_height="match_parent">
             android:layout_height="match_parent"
             android:text="Принять"
             android:id="@+id/btnCurOrderMainAction"
-            android:backgroundTint="@color/primaryGreenDark"
+            style="@style/MainButton"
+            android:layout_margin="@dimen/button_margin"
             android:layout_weight="1" />
 
         <Button
             android:id="@+id/btnCurOrderAction"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/button_radius"
+            android:layout_margin="@dimen/button_margin"
             android:layout_weight="1"
             android:backgroundTint="@color/primaryRedDark"
+            style="@style/MainButton"
             android:text="Отказ"
             tools:visibility="gone" />
 
@@ -53,9 +55,10 @@ android:layout_height="match_parent">
             android:id="@+id/btnCurOrderCompleteOrders"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/button_radius"
+            android:layout_margin="@dimen/button_margin"
             android:layout_weight="1"
             android:backgroundTint="@color/primaryYellowDark"
+            style="@style/MainButton"
             android:text="Заказы по выполнению"
             tools:visibility="gone" />
     </LinearLayout>

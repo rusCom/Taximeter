@@ -112,10 +112,10 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
 
         drawer.addItem(new DividerDrawerItem());
-        if (MainApplication.getInstance().getPreferences().getPaymentsAvailable()){
+        if (PaymentService.getInstance().getPaymentsAvailable()){
             drawer.addItem(new PrimaryDrawerItem().withName("Пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT));
         }
-        if (!MainApplication.getInstance().getPreferences().getPaymentInstructionLink().equals("")) {
+        if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink()!= null) {
             drawer.addItem(new PrimaryDrawerItem().withName("Как пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT_INSTRUCTION));
         }
         if (!MainApplication.getInstance().getPreferences().instructionLink.equals("")) {
@@ -219,23 +219,16 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 mainActivity.startActivity(new Intent(mainActivity, HisOrdersActivity.class));
                 break;
             case Constants.MENU_PAYMENT_INSTRUCTION:
-                Uri address = Uri.parse(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
-                Intent openLinkIntent = new Intent(Intent.ACTION_VIEW, address);
-                mainActivity.startActivity(openLinkIntent);
-                // PaymentService.showPaymentDialog(mainActivity);
+                mainActivity.goToURL(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
                 break;
             case Constants.MENU_PAYMENT:
-                PaymentService.showPaymentDialog(mainActivity);
+                PaymentService.getInstance().showPaymentDialog(mainActivity);
                 break;
             case Constants.MENU_INSTRUCTION:
-                Uri instructionLink = Uri.parse(MainApplication.getInstance().getPreferences().instructionLink);
-                Intent instructionLinkIntent = new Intent(Intent.ACTION_VIEW, instructionLink);
-                mainActivity.startActivity(instructionLinkIntent);
+                mainActivity.goToURL(MainApplication.getInstance().getPreferences().instructionLink);
                 break;
             case Constants.MENU_VK_GROUP:
-                Uri vkGroupLink = Uri.parse(MainApplication.getInstance().getPreferences().vkGroupLink);
-                Intent vkGroupLinkIntent = new Intent(Intent.ACTION_VIEW, vkGroupLink);
-                mainActivity.startActivity(vkGroupLinkIntent);
+                mainActivity.goToURL(MainApplication.getInstance().getPreferences().vkGroupLink);
                 break;
         }
         return false;

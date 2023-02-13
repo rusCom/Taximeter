@@ -399,7 +399,9 @@ public class MainApplication extends Application {
     }
 
     public void showToast(String message) {
+        LogService.getInstance().log("sys", message);
         if (mainActivity != null) {
+            LogService.getInstance().log("sys", message);
             mainActivity.runOnUiThread(() -> Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show());
         }
     }

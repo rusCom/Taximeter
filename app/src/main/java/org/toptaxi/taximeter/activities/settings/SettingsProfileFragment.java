@@ -49,22 +49,15 @@ public class SettingsProfileFragment extends Fragment {
         });
 
         alertDialog.setPositiveButton("Подтвердить выход", (dialogInterface, i) -> {
-            /*
-
-
-            */
-
             closeProfile();
-
-
         });
         alertDialog.create();
         alertDialog.show();
     }
 
-    public void closeProfile(){
+    public void closeProfile() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(()->{
+        executorService.execute(() -> {
             this.getActivity().runOnUiThread(this::showLoadingDialog);
             MainApplication.getInstance().stopMainService();
             try {

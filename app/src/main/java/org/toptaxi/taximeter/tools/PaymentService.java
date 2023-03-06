@@ -25,13 +25,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
+import ru.tinkoff.acquiring.sdk.TinkoffAcquiring;
+import ru.tinkoff.acquiring.sdk.models.options.FeaturesOptions;
+import ru.tinkoff.acquiring.sdk.models.options.OrderOptions;
+import ru.tinkoff.acquiring.sdk.models.options.screen.PaymentOptions;
+import ru.tinkoff.acquiring.sdk.utils.Money;
+
 public class PaymentService {
     private static volatile PaymentService paymentService;
-
     private String detailNote;
     private String qiwiNote;
     private Boolean qiwiAvailable;
     private Boolean sbpAvailable;
+    private String sbpNote;
     private String ckassa = "";
     private String qiwiTerminal = "";
     private String qiwiWallet = "";
@@ -57,6 +63,7 @@ public class PaymentService {
         detailNote = JSONGetString(data, "detail");
         qiwiNote = JSONGetString(data, "qiwi_note");
         qiwiAvailable = JSONGetBool(data, "qiwi", false);
+        sbpNote = JSONGetString(data, "sbp_note");
         sbpAvailable = JSONGetBool(data, "sbp", false);
         ckassa = JSONGetString(data, "ckassa");
         qiwiTerminal = JSONGetString(data, "qiwi_terminal");
@@ -151,8 +158,53 @@ public class PaymentService {
             bottomSheetView.findViewById(R.id.tvChoosePayment).setVisibility(View.VISIBLE);
         }
 
+        AtomicReference<Boolean> sbpShowMessage = new AtomicReference<>(false);
+
         if (sbpAvailable) {
             buttonSPBPayment.setVisibility(View.VISIBLE);
+            buttonSPBPayment.setOnClickListener(view -> {
+                String amountString = ednPaymentAmount.getText().toString();
+                if (amountString.equals("")) {
+                    ednPaymentAmount.requestFocus();
+                    ednPaymentAmount.setError("Введите сумму платежа");
+                    return;
+                }
+
+                int amountInteger = Integer.parseInt(amountString) * 100;
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.execute(() -> {
+                    JSONObject response = MainApplication.getInstance().getRestService().httpGet(activity, "/payments/order?amount=" + amountInteger + "&source=sbp");
+                    if (JSONGetString(response, "status").equals("OK")) {
+                        Boolean showMessage = JSONGetBool(response, "result_message");
+                        if (!sbpShowMessage.get() && showMessage) {
+                            activity.runOnUiThread(() -> {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                                builder.setMessage(sbpNote);
+                                builder.setCancelable(true);
+                                builder.setPositiveButton("Понятно", (dialog, which) -> {
+                                    sbpShowMessage.set(true);
+                                    dialog.dismiss();
+                                    bottomSheetDialog.dismiss();
+                                    tinkoffSBPPay(activity,
+                                            JSONGetString(response, "result_terminal_key"),
+                                            JSONGetString(response, "result_public_key"),
+                                            JSONGetString(response, "result_number"), amountInteger);
+                                });
+                                builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+                                builder.show();
+                            });
+
+                        } else {
+                            bottomSheetDialog.dismiss();
+                            tinkoffSBPPay(activity, JSONGetString(response, "result_terminal_key"),
+                                    JSONGetString(response, "result_public_key"),
+                                    JSONGetString(response, "result_number"), amountInteger);
+                        }
+                    }
+
+                });
+
+            });
         }
 
         AtomicReference<Boolean> qiwiShowMessage = new AtomicReference<>(false);
@@ -171,7 +223,7 @@ public class PaymentService {
 
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 executorService.execute(() -> {
-                    JSONObject response = MainApplication.getInstance().getRestService().httpGet(activity,"/payments/order?amount=" + amountInteger + "&source=qiwi");
+                    JSONObject response = MainApplication.getInstance().getRestService().httpGet(activity, "/payments/order?amount=" + amountInteger + "&source=qiwi");
 
                     if (JSONGetString(response, "status").equals("OK")) {
                         Boolean showMessage = JSONGetBool(response, "result_message");
@@ -211,35 +263,59 @@ public class PaymentService {
         bottomSheetDialog.show();
     }
 
-    public void showAnotherPaymentDialog(MainAppCompatActivity activity){
+    private void tinkoffSBPPay(MainAppCompatActivity activity, String terminalKey, String publicKey, String orderID, long summa){
+        OrderOptions orderOptions = new OrderOptions();
+        orderOptions.setOrderId(orderID);
+        orderOptions.setAmount(Money.ofCoins(summa));
+        orderOptions.setTitle("Пополнение баланса");
+        orderOptions.setRecurrentPayment(false);
+        FeaturesOptions featuresOptions = new FeaturesOptions();
+        featuresOptions.setTinkoffPayEnabled(false);
+        featuresOptions.setFpsEnabled(true);
+        // featuresOptions.set
+
+        PaymentOptions paymentOptions = new PaymentOptions();
+        paymentOptions.setOrder(orderOptions);
+        paymentOptions.setFeatures(featuresOptions);
+        try {
+            TinkoffAcquiring tinkoffAcquiring = new TinkoffAcquiring(activity.getApplicationContext(), terminalKey, publicKey);
+            // tinkoffAcquiring.openPaymentScreen(activity, paymentOptions, 154);
+            tinkoffAcquiring.payWithSbp(activity, paymentOptions, 254);
+        }
+        catch (Exception exception){
+            activity.runOnUiThread(()->activity.showToast("Ошибка платежной системы. Попробуйте попозже.\n" + exception.getLocalizedMessage()));
+        }
+
+
+
+    }
+
+    public void showAnotherPaymentDialog(MainAppCompatActivity activity) {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(activity, R.style.CustomBottomSheetDialog);
         View bottomSheetView = LayoutInflater.from(activity)
                 .inflate(R.layout.dialog_another_payments_available,
                         activity.findViewById(R.id.modalBottomAddPayment));
-        if (qiwiTerminal.equals("")){
+        if (qiwiTerminal.equals("")) {
             bottomSheetView.findViewById(R.id.cvQiwiTerminal).setVisibility(View.GONE);
-        }
-        else {
+        } else {
             bottomSheetView.findViewById(R.id.cvQiwiTerminal).setVisibility(View.VISIBLE);
             bottomSheetView.findViewById(R.id.cvQiwiTerminal).setOnClickListener(view -> activity.goToURL(qiwiTerminal));
-            ((TextView)bottomSheetView.findViewById(R.id.tvQiwiTerminalNote)).setText(qiwiTerminalNote);
+            ((TextView) bottomSheetView.findViewById(R.id.tvQiwiTerminalNote)).setText(qiwiTerminalNote);
         }
-        if (qiwiWallet.equals("")){
+        if (qiwiWallet.equals("")) {
             bottomSheetView.findViewById(R.id.cvQiwiWallet).setVisibility(View.GONE);
-        }
-        else {
+        } else {
             bottomSheetView.findViewById(R.id.cvQiwiWallet).setVisibility(View.VISIBLE);
             bottomSheetView.findViewById(R.id.cvQiwiWallet).setOnClickListener(view -> activity.goToURL(qiwiWallet));
-            ((TextView)bottomSheetView.findViewById(R.id.tvQiwiWalletNote)).setText(qiwiWalletNote);
+            ((TextView) bottomSheetView.findViewById(R.id.tvQiwiWalletNote)).setText(qiwiWalletNote);
         }
 
-        if (ckassa.equals("")){
+        if (ckassa.equals("")) {
             bottomSheetView.findViewById(R.id.cvCKassa).setVisibility(View.GONE);
-        }
-        else {
+        } else {
             bottomSheetView.findViewById(R.id.cvCKassa).setVisibility(View.VISIBLE);
             bottomSheetView.findViewById(R.id.cvCKassa).setOnClickListener(view -> activity.goToURL(ckassa));
-            ((TextView)bottomSheetView.findViewById(R.id.tvCKassaNote)).setText(ckassaNote);
+            ((TextView) bottomSheetView.findViewById(R.id.tvCKassaNote)).setText(ckassaNote);
         }
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();

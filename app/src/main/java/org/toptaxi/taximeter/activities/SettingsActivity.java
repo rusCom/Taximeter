@@ -14,7 +14,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        SettingsSectionsPagerAdapter settingsSectionsPagerAdapter = new SettingsSectionsPagerAdapter(this, getSupportFragmentManager());
+        SettingsSectionsPagerAdapter settingsSectionsPagerAdapter = new SettingsSectionsPagerAdapter(getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(settingsSectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);

@@ -2,22 +2,17 @@ package org.toptaxi.taximeter.activities.settings;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.SeekBar;
-import android.widget.Switch;
-import android.widget.TextView;
-
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
-import org.toptaxi.taximeter.services.FirebaseService;
 import org.toptaxi.taximeter.services.LogService;
 
 

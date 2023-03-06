@@ -1,15 +1,9 @@
 package org.toptaxi.taximeter.activities.settings;
 
-import android.content.Context;
-
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-
-import org.toptaxi.taximeter.R;
-import org.toptaxi.taximeter.activities.settings.PlaceholderFragment;
 
 
 /**
@@ -17,11 +11,9 @@ import org.toptaxi.taximeter.activities.settings.PlaceholderFragment;
  * one of the sections/tabs/pages.
  */
 public class SettingsSectionsPagerAdapter extends FragmentPagerAdapter {
-    private final Context mContext;
 
-    public SettingsSectionsPagerAdapter(Context context, FragmentManager fm) {
+    public SettingsSectionsPagerAdapter(FragmentManager fm) {
         super(fm);
-        mContext = context;
     }
 
     @Override
@@ -34,8 +26,7 @@ public class SettingsSectionsPagerAdapter extends FragmentPagerAdapter {
             case 1:return SettingsProfileFragment.mewInstance();
         }
 
-
-        return PlaceholderFragment.newInstance(position + 1);
+        return SettingsAlarmFragment.newInstance("0","1");
     }
 
     @Nullable

@@ -8,14 +8,14 @@ import android.widget.TextView;
 
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
-import org.toptaxi.taximeter.data.UnlimitedTariffPlan;
+import org.toptaxi.taximeter.data.TariffPlan;
 
 public class OnMainActionUnlimClickListener implements AdapterView.OnItemClickListener {
     protected static String TAG = "#########" + OnMainActionUnlimClickListener.class.getName();
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         TextView textViewItem = ((TextView) view.findViewById(R.id.tvMainActionUnlimTitle));
-        final UnlimitedTariffPlan unlimTariff = (UnlimitedTariffPlan)textViewItem.getTag();
+        final TariffPlan unlimTariff = (TariffPlan)textViewItem.getTag();
         Log.d(TAG,  "onItemClick " + unlimTariff.Name);
 
 

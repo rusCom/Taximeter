@@ -13,9 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
-import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.MainUtils;
-import org.toptaxi.taximeter.tools.PaymentService;
+import org.toptaxi.taximeter.dialogs.PaymentsDialog;
+import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class Preferences {
     public Long corporateTaxiCheckOrderDialogLastShow;
     public Boolean dispatcherMessages = false;
 
-    private final List<UnlimitedTariffPlan> unlimitedTariffPlans;
+    private final List<TariffPlan> driverTariffPlans;
 
 
     public Preferences() {
@@ -62,7 +62,7 @@ public class Preferences {
         newOrderAlarmDistance = sPref.getInt("newOrderAlarmDistance", 2);
         newOrderAlarmCost = sPref.getInt("newOrderAlarmCost", 100);
 
-        unlimitedTariffPlans = new ArrayList<>();
+        driverTariffPlans = new ArrayList<>();
 
     }
 
@@ -83,7 +83,7 @@ public class Preferences {
         this.dispatcherMessages = JSONGetBool(data, "dispatcher_messages");
 
         dispatcherTemplateMessages.clear();
-        unlimitedTariffPlans.clear();
+        driverTariffPlans.clear();
 
         if (data.has("dispatcher_template_messages")) {
             JSONArray templateMessagesJSON = data.getJSONArray("dispatcher_template_messages");
@@ -92,10 +92,10 @@ public class Preferences {
             }
         }
 
-        if (data.has("unlimited_tariff_plans")) {
-            JSONArray unlimitedTariffPlansJSONArray = data.getJSONArray("unlimited_tariff_plans");
+        if (data.has("tariff_plans")) {
+            JSONArray unlimitedTariffPlansJSONArray = data.getJSONArray("tariff_plans");
             for (int itemID = 0; itemID < unlimitedTariffPlansJSONArray.length(); itemID++) {
-                unlimitedTariffPlans.add(new UnlimitedTariffPlan(unlimitedTariffPlansJSONArray.getJSONObject(itemID)));
+                driverTariffPlans.add(new TariffPlan(unlimitedTariffPlansJSONArray.getJSONObject(itemID)));
             }
         }
 
@@ -121,7 +121,7 @@ public class Preferences {
         }
 
         if (data.has("available_payments")) {
-            PaymentService.getInstance().setPreferences(data.getJSONObject("available_payments"));
+            PaymentsDialog.getInstance().setPreferences(data.getJSONObject("available_payments"));
         }
     }
 
@@ -151,12 +151,12 @@ public class Preferences {
         editor.apply();
     }
 
-    public List<UnlimitedTariffPlan> getUnlimitedTariffPlans() {
-        return unlimitedTariffPlans;
+    public List<TariffPlan> getDriverTariffPlans() {
+        return driverTariffPlans;
     }
 
     public boolean useUnlimitedTariffPlans() {
-        return unlimitedTariffPlans.size() != 0;
+        return driverTariffPlans.size() != 0;
     }
 
     public Boolean useRating() {

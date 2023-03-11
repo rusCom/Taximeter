@@ -3,6 +3,8 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">https://ataxi24.ru</domain>
         <domain includeSubdomains="true">ataxi24.ru</domain>
+        <domain includeSubdomains="true">92.50.171.110</domain>
+        <domain includeSubdomains="true">62.133.173.81</domain>
         <domain includeSubdomains="true">192.168.1.199</domain>
         <domain includeSubdomains="true">transfer-ufa.ru</domain>
     </domain-config>

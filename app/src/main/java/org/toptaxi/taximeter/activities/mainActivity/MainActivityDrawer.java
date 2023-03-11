@@ -1,7 +1,6 @@
 package org.toptaxi.taximeter.activities.mainActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.view.View;
 
 import androidx.appcompat.content.res.AppCompatResources;
@@ -30,13 +29,13 @@ import org.toptaxi.taximeter.activities.SettingsActivity;
 import org.toptaxi.taximeter.activities.StatisticsActivity;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
-import org.toptaxi.taximeter.tools.PaymentService;
+import org.toptaxi.taximeter.dialogs.PaymentsDialog;
 
 public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
     MainActivity mainActivity;
     Toolbar toolbar;
     protected AccountHeader accountHeader;
-    PrimaryDrawerItem balanceItem, themeItem, messagesItem, unlimInfo;
+    PrimaryDrawerItem balanceItem, themeItem, messagesItem, tariffPlanItem;
     PrimaryDrawerItem balanceCorporateTaxiItem;
     ProfileDrawerItem profile;
     Drawer drawer;
@@ -87,10 +86,19 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
         }
 
 
+        if (MainApplication.getInstance().getProfile().showTariffPlanCaption()){
+            tariffPlanItem = new PrimaryDrawerItem().withName(MainApplication.getInstance().getProfile().getTariffPlanCaption()).withIcon(FontAwesome.Icon.faw_fire).withSelectable(false);
+            drawer.addItem(tariffPlanItem);
+        }
+
+
+        /*
         if (MainApplication.getInstance().getPreferences().useUnlimitedTariffPlans()) {
             unlimInfo = new PrimaryDrawerItem().withName(MainApplication.getInstance().getMainAccount().getUnlimitedTariffInfo()).withIcon(FontAwesome.Icon.faw_fire).withSelectable(false).withIdentifier(Constants.MENU_ACITVATE_UNLIM);
             drawer.addItem(unlimInfo);
         }
+
+         */
 
 
         drawer.addItem(new DividerDrawerItem());
@@ -112,7 +120,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
 
         drawer.addItem(new DividerDrawerItem());
-        if (PaymentService.getInstance().getPaymentsAvailable()){
+        if (PaymentsDialog.getInstance().getPaymentsAvailable()){
             drawer.addItem(new PrimaryDrawerItem().withName("Пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT));
         }
         if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink()!= null) {
@@ -162,9 +170,17 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                     drawer.updateItem(messagesItem);
                 }
 
-                if (unlimInfo != null) {
-                    unlimInfo.withName(MainApplication.getInstance().getMainAccount().getUnlimitedTariffInfo());
-                    drawer.updateItem(unlimInfo);
+                if (MainApplication.getInstance().getProfile().showActivateTariffPlan()){
+                    if (tariffPlanItem == null){
+                        tariffPlanItem = new PrimaryDrawerItem().withName(MainApplication.getInstance().getProfile().getTariffPlanCaption()).withIcon(FontAwesome.Icon.faw_fire).withSelectable(false);
+                        drawer.addItem(tariffPlanItem);
+                    }
+                    tariffPlanItem.withName(MainApplication.getInstance().getProfile().getTariffPlanCaption());
+                }
+                // Иначе, если нстрочка показано, то скрывам ее
+                else if (tariffPlanItem != null){
+                    drawer.removeItem(tariffPlanItem.getIdentifier());
+                    tariffPlanItem = null;
                 }
             }
         } else {
@@ -185,7 +201,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 drawer.updateItem(themeItem);
                 break;
             case Constants.MENU_ACITVATE_UNLIM:
-                mainActivity.onUnlimitedTariffPlanClick();
+                mainActivity.onTariffPlanClick();
                 break;
             case Constants.MENU_MESSAGES:
                 mainActivity.startActivity(new Intent(mainActivity, MessagesActivity.class));
@@ -222,7 +238,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 mainActivity.goToURL(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
                 break;
             case Constants.MENU_PAYMENT:
-                PaymentService.getInstance().showPaymentDialog(mainActivity);
+                PaymentsDialog.getInstance().showPaymentDialog(mainActivity);
                 break;
             case Constants.MENU_INSTRUCTION:
                 mainActivity.goToURL(MainApplication.getInstance().getPreferences().instructionLink);

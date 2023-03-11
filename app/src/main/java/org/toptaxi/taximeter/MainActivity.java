@@ -1,7 +1,6 @@
 package org.toptaxi.taximeter;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -14,7 +13,6 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,29 +26,29 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.json.JSONObject;
 import org.toptaxi.taximeter.activities.OrdersOnCompleteActivity;
 import org.toptaxi.taximeter.activities.mainActivity.MainActivityDrawer;
 import org.toptaxi.taximeter.adapters.MainActionAdapter;
-import org.toptaxi.taximeter.adapters.MainActionUnlimitedTariffPlanAdapter;
+import org.toptaxi.taximeter.tools.bottomsheets.MainBottomSheetRecycler;
 import org.toptaxi.taximeter.adapters.OnMainActionClickListener;
-import org.toptaxi.taximeter.adapters.OnMainActionUnlimClickListener;
 import org.toptaxi.taximeter.adapters.RVCurOrdersAdapter;
 import org.toptaxi.taximeter.adapters.RecyclerItemClickListener;
 import org.toptaxi.taximeter.adapters.RoutePointsAdapter;
 import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.data.Orders;
 import org.toptaxi.taximeter.data.RoutePoint;
+import org.toptaxi.taximeter.data.TariffPlan;
 import org.toptaxi.taximeter.services.LocationService;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
 import org.toptaxi.taximeter.tools.FontFitTextView;
-import org.toptaxi.taximeter.tools.LockOrientation;
 import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 import org.toptaxi.taximeter.tools.MainUtils;
 import org.toptaxi.taximeter.tools.OnMainDataChangeListener;
+import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -238,10 +236,6 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         if (mainActivityDrawer.closeDrawer()) {
             return;
         }
-        // Если по какой-либо причине данные по водителю не загружены, то загружаем их. Бывает такое, когда из спящего режима востанавливается приложение
-        if (!MainApplication.getInstance().getMainAccount().isParsedData) {
-            MainApplication.getInstance().getRestService().httpGetResult("/profile/auth");
-        }
 
         if (MainApplication.getInstance().getMainActivityCurView() == Constants.CUR_VIEW_VIEW_ORDER) {
             MainApplication.getInstance().setMainActivityCurView(Constants.CUR_VIEW_CUR_ORDERS);
@@ -352,7 +346,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 alertDialog.setTitle("Внимание");
                 alertDialog.setMessage(alertText);
                 final String finalAction = action;
-                alertDialog.setPositiveButton("Да", (dialogInterface, i) -> MainApplication.getInstance().getRestService().httpGetResult(finalAction));
+                alertDialog.setPositiveButton("Да", (dialogInterface, i) -> httpGetResult(finalAction));
                 alertDialog.setNegativeButton("Нет", null);
                 alertDialog.create();
                 alertDialog.show();
@@ -408,22 +402,30 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 .show();
     }
 
-    public void onUnlimitedTariffPlanClick() {
+    public void onTariffPlanClick() {
         if ((MainApplication.getInstance().getMainAccount().getStatus() != Constants.DRIVER_ON_ORDER)
-                && (MainApplication.getInstance().getMainAccount().UnlimInfo.equals(""))) {
+                && (MainApplication.getInstance().getProfile().showActivateTariffPlan())) {
+            ArrayList<IMainCardViewData> cards = new ArrayList<>(MainApplication.getInstance().getPreferences().getDriverTariffPlans());
+            MainBottomSheetRecycler myBottomSheetFragment = new MainBottomSheetRecycler(
+                    cards,
+                    mainCardViewData -> {
+                        TariffPlan tariffPlan = (TariffPlan)mainCardViewData;
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainApplication.getInstance().getMainActivity());
+                        alertDialog.setTitle("Покупка смены");
+                        alertDialog.setMessage("Купить смену \"" + tariffPlan.Name + "\" за " +
+                                MainUtils.getSummaString(tariffPlan.Cost) + "?");
+                        alertDialog.setPositiveButton("Да", (dialogInterface, i1) -> {
+                            httpGetResult("/tariff/activate?tariff_id=" + tariffPlan.ID);
+                            LogService.getInstance().log("sys", "activate unlim with id = " + tariffPlan.ID);
+                        });
+                        alertDialog.setNegativeButton("Нет" , null);
+                        alertDialog.create();
+                        alertDialog.show();
 
-            MainActionUnlimitedTariffPlanAdapter mainActionAdapter = new MainActionUnlimitedTariffPlanAdapter(this,
-                    R.layout.main_action_unlim_info,
-                    MainApplication.getInstance().getPreferences().getUnlimitedTariffPlans());
-            ListView listViewItems = new ListView(this);
-            listViewItems.setAdapter(mainActionAdapter);
-            listViewItems.setOnItemClickListener(new OnMainActionUnlimClickListener());
-
-            mainActionsUnlimDialog = new AlertDialog.Builder(MainActivity.this)
-                    .setView(listViewItems)
-                    .show();
+                    }
+            );
+            myBottomSheetFragment.show(getSupportFragmentManager(), myBottomSheetFragment.getTag());
         }
-        //new GetUnlimInfoTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void onLocationDataChange() {
@@ -538,24 +540,24 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
 
                     btnCurOrderMainAction.setVisibility(View.VISIBLE);
                     btnCurOrderMainAction.setText("Принять");
-                    btnCurOrderMainAction.setOnClickListener(view -> MainApplication.getInstance().getRestService().httpGetResult("/last/orders/apply"));
+                    btnCurOrderMainAction.setOnClickListener(view -> httpGetResult("/last/orders/apply"));
 
                     btnCurOrderAction.setVisibility(View.VISIBLE);
                     btnCurOrderAction.setText("Отказаться");
-                    btnCurOrderAction.setOnClickListener(view -> MainApplication.getInstance().getRestService().httpGetResult("/last/orders/deny"));
+                    btnCurOrderAction.setOnClickListener(view -> httpGetResult("/last/orders/deny"));
                     break;
                 case "set_driver_at_client":
                     btnCurOrderMainAction.setVisibility(View.VISIBLE);
                     btnCurOrderMainAction.setText("Подъехал");
                     btnCurOrderAction.setVisibility(View.GONE);
-                    btnCurOrderMainAction.setOnClickListener(view -> MainApplication.getInstance().getRestService().httpGetResult("/last/orders/waiting"));
+                    btnCurOrderMainAction.setOnClickListener(view -> httpGetResult("/last/orders/waiting"));
                     fabMainActions.setVisibility(View.VISIBLE);
                     break;
                 case "set_client_in_car":
                     btnCurOrderMainAction.setVisibility(View.VISIBLE);
                     btnCurOrderMainAction.setText("Клиент в машине");
                     btnCurOrderAction.setVisibility(View.GONE);
-                    btnCurOrderMainAction.setOnClickListener(view -> MainApplication.getInstance().getRestService().httpGetResult("/last/orders/executed"));
+                    btnCurOrderMainAction.setOnClickListener(view -> httpGetResult("/last/orders/executed"));
                     fabMainActions.setVisibility(View.VISIBLE);
                     break;
                 case "set_order_done":
@@ -565,7 +567,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                     btnCurOrderMainAction.setVisibility(View.VISIBLE);
                     btnCurOrderMainAction.setText("Выполнил");
                     btnCurOrderAction.setVisibility(View.GONE);
-                    btnCurOrderMainAction.setOnClickListener(view -> MainApplication.getInstance().getRestService().httpGetResult("/last/orders/done"));
+                    btnCurOrderMainAction.setOnClickListener(view -> httpGetResult("/last/orders/done"));
                     fabMainActions.setVisibility(View.GONE);
                     break;
             }
@@ -624,7 +626,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
 
                         alertDialog.setPositiveButton("Да", (dialogInterface, i) -> {
                             MainApplication.getInstance().setMainActivityCurView(Constants.CUR_VIEW_CUR_ORDERS);
-                            MainApplication.getInstance().getRestService().httpGetResult("/last/orders/check?order_id=" + viewOrder.getID());
+                            httpGetResult("/last/orders/check?order_id=" + viewOrder.getID());
                             MainApplication.getInstance().getPreferences().setLastShowCorporateTaxiCheckOrderDialog();
                         });
                         alertDialog.setNegativeButton("Нет", null);

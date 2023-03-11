@@ -45,8 +45,8 @@ public class OnMainActionClickListener implements AdapterView.OnItemClickListene
                 case Constants.MAIN_ACTION_GO_OFFLINE:
                     MainApplication.getInstance().getMainActivity().driverGoOffLine();
                     break;
-                case Constants.MAIN_ACTION_ACTIVATE_UNLIM:
-                    MainApplication.getInstance().getMainActivity().onUnlimitedTariffPlanClick();
+                case Constants.MAIN_ACTION_TARIFF_PLAN:
+                    MainApplication.getInstance().getMainActivity().onTariffPlanClick();
                     break;
                 case Constants.MAIN_ACTION_PRIOR_ORDER:
 

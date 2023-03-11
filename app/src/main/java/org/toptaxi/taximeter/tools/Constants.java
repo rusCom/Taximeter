@@ -45,7 +45,7 @@ public class Constants {
 
     public static final int MAIN_ACTION_GO_ONLINE       = 100;
     public static final int MAIN_ACTION_GO_OFFLINE      = 101;
-    public static final int MAIN_ACTION_ACTIVATE_UNLIM  = 102;
+    public static final int MAIN_ACTION_TARIFF_PLAN     = 102;
     public static final int MAIN_ACTION_ORDER_SETTINGS  = 103;
     public static final int MAIN_ACTION_PRIOR_ORDER     = 104;
     public static final int MAIN_ACTION_SEND_MESSAGE    = 105;

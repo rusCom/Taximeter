@@ -1,4 +1,4 @@
-package org.toptaxi.taximeter.tools;
+package org.toptaxi.taximeter.dialogs;
 
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetBool;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
@@ -17,26 +17,32 @@ import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.tinkoff.acquiring.sdk.TinkoffAcquiring;
+import ru.tinkoff.acquiring.sdk.models.enums.CheckType;
+import ru.tinkoff.acquiring.sdk.models.options.CustomerOptions;
 import ru.tinkoff.acquiring.sdk.models.options.FeaturesOptions;
 import ru.tinkoff.acquiring.sdk.models.options.OrderOptions;
 import ru.tinkoff.acquiring.sdk.models.options.screen.PaymentOptions;
 import ru.tinkoff.acquiring.sdk.utils.Money;
 
-public class PaymentService {
-    private static volatile PaymentService paymentService;
+public class PaymentsDialog {
+    private static volatile PaymentsDialog paymentService;
     private String detailNote;
     private String qiwiNote;
-    private Boolean qiwiAvailable;
-    private Boolean sbpAvailable;
+    private String tinkoffNote;
+    private Boolean qiwiAvailable = false;
+    private Boolean sbpAvailable = false;
+    private Boolean tinkoffAvailable = false;
     private String sbpNote;
     private String ckassa = "";
     private String qiwiTerminal = "";
@@ -46,13 +52,13 @@ public class PaymentService {
     private String qiwiWalletNote = "";
 
 
-    public static PaymentService getInstance() {
-        PaymentService localInstance = paymentService;
+    public static PaymentsDialog getInstance() {
+        PaymentsDialog localInstance = paymentService;
         if (localInstance == null) {
-            synchronized (PaymentService.class) {
+            synchronized (PaymentsDialog.class) {
                 localInstance = paymentService;
                 if (localInstance == null) {
-                    paymentService = localInstance = new PaymentService();
+                    paymentService = localInstance = new PaymentsDialog();
                 }
             }
         }
@@ -65,6 +71,8 @@ public class PaymentService {
         qiwiAvailable = JSONGetBool(data, "qiwi", false);
         sbpNote = JSONGetString(data, "sbp_note");
         sbpAvailable = JSONGetBool(data, "sbp", false);
+        tinkoffNote = JSONGetString(data, "tinkoff_note");
+        tinkoffAvailable = JSONGetBool(data, "tinkoff", false);
         ckassa = JSONGetString(data, "ckassa");
         qiwiTerminal = JSONGetString(data, "qiwi_terminal");
         qiwiWallet = JSONGetString(data, "qiwi_wallet");
@@ -74,7 +82,7 @@ public class PaymentService {
     }
 
     public boolean getPaymentsAvailable() {
-        return sbpAvailable || qiwiAvailable;
+        return sbpAvailable || qiwiAvailable || tinkoffAvailable;
     }
 
     public boolean getPaymentsAnotherAvailable() {
@@ -96,11 +104,15 @@ public class PaymentService {
 
         Button buttonSPBPayment = bottomSheetView.findViewById(R.id.btnSBPPayment);
         Button buttonQiwiPayment = bottomSheetView.findViewById(R.id.btnQiwiPayment);
+        Button buttonTinkoffPayment = bottomSheetView.findViewById(R.id.btnTinkoffPayment);
+
         EditText ednPaymentAmount = bottomSheetView.findViewById(R.id.ednPaymentAmount);
         TextView tvDetail = bottomSheetView.findViewById(R.id.tvDetail);
         TextView tvAnotherPayments = bottomSheetView.findViewById(R.id.tvAnotherPayments);
         buttonSPBPayment.setVisibility(View.GONE);
         buttonQiwiPayment.setVisibility(View.GONE);
+        buttonTinkoffPayment.setVisibility(View.GONE);
+
 
 
         bottomSheetView.findViewById(R.id.btnPayment100).setOnClickListener(v -> ednPaymentAmount.setText("100"));
@@ -185,7 +197,8 @@ public class PaymentService {
                                     sbpShowMessage.set(true);
                                     dialog.dismiss();
                                     bottomSheetDialog.dismiss();
-                                    tinkoffSBPPay(activity,
+                                    tinkoffPay(activity,
+                                            "sbp",
                                             JSONGetString(response, "result_terminal_key"),
                                             JSONGetString(response, "result_public_key"),
                                             JSONGetString(response, "result_number"), amountInteger);
@@ -196,7 +209,9 @@ public class PaymentService {
 
                         } else {
                             bottomSheetDialog.dismiss();
-                            tinkoffSBPPay(activity, JSONGetString(response, "result_terminal_key"),
+                            tinkoffPay(activity,
+                                    "sbp",
+                                    JSONGetString(response, "result_terminal_key"),
                                     JSONGetString(response, "result_public_key"),
                                     JSONGetString(response, "result_number"), amountInteger);
                         }
@@ -259,11 +274,62 @@ public class PaymentService {
             });
         }
 
+        if (tinkoffAvailable){
+            buttonTinkoffPayment.setVisibility(View.VISIBLE);
+            AtomicReference<Boolean> tinkoffShowMessage = new AtomicReference<>(false);
+            buttonTinkoffPayment.setOnClickListener(view -> {
+                String amountString = ednPaymentAmount.getText().toString();
+                if (amountString.equals("")) {
+                    ednPaymentAmount.requestFocus();
+                    ednPaymentAmount.setError("Введите сумму платежа");
+                    return;
+                }
+
+                int amountInteger = Integer.parseInt(amountString) * 100;
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.execute(() -> {
+                    JSONObject response = MainApplication.getInstance().getRestService().httpGet(activity, "/payments/order?amount=" + amountInteger + "&source=tinkoff");
+                    if (JSONGetString(response, "status").equals("OK")) {
+                        Boolean showMessage = JSONGetBool(response, "result_message");
+                        if (!tinkoffShowMessage.get() && showMessage) {
+                            activity.runOnUiThread(() -> {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                                builder.setMessage(tinkoffNote);
+                                builder.setCancelable(true);
+                                builder.setPositiveButton("Понятно", (dialog, which) -> {
+                                    sbpShowMessage.set(true);
+                                    dialog.dismiss();
+                                    bottomSheetDialog.dismiss();
+                                    tinkoffPay(activity,
+                                            "tinkoff",
+                                            JSONGetString(response, "result_terminal_key"),
+                                            JSONGetString(response, "result_public_key"),
+                                            JSONGetString(response, "result_number"), amountInteger);
+                                });
+                                builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+                                builder.show();
+                            });
+
+                        } else {
+                            bottomSheetDialog.dismiss();
+                            tinkoffPay(activity,
+                                    "tinkoff",
+                                    JSONGetString(response, "result_terminal_key"),
+                                    JSONGetString(response, "result_public_key"),
+                                    JSONGetString(response, "result_number"), amountInteger);
+                        }
+                    }
+
+                });
+
+            });
+        }
+
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
     }
 
-    private void tinkoffSBPPay(MainAppCompatActivity activity, String terminalKey, String publicKey, String orderID, long summa){
+    private void tinkoffPay(MainAppCompatActivity activity, String payType, String terminalKey, String publicKey, String orderID, long summa){
         OrderOptions orderOptions = new OrderOptions();
         orderOptions.setOrderId(orderID);
         orderOptions.setAmount(Money.ofCoins(summa));
@@ -272,22 +338,32 @@ public class PaymentService {
         FeaturesOptions featuresOptions = new FeaturesOptions();
         featuresOptions.setTinkoffPayEnabled(false);
         featuresOptions.setFpsEnabled(true);
-        // featuresOptions.set
+        featuresOptions.setEmailRequired(false);
+
+        CustomerOptions customerOptions = new CustomerOptions();
+        customerOptions.setCustomerKey(MainApplication.getInstance().getMainAccount().getToken());
+        customerOptions.setCheckType(CheckType.NO.toString());
 
         PaymentOptions paymentOptions = new PaymentOptions();
         paymentOptions.setOrder(orderOptions);
         paymentOptions.setFeatures(featuresOptions);
+        paymentOptions.setCustomer(customerOptions);
+
+
+
         try {
             TinkoffAcquiring tinkoffAcquiring = new TinkoffAcquiring(activity.getApplicationContext(), terminalKey, publicKey);
-            // tinkoffAcquiring.openPaymentScreen(activity, paymentOptions, 154);
-            tinkoffAcquiring.payWithSbp(activity, paymentOptions, 254);
+            if (payType.equals("sbp")){
+                tinkoffAcquiring.payWithSbp(activity, paymentOptions, 254);
+            } else if (payType.equals("tinkoff")) {
+                featuresOptions.setFpsEnabled(false);
+                tinkoffAcquiring.openPaymentScreen(activity, paymentOptions, 154);
+            }
         }
         catch (Exception exception){
+            MainApplication.getInstance().getRestService().serverError("tinkoffPay", ExceptionUtils.getStackTrace(exception));
             activity.runOnUiThread(()->activity.showToast("Ошибка платежной системы. Попробуйте попозже.\n" + exception.getLocalizedMessage()));
         }
-
-
-
     }
 
     public void showAnotherPaymentDialog(MainAppCompatActivity activity) {
@@ -295,6 +371,9 @@ public class PaymentService {
         View bottomSheetView = LayoutInflater.from(activity)
                 .inflate(R.layout.dialog_another_payments_available,
                         activity.findViewById(R.id.modalBottomAddPayment));
+
+
+
         if (qiwiTerminal.equals("")) {
             bottomSheetView.findViewById(R.id.cvQiwiTerminal).setVisibility(View.GONE);
         } else {

@@ -77,46 +77,36 @@ public class Messages {
                             MediaPlayer mp = MediaPlayer.create(MainApplication.getInstance().getMainActivity(), R.raw.incomming_message_frg);
                             mp.setLooping(false);
                             mp.start();
-                            uiHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    onMessagesListener.OnNewMessage();
-                                }
-                            });
+                            uiHandler.post(() -> onMessagesListener.OnNewMessage());
                         } else {
-                            MainApplication.getInstance().getMainActivity().runOnUiThread(new Runnable() {
-                                public void run() {
-                                    MediaPlayer mp = MediaPlayer.create(MainApplication.getInstance().getMainActivity(), R.raw.incomming_message);
-                                    mp.setLooping(false);
-                                    mp.start();
-                                    AlertDialog.Builder adb = new AlertDialog.Builder(MainApplication.getInstance().getMainActivity());
-                                    adb.setMessage(message.Text);
-                                    adb.setIcon(android.R.drawable.ic_dialog_info);
-                                    adb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            setRead(message.ID);
-                                        }
+                            MainApplication.getInstance().getMainActivity().runOnUiThread(() -> {
+                                MediaPlayer mp = MediaPlayer.create(MainApplication.getInstance().getMainActivity(), R.raw.incomming_message);
+                                mp.setLooping(false);
+                                mp.start();
+                                AlertDialog.Builder adb = new AlertDialog.Builder(MainApplication.getInstance().getMainActivity());
+                                adb.setMessage(message.Text);
+                                adb.setIcon(android.R.drawable.ic_dialog_info);
+                                adb.setPositiveButton("Ok", (dialogInterface, i) -> setRead(message.ID));
+                                if (message.Type.equals("disp")) {
+                                    adb.setTitle("Сообщение от диспетчера");
+                                    adb.setNegativeButton("Ответить", (dialogInterface, i) -> {
+                                        setRead(message.ID);
+                                        Intent messagesIntent = new Intent(MainApplication.getInstance().getMainActivity(), MessagesActivity.class);
+                                        MainApplication.getInstance().getMainActivity().startActivity(messagesIntent);
                                     });
-                                    if (message.Type.equals("disp")) {
-                                        adb.setTitle("Сообщение от диспетчера");
-                                        adb.setNegativeButton("Ответить", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                setRead(message.ID);
-                                                Intent messagesIntent = new Intent(MainApplication.getInstance().getMainActivity(), MessagesActivity.class);
-                                                MainApplication.getInstance().getMainActivity().startActivity(messagesIntent);
-                                            }
-                                        });
-                                    }
-
-                                    adb.create();
-                                    adb.show();
                                 }
+                                adb.create();
+                                adb.show();
                             });
                         }
                     } else {
-                        sendNotification(message.Text, String.valueOf(message.ID));
+                        try {
+                            sendNotification(message.Text, String.valueOf(message.ID));
+                        }
+                        catch (Exception exception){
+                            MainApplication.getInstance().getRestService().serverError("Messages.sendNotification", exception.toString());
+                        }
+
                     }
                 }
             }
@@ -141,9 +131,10 @@ public class Messages {
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
+
+
         ((NotificationManager) MainApplication.getInstance().getSystemService(Context.NOTIFICATION_SERVICE)).notify(Integer.parseInt(ID), notificationBuilder.build());
     }
-
 
     private boolean isNewMessage(Message message) {
         boolean result = false;

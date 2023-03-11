@@ -92,6 +92,15 @@
         android:layout_marginTop="@dimen/button_margin"
         android:text="Mир/Visa/MasterCard" />
 
+    <Button
+        android:id="@+id/btnTinkoffPayment"
+        style="@style/MainButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/primaryYellowDark"
+        android:layout_marginTop="@dimen/button_margin"
+        android:text="Mир/Visa/MasterCard" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

@@ -248,8 +248,8 @@ public class MainApplication extends Application {
                 if (getMainAccount().getStatus() == Constants.DRIVER_ONLINE)
                     mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_GO_OFFLINE, "Сняться с автораздачи"));
                 if (getPreferences().useUnlimitedTariffPlans()) {
-                    if (getMainAccount().UnlimInfo.equals(""))
-                        mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_ACTIVATE_UNLIM, "Активировать безлимит"));
+                    if (getProfile().showActivateTariffPlan())
+                        mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_TARIFF_PLAN, "Покупка смены"));
                 }
                 mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_PRIOR_ORDER, "Предварительные заказы"));
             }

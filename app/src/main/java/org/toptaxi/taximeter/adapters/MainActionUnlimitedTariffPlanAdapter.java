@@ -9,17 +9,17 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.toptaxi.taximeter.R;
-import org.toptaxi.taximeter.data.UnlimitedTariffPlan;
+import org.toptaxi.taximeter.data.TariffPlan;
 
 import java.util.List;
 
 
-public class MainActionUnlimitedTariffPlanAdapter extends ArrayAdapter<UnlimitedTariffPlan> {
+public class MainActionUnlimitedTariffPlanAdapter extends ArrayAdapter<TariffPlan> {
     Context mContext;
     int layoutResourceId;
-    List<UnlimitedTariffPlan> mainActionItems;
+    List<TariffPlan> mainActionItems;
 
-    public MainActionUnlimitedTariffPlanAdapter(Context context, int resource, List<UnlimitedTariffPlan> objects) {
+    public MainActionUnlimitedTariffPlanAdapter(Context context, int resource, List<TariffPlan> objects) {
         super(context, resource, objects);
         mContext = context;
         layoutResourceId = resource;
@@ -32,7 +32,7 @@ public class MainActionUnlimitedTariffPlanAdapter extends ArrayAdapter<Unlimited
             LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
             convertView = inflater.inflate(layoutResourceId, parent, false);
         }
-        UnlimitedTariffPlan mainActionItem = mainActionItems.get(position);
+        TariffPlan mainActionItem = mainActionItems.get(position);
         TextView tvMainActionTitle = (TextView)convertView.findViewById(R.id.tvMainActionUnlimTitle);
         tvMainActionTitle.setText(mainActionItem.Name);
         tvMainActionTitle.setTag(mainActionItem);

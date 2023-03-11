@@ -24,7 +24,6 @@ public class Account {
     private String serName;
     private Integer status = 0, lastStatus = -1;
     private String NotReadMessageCount;
-    public String UnlimInfo = "";
     private Boolean isCheckPriorOrder = true;
     private Boolean isGetOnLine = false;
     public boolean isParsedData = false;
@@ -42,7 +41,6 @@ public class Account {
         serName = JSONGetString(data, "ser_name");
         status = JSONGetInteger(data, "status", 0);
         NotReadMessageCount = JSONGetString(data, "nrmc");
-        UnlimInfo = JSONGetString(data, "unlim");
         isCheckPriorOrder = JSONGetBool(data, "check_prior");
         isGetOnLine = JSONGetBool(data, "get_on_line");
         balanceCorporateTaxi = JSONGetDouble(data, "balance_corporate_taxi");
@@ -61,14 +59,8 @@ public class Account {
         isParsedData = true;
     }
 
-    public String getUnlimitedTariffInfo() {
-        if (this.UnlimInfo.equals("")) return "На процентах";
-        return this.UnlimInfo;
-    }
-
-
     public String getMainActivityCaption() {
-        String result = new DecimalFormat("###,###.00").format(Balance);
+        String result = new DecimalFormat("###,##0.00").format(Balance);
         result += " " + MainUtils.getRubSymbol();
         result += " " + getStatusName();
         return result;
@@ -92,7 +84,16 @@ public class Account {
     }
 
     public String getBalanceString() {
-        return new DecimalFormat("###,#00.00").format(Balance);
+        if (Balance == null){
+            return "0.00";
+        }
+        try {
+            return new DecimalFormat("###,##0.00").format(Balance);
+        }
+        catch (Exception ignored){
+            MainApplication.getInstance().getRestService().serverError("Account.getBalanceString", Balance.toString());
+        }
+        return Balance.toString();
     }
 
     public String getBalanceCorporateTaxiString() {

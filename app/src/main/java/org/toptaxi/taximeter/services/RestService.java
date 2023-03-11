@@ -3,6 +3,7 @@ package org.toptaxi.taximeter.services;
 import android.content.Context;
 import android.os.Build;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -119,6 +120,10 @@ public class RestService {
         });
     }
 
+    public void serverError(String method, String data){
+        httpGetThread("/server_error?method=" + method + "&data=" + data);
+    }
+
 
     public void httpGetThread(final String path) {
         new Thread(() -> httpGetHost(path)).start();
@@ -133,6 +138,7 @@ public class RestService {
             mainAppCompatActivity.runOnUiThread(mainAppCompatActivity::showProgressDialog);
         }
         JSONObject response = httpGetHost(path);
+        // LogService.getInstance().log("sys", response.toString());
         if (response == null) {
             response = new JSONObject();
             try {
@@ -205,7 +211,9 @@ public class RestService {
 
     private JSONObject httpGetHost(String path) {
         String url = restHost.get(restIndex) + path;
+        // LogService.getInstance().log("sys", url);
         Response response = restCallGet(url);
+        // LogService.getInstance().log("sys", response.body().toString());
 
         if (response == null) {
             for (int item = 0; item < restHost.size(); item++) {
@@ -270,7 +278,8 @@ public class RestService {
                     .header("authorization", "Bearer " + getHeader())
                     .build();
             response = httpClient.newCall(request).execute();
-        } catch (IOException ignored) {
+        } catch (Exception exception) {
+            MainApplication.getInstance().getRestService().serverError("restCallGet", ExceptionUtils.getStackTrace(exception));
         }
         return response;
     }

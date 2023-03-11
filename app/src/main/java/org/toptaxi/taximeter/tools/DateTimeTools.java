@@ -1,8 +1,29 @@
 package org.toptaxi.taximeter.tools;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 
 public class DateTimeTools {
+
+    public static boolean isToday(LocalDateTime dateTime){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDate now = LocalDate.now();
+            LocalDate checkDate = dateTime.toLocalDate();
+            if (now.equals(checkDate)){return true;}
+            return false;
+        }
+        return false;
+    }
+    public static boolean isTomorrow(LocalDateTime dateTime){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDate now = LocalDate.now().plusDays(1);
+            LocalDate checkDate = dateTime.toLocalDate();
+            if (now.equals(checkDate)){return true;}
+            return false;
+        }
+        return false;
+    }
     public static boolean isTomorrow(Calendar date){
         Calendar curDate = Calendar.getInstance();
         curDate.setTimeInMillis(System.currentTimeMillis());

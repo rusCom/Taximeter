@@ -80,11 +80,9 @@ public class StartApplicationActivity extends AppCompatActivity {
         }
         tvAction.setText("Проверка доступа к GPS");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        Constants.MY_PERMISSIONS_REQUEST_LOCATION);
-                return;
-            }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    Constants.MY_PERMISSIONS_REQUEST_LOCATION);
+            return;
         }
         tvAction.setText("Проверка подключения к GPS");
         if (!((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -99,26 +97,6 @@ public class StartApplicationActivity extends AppCompatActivity {
             startApplication = false;
         }
 
-
-        /*
-
-        if (startApplication) {
-            Intent intent = new Intent();
-            String packageName = this.getPackageName();
-            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                    LogService.getInstance().log(this, "isIgnoringBatteryOptimizations");
-                    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-                    this.startActivity(intent);
-                    startApplication = false;
-                }
-            }
-
-        }
-
-         */
 
 
         LogService.getInstance().log(this, "checkPermissions", "startInit");

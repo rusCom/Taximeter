@@ -47,13 +47,13 @@ public class MainUtils {
 
     public static String getRubSymbol() {
         String result;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            result = String.valueOf(Html.fromHtml("&#x20bd", Html.FROM_HTML_MODE_LEGACY)); // for 24 api and more
-        } else {
-            result = String.valueOf(Html.fromHtml("&#x20bd"));
-        }
+        result = String.valueOf(Html.fromHtml("&#x20bd", Html.FROM_HTML_MODE_LEGACY)); // for 24 api and more
         if (result.trim().equals("")) result = "руб.";
         return result;
+    }
+
+    public static String getSummaString(int summa){
+        return new DecimalFormat("###,##0").format(summa) + " " + getRubSymbol();
     }
 
     public static Boolean JSONGetBool(JSONObject data, String field, Boolean def) {

@@ -24,7 +24,7 @@ public class Payment {
     }
 
     public String getSummaString() {
-        return new DecimalFormat("###,#00.00").format(Summa);
+        return new DecimalFormat("###,##0.00").format(Summa);
     }
 
     public String getBalanceString() {

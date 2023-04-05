@@ -18,8 +18,9 @@ import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.adapters.RoutePointsAdapter;
 import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.data.RoutePoint;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 
-public class HisOrderActivity extends AppCompatActivity  {
+public class HisOrderActivity extends MainAppCompatActivity {
     Order viewOrder;
     RecyclerView rvRoutePoints;
     RoutePointsAdapter routePointsAdapter;
@@ -34,10 +35,10 @@ public class HisOrderActivity extends AppCompatActivity  {
         mapFragment.getMapAsync(this::init);
 
         viewOrder = MainApplication.getInstance().getHisOrderView();
-        rvRoutePoints = findViewById(R.id.rvCurOrderRoutePoints);
+        rvRoutePoints = findViewById(R.id.rvOrderDataRoutePoints);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvRoutePoints.setLayoutManager(linearLayoutManager);
-        routePointsAdapter = new RoutePointsAdapter();
+        routePointsAdapter = new RoutePointsAdapter(viewOrder);
         rvRoutePoints.setAdapter(routePointsAdapter);
     }
 
@@ -62,11 +63,12 @@ public class HisOrderActivity extends AppCompatActivity  {
                 }
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBuilder.build(), size, size, 200));
             }
-            routePointsAdapter.setOrder(viewOrder);
-            routePointsAdapter.notifyItemRangeInserted(0, viewOrder.getRouteCount());
+
+            // routePointsAdapter.setOrder(viewOrder);
+            // routePointsAdapter.notifyItemRangeInserted(0, viewOrder.getRouteCount());
             // routePointsAdapter.notifyDataSetChanged();
             findViewById(R.id.llCurOrderTitleEx).setVisibility(View.GONE);
-            viewOrder.fillCurOrderViewData(this);
+            viewOrder.fillCurOrderViewData(this, getWindow().getDecorView().findViewById(android.R.id.content));
         }
 
     }

@@ -46,6 +46,7 @@ public class Preferences {
     public String corporateTaxiContactPhone;
     public Long corporateTaxiCheckOrderDialogLastShow;
     public Boolean dispatcherMessages = false;
+    public String hourInfoText = "";
 
     private final List<TariffPlan> driverTariffPlans;
 
@@ -81,6 +82,7 @@ public class Preferences {
         this.driverInviteText = JSONGetString(data, "driver_invite_text");
         this.useRating = MainUtils.JSONGetBool(data, "use_rating");
         this.dispatcherMessages = JSONGetBool(data, "dispatcher_messages");
+        this.hourInfoText = JSONGetString(data, "hour_info_text");
 
         dispatcherTemplateMessages.clear();
         driverTariffPlans.clear();

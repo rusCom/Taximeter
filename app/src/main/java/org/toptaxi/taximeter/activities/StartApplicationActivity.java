@@ -61,7 +61,7 @@ public class StartApplicationActivity extends AppCompatActivity {
 
         tvAction = findViewById(R.id.tvSplashAction);
         ((TextView) findViewById(R.id.tvSplashVersion)).setText(MainApplication.getInstance().getAppVersion());
-        ((NotificationManager) Objects.requireNonNull(getSystemService(Context.NOTIFICATION_SERVICE))).cancelAll();
+
         checkPermissions();
     }
 
@@ -126,6 +126,7 @@ public class StartApplicationActivity extends AppCompatActivity {
         executorService.execute(() -> {
             LogService.getInstance().log("StartApplicationActivity", "start auth");
 
+
             runOnUiThread(() -> tvAction.setText("Запуск приложения ..."));
             JSONObject result = MainApplication.getInstance().getRestService().httpGet("/profile/auth");
             if (isFinished) return;
@@ -159,7 +160,6 @@ public class StartApplicationActivity extends AppCompatActivity {
                         MainApplication.getInstance().startMainService();
                         Intent intent = new Intent(this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        LogService.getInstance().log("sys", "startMainActivity");
                         startActivity(intent);
                     }
 

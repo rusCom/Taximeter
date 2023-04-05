@@ -25,7 +25,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <include layout="@layout/inc_cur_order_info" />
+        <include layout="@layout/card_view_order_data" />
     </ScrollView>
 
 

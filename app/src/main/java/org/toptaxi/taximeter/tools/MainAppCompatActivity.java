@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
+import org.toptaxi.taximeter.services.LogService;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -80,31 +81,6 @@ public class MainAppCompatActivity extends AppCompatActivity {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             MainApplication.getInstance().getRestService().httpGet(this, path);
-            /*
-            String errorText = "";
-            runOnUiThread(this::showProgressDialog);
-            JSONObject response = MainApplication.getInstance().getRestService().httpGet(path);
-            if (JSONGetString(response, "status").equals("OK")){
-                if (response.has("result")){
-                    try {
-                        MainApplication.getInstance().parseData(response.getJSONObject("result"));
-                    } catch (JSONException ignored) {
-                    }
-                }
-            } // if (JSONGetString(response, "status").equals("OK")){
-            else {
-                errorText = JSONGetString(response, "result");
-                if (errorText.equals("")){
-                    errorText = response.toString();
-                }
-            }
-            runOnUiThread(this::dismissProgressDialog);
-            if (!errorText.equals("")){
-                String finalErrorText = errorText;
-                runOnUiThread(()->showToast(finalErrorText));
-            }
-
-             */
         });
 
     }

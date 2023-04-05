@@ -38,7 +38,7 @@ public class CheckOrderOnCompleteDialog extends Dialog {
         TextView tvOrder = findViewById(R.id.tvCheckOrderOnCompleteOrderInfo);
         String text = "Принять заказ по маршруту:<br><b>" + order.getRoute() + "</b>";
         if (!order.getNote().equals("")) text += "<br>" + order.getNote();
-        text += "<br>на сумму <b>" + order.getCalcType() + "</b>";
+        text += "<br>на сумму <b>" + order.getCostString() + "</b>";
         text += "<br><b><i>Убедитесь, что клиент не продолжает маршрут</i></b>";
         tvOrder.setText(MainApplication.fromHtml(text));
     }

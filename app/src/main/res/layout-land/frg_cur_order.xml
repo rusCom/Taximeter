@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="2">
-            <include layout="@layout/inc_cur_order_info"/>
+            <include layout="@layout/card_view_order_data"/>
         </ScrollView>
 
 
@@ -51,23 +51,27 @@
                 android:singleLine="true"
                 style="@style/MainButton"
                 android:layout_weight="1" />
+
             <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Отказ"
                 android:id="@+id/btnCurOrderAction"
-                android:singleLine="true"
-                android:backgroundTint="@color/primaryRedDark"
                 style="@style/MainButton"
-                android:layout_weight="1" />
-            <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Заказы по выполнению"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primaryRedDark"
+                android:singleLine="true"
+                android:text="Отказ"
+                android:visibility="gone" />
+
+            <Button
                 android:id="@+id/btnCurOrderCompleteOrders"
-                android:backgroundTint="@color/primaryYellowDark"
                 style="@style/MainButton"
-                android:layout_weight="1"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primaryYellowDark"
+                android:text="Заказы по выполнению"
+                android:visibility="gone" />
 
         </LinearLayout>
 

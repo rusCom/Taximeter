@@ -138,7 +138,6 @@ public class RestService {
             mainAppCompatActivity.runOnUiThread(mainAppCompatActivity::showProgressDialog);
         }
         JSONObject response = httpGetHost(path);
-        // LogService.getInstance().log("sys", response.toString());
         if (response == null) {
             response = new JSONObject();
             try {
@@ -211,10 +210,7 @@ public class RestService {
 
     private JSONObject httpGetHost(String path) {
         String url = restHost.get(restIndex) + path;
-        // LogService.getInstance().log("sys", url);
         Response response = restCallGet(url);
-        // LogService.getInstance().log("sys", response.body().toString());
-
         if (response == null) {
             for (int item = 0; item < restHost.size(); item++) {
                 if ((item != restIndex) && (response == null)) {

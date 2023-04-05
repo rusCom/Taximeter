@@ -54,7 +54,7 @@
             android:layout_height="match_parent">
 
             <FrameLayout
-                android:id="@+id/curOrders"
+                android:id="@+id/curOrdersRecyclerViewLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/tvGPSInfo"
@@ -83,6 +83,15 @@
             </FrameLayout>
 
             <FrameLayout
+                android:id="@+id/flCurOrder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <include layout="@layout/frg_cur_order" />
+            </FrameLayout>
+
+            <FrameLayout
                 android:id="@+id/flViewOrder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -91,14 +100,7 @@
                 <include layout="@layout/frg_view_order" />
             </FrameLayout>
 
-            <FrameLayout
-                android:id="@+id/flCurOrder"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone">
 
-                <include layout="@layout/frg_cur_order" />
-            </FrameLayout>
 
         </FrameLayout>
 

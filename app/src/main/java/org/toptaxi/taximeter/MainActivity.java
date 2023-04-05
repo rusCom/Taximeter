@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -36,7 +37,6 @@ import org.toptaxi.taximeter.adapters.RecyclerItemClickListener;
 import org.toptaxi.taximeter.adapters.RoutePointsAdapter;
 import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.data.Orders;
-import org.toptaxi.taximeter.data.RoutePoint;
 import org.toptaxi.taximeter.data.TariffPlan;
 import org.toptaxi.taximeter.services.LocationService;
 import org.toptaxi.taximeter.services.LogService;
@@ -47,7 +47,6 @@ import org.toptaxi.taximeter.tools.MainUtils;
 import org.toptaxi.taximeter.tools.OnMainDataChangeListener;
 import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,7 +60,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
     MenuItem miGPSFixed, miGPSNotFixed, miGPSOff, miDriverOffline, miDriverOnOrder, miDriverOnLine;
     RVCurOrdersAdapter curOrdersAdapter;
     RoutePointsAdapter viewOrderPointsAdapter, curOrderPointsAdapter;
-    public AlertDialog mainActionsDialog, mainActionsUnlimDialog;
+    public AlertDialog mainActionsDialog;
     GoogleMap googleMap;
     FontFitTextView tvCurOrderClientCost;
     int viewOrderLastState;
@@ -69,6 +68,8 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
     RecyclerView rvCurOrders;
     FloatingActionButton fabMainActions;
     MainActivityDrawer mainActivityDrawer;
+
+    String lastCurOrderData = "";
 
     boolean isShowNullBalanceDialog = false;
 
@@ -82,9 +83,10 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         super.onCreate(savedInstanceState);
         LogService.getInstance().log(this, "onCreate");
         setContentView(R.layout.activity_main);
-        LogService.getInstance().log(this, "onCreate");
 
-        viewCurOrders = findViewById(R.id.curOrders);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        viewCurOrders = findViewById(R.id.curOrdersRecyclerViewLayout);
         viewViewOrder = findViewById(R.id.flViewOrder);
         viewCurOrder = findViewById(R.id.flCurOrder);
         viewGPSError = findViewById(R.id.flGPSError);
@@ -118,12 +120,13 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 })
         );
 
-        RecyclerView rvViewOrderRoutePoints = findViewById(R.id.rvViewOrderRoutePoints);
+        /*
+        RecyclerView rvViewOrderRoutePoints = findViewById(R.id.rvOrderDataRoutePoints);
         rvViewOrderRoutePoints.setLayoutManager(new LinearLayoutManager(this));
         viewOrderPointsAdapter = new RoutePointsAdapter();
         rvViewOrderRoutePoints.setAdapter(viewOrderPointsAdapter);
 
-        RecyclerView rvCurOrderRoutePoints = findViewById(R.id.rvCurOrderRoutePoints);
+        RecyclerView rvCurOrderRoutePoints = findViewById(R.id.rvOrderDataRoutePoints);
         rvCurOrderRoutePoints.setLayoutManager(new LinearLayoutManager(this));
         curOrderPointsAdapter = new RoutePointsAdapter();
         rvCurOrderRoutePoints.setAdapter(curOrderPointsAdapter);
@@ -153,8 +156,10 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 })
         );
 
+
+         */
         tvCurOrderClientCost = findViewById(R.id.tvCurOrderClientPrice);
-        (findViewById(R.id.tvCurOrderPhone)).setOnClickListener(view -> callIntent(((TextView) findViewById(R.id.tvCurOrderPhone)).getText().toString()));
+        (findViewById(R.id.tvOrderDataClientPhone)).setOnClickListener(view -> callIntent(((TextView) findViewById(R.id.tvOrderDataClientPhone)).getText().toString()));
 
 
         mpOrderStateChange = MediaPlayer.create(this, R.raw.order_state_change);
@@ -249,6 +254,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                     alertDialog.setMessage("При закрытие программы Вы будете сняты с линии");
                     alertDialog.setPositiveButton("Сняться", (dialogInterface, i) -> {
                         MainApplication.getInstance().stopMainService();
+                        MainApplication.getInstance().isRunning = false;
                         finish();
                     });
                     alertDialog.setNegativeButton("Остаться", null);
@@ -275,6 +281,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         miGPSFixed = menu.findItem(R.id.action_gps_fixed);
         miGPSNotFixed = menu.findItem(R.id.action_gps_not_fixed);
         miGPSOff = menu.findItem(R.id.action_gps_off);
+
         miDriverOffline = menu.findItem(R.id.action_driver_offline);
         miDriverOnLine = menu.findItem(R.id.action_driver_online);
         miDriverOnOrder = menu.findItem(R.id.action_driver_on_order);
@@ -294,11 +301,8 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 miGPSOff.setVisible(true);
                 break;
         }
+        setDriverStatusIcon(MainApplication.getInstance().getMainAccount().getStatus());
 
-        miDriverOffline.setVisible(false);
-        miDriverOnLine.setVisible(false);
-        miDriverOnOrder.setVisible(false);
-        miDriverOffline.setVisible(true);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -409,16 +413,15 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             MainBottomSheetRecycler myBottomSheetFragment = new MainBottomSheetRecycler(
                     cards,
                     mainCardViewData -> {
-                        TariffPlan tariffPlan = (TariffPlan)mainCardViewData;
+                        TariffPlan tariffPlan = (TariffPlan) mainCardViewData;
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainApplication.getInstance().getMainActivity());
                         alertDialog.setTitle("Покупка смены");
                         alertDialog.setMessage("Купить смену \"" + tariffPlan.Name + "\" за " +
                                 MainUtils.getSummaString(tariffPlan.Cost) + "?");
                         alertDialog.setPositiveButton("Да", (dialogInterface, i1) -> {
                             httpGetResult("/tariff/activate?tariff_id=" + tariffPlan.ID);
-                            LogService.getInstance().log("sys", "activate unlim with id = " + tariffPlan.ID);
                         });
-                        alertDialog.setNegativeButton("Нет" , null);
+                        alertDialog.setNegativeButton("Нет", null);
                         alertDialog.create();
                         alertDialog.show();
 
@@ -469,8 +472,8 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
 
     }
 
-    public void onDriverStatusChange(Integer driverStatus) {
-        if (miDriverOffline != null) {
+    public void setDriverStatusIcon(int driverStatus) {
+        if ((miDriverOffline != null) && (miDriverOnLine != null) && (miDriverOnOrder != null)) {
             miDriverOffline.setVisible(false);
             miDriverOnLine.setVisible(false);
             miDriverOnOrder.setVisible(false);
@@ -497,7 +500,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             tvNullCurOrderInfo.setVisibility(View.GONE);
             rvCurOrders.setVisibility(View.VISIBLE);
             rvCurOrders.getRecycledViewPool().clear();
-            curOrdersAdapter.notifyItemRangeInserted(0, MainApplication.getInstance().getCurOrders().getCount());
+            // curOrdersAdapter.notifyItemRangeInserted(0, MainApplication.getInstance().getCurOrders().getCount());
             curOrdersAdapter.notifyDataSetChanged();
         }
 
@@ -517,22 +520,27 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
 
     private void generateCurOrder() {
         Order viewOrder = MainApplication.getInstance().getCurOrder();
-        if (viewOrder.getState() != null) {
+        if (viewOrder.getState() == null)return;
+        if (lastCurOrderData.equals(viewOrder.JSONDataToCheckNew)) {
+            ((TextView) findViewById(R.id.tvCurOrderTimer)).setText(viewOrder.getTimer());
+        } else {
+            lastCurOrderData = viewOrder.JSONDataToCheckNew;
+            viewOrder.fillCurOrderViewData(this, viewCurOrder);
             btnCompleteOrders.setVisibility(View.GONE);
             findViewById(R.id.btnOrderAction).setVisibility(View.GONE);
-            viewOrder.fillCurOrderViewData(this);
-            curOrderPointsAdapter.setOrder(viewOrder);
-            curOrderPointsAdapter.notifyItemRangeInserted(0, MainApplication.getInstance().getCurOrder().getRouteCount());
-            curOrderPointsAdapter.notifyDataSetChanged();
-            tvCurOrderClientCost.setText(new DecimalFormat("###,###.0").format(viewOrder.getCost()));
+
+
             if (viewOrderLastState != viewOrder.getState()) {
                 mpOrderStateChange.start();
                 viewOrderLastState = viewOrder.getState();
             }
 
+            findViewById(R.id.llCurOrderTitleEx).setVisibility(View.VISIBLE);
 
             ((TextView) findViewById(R.id.tvCurOrderStateName)).setText(viewOrder.getStateName());
             ((TextView) findViewById(R.id.tvCurOrderTimer)).setText(viewOrder.getTimer());
+
+            ((FontFitTextView) findViewById(R.id.tvCurOrderClientPrice)).setText(viewOrder.getCostString());
 
             switch (viewOrder.getMainAction()) {
                 case "apply_deny":
@@ -592,21 +600,13 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 15));
                 }
             }
-            findViewById(R.id.llViewOrderTitle).setBackgroundResource(viewOrder.getCaptionColor());
-            ((TextView) findViewById(R.id.tvViewOrderDistance)).setText(viewOrder.getDistanceString());
-            ((TextView) findViewById(R.id.tvViewOrderPayType)).setText(viewOrder.getPayTypeName());
-            ((TextView) findViewById(R.id.tvViewOrderCalcType)).setText(viewOrder.getCalcType());
-            MainUtils.TextViewSetTextOrGone(findViewById(R.id.tvViewOrderPayPercent), viewOrder.getDispatchingCommission());
 
-            MainUtils.TextViewSetTextOrGone(findViewById(R.id.tvViewOrderPayPercent), viewOrder.getDispatchingCommission());
-            MainUtils.TextViewSetTextOrGone(findViewById(R.id.tvViewOrderDispatchingName), viewOrder.dispatchingName);
+            viewOrder.fillCurOrderViewData(this, viewViewOrder);
+
 
             findViewById(R.id.btnOrderAction).setVisibility(View.GONE);
             findViewById(R.id.tvOrderTimer).setVisibility(View.GONE);
 
-            viewOrderPointsAdapter.setOrder(MainApplication.getInstance().getViewOrder());
-            viewOrderPointsAdapter.notifyItemRangeInserted(0, MainApplication.getInstance().getViewOrder().getRouteCount());
-            viewOrderPointsAdapter.notifyDataSetChanged();
             Button btnOrderMainAction = findViewById(R.id.btnOrderMainAction);
 
             switch (viewOrder.getCheck()) {
@@ -648,20 +648,6 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 mpOrderStateChange.start();
                 viewOrderLastState = viewOrder.getCheck();
             }
-
-            if (viewOrder.getPriorInfo().equals("")) {
-                (findViewById(R.id.llViewOrderPriorInfo)).setVisibility(View.GONE);
-            } else {
-                (findViewById(R.id.llViewOrderPriorInfo)).setVisibility(View.VISIBLE);
-                ((TextView) findViewById(R.id.tvViewOrderPriorInfo)).setText(viewOrder.getPriorInfo());
-            }
-
-            (findViewById(R.id.llViewOrderNote)).setVisibility(View.GONE);
-            if (viewOrder.getNote() != null)
-                if (!viewOrder.getNote().equals("")) {
-                    (findViewById(R.id.llViewOrderNote)).setVisibility(View.VISIBLE);
-                    ((TextView) findViewById(R.id.tvViewOrderNote)).setText(viewOrder.getNote());
-                }
         }
     }
 }

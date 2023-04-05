@@ -10,6 +10,9 @@ import org.json.JSONException;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.tools.MainUtils;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class FirebaseService {
     private final SharedPreferences sharedPreferences;
@@ -35,14 +38,17 @@ public class FirebaseService {
     }
 
     public void clearData() {
-        FirebaseMessaging.getInstance().deleteToken();
+        FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener(
+                task -> {
+                    LogService.getInstance().log("FirebaseService", "deleteToken " + task.isSuccessful());
+                }
+        );
         SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
         sharedPreferencesEditor.remove("pushTopics");
         sharedPreferencesEditor.remove("pushToken");
         sharedPreferencesEditor.apply();
         LogService.getInstance().log("FirebaseService", "clear PushToken");
     }
-
 
     void onNewPushToken(String token) {
         LogService.getInstance().log("FirebaseService", "onNewPushToken", token);

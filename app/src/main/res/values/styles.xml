@@ -37,6 +37,12 @@
         <item name="android:singleLine">true</item>
     </style>>
 
+    <style name="OrderDataTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:drawablePadding">3dp</item>
+        <item name="android:layout_margin">3dp</item>
+    </style>>
+
 
 
     <style name="CustomBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">

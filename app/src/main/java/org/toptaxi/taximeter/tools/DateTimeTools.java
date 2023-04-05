@@ -24,6 +24,19 @@ public class DateTimeTools {
         }
         return false;
     }
+
+    public static String getTime(Calendar calendar){
+        String result = "";
+        if (calendar != null){
+            String hour = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
+            if (calendar.get(Calendar.HOUR_OF_DAY) < 10){hour = "0" + calendar.get(Calendar.HOUR_OF_DAY);}
+            String minute = String.valueOf(calendar.get(Calendar.MINUTE));
+            if (calendar.get(Calendar.MINUTE) < 10){minute = "0" + calendar.get(Calendar.MINUTE);}
+            result = hour + ":" + minute;
+        }
+        return result;
+    }
+
     public static boolean isTomorrow(Calendar date){
         Calendar curDate = Calendar.getInstance();
         curDate.setTimeInMillis(System.currentTimeMillis());

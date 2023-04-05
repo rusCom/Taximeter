@@ -86,23 +86,12 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
         }
 
 
-        if (MainApplication.getInstance().getProfile().showTariffPlanCaption()){
+        if (MainApplication.getInstance().getPreferences().useUnlimitedTariffPlans()) {
             tariffPlanItem = new PrimaryDrawerItem().withName(MainApplication.getInstance().getProfile().getTariffPlanCaption()).withIcon(FontAwesome.Icon.faw_fire).withSelectable(false);
             drawer.addItem(tariffPlanItem);
         }
 
-
-        /*
-        if (MainApplication.getInstance().getPreferences().useUnlimitedTariffPlans()) {
-            unlimInfo = new PrimaryDrawerItem().withName(MainApplication.getInstance().getMainAccount().getUnlimitedTariffInfo()).withIcon(FontAwesome.Icon.faw_fire).withSelectable(false).withIdentifier(Constants.MENU_ACITVATE_UNLIM);
-            drawer.addItem(unlimInfo);
-        }
-
-         */
-
-
         drawer.addItem(new DividerDrawerItem());
-
 
         // Если у нас есть телефон диспетчера, то занчит ему можно и писать
         if (MainApplication.getInstance().getPreferences().dispatcherMessages) {
@@ -170,17 +159,9 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                     drawer.updateItem(messagesItem);
                 }
 
-                if (MainApplication.getInstance().getProfile().showActivateTariffPlan()){
-                    if (tariffPlanItem == null){
-                        tariffPlanItem = new PrimaryDrawerItem().withName(MainApplication.getInstance().getProfile().getTariffPlanCaption()).withIcon(FontAwesome.Icon.faw_fire).withSelectable(false);
-                        drawer.addItem(tariffPlanItem);
-                    }
+                if (tariffPlanItem != null){
                     tariffPlanItem.withName(MainApplication.getInstance().getProfile().getTariffPlanCaption());
-                }
-                // Иначе, если нстрочка показано, то скрывам ее
-                else if (tariffPlanItem != null){
-                    drawer.removeItem(tariffPlanItem.getIdentifier());
-                    tariffPlanItem = null;
+                    drawer.updateItem(tariffPlanItem);
                 }
             }
         } else {

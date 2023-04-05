@@ -2,6 +2,7 @@ package org.toptaxi.taximeter.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class MessagesActivity extends AppCompatActivity implements AbsListView.O
     LoadMoreAsyncTask loadMoreAsyncTask = new LoadMoreAsyncTask();
     boolean isFirst = true;
     RelativeLayout rlSendForm;
+    MediaPlayer mediaPlayerNewMessage;
 
 
     @Override
@@ -56,6 +58,9 @@ public class MessagesActivity extends AppCompatActivity implements AbsListView.O
         listView.setOnScrollListener(this);
 
         loadMoreAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        mediaPlayerNewMessage = MediaPlayer.create(this, R.raw.incomming_message_frg);
+        mediaPlayerNewMessage.setLooping(false);
 
         edMessage = (EditText) findViewById(R.id.etMessagesMessage);
         edMessage.setSingleLine(true);
@@ -110,7 +115,6 @@ public class MessagesActivity extends AppCompatActivity implements AbsListView.O
             listView.removeHeaderView(footer);
         } else {
             if ((firstVisibleItem == 0) && (loadMoreAsyncTask.getStatus() == AsyncTask.Status.FINISHED)) {
-                //Log.d(TAG, "onScroll stra = " + firstVisibleItem);
                 loadMoreAsyncTask = new LoadMoreAsyncTask();
                 loadMoreAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
@@ -119,8 +123,11 @@ public class MessagesActivity extends AppCompatActivity implements AbsListView.O
 
     @Override
     public void OnNewMessage() {
-        adapter.notifyDataSetChanged();
-        listView.setSelection(listView.getCount());
+        runOnUiThread(()->{
+            adapter.notifyDataSetChanged();
+            listView.setSelection(listView.getCount());
+            mediaPlayerNewMessage.start();
+        });
     }
 
     private class LoadMoreAsyncTask extends AsyncTask<Void, Void, Integer> {

@@ -44,9 +44,11 @@ public class LogService {
                 return false;
             case "Preferences":
                 return false;
+            case "Messages":
+                return false;
             case "LoginActivity":
                 return false;
-            case "Payment":
+            case "Profile":
                 return false;
             case "BalanceActivity":
                 return false;
@@ -66,6 +68,9 @@ public class LogService {
                 return false;
             case "MainService":
                 return false;
+            case "MainApplication":
+                return false;
+
             case "sys":
                 return true;
         }

@@ -17,7 +17,9 @@ import org.toptaxi.taximeter.services.LogService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.util.Calendar;
 
 public class MainUtils {
     public static Double round(Double d, int precise) {
@@ -130,7 +132,16 @@ public class MainUtils {
         String strResult = JSONGetString(data, field);
         if (strResult.equals(""))return null;
         return Integer.parseInt(strResult);
+    }
 
+    public static Calendar JSONGetCalendar(JSONObject data, String field){
+        String stringData = JSONGetString(data, field);
+        if (stringData.equals(""))return null;
+        stringData = stringData.replace("T", " ");
+
+        Calendar result = Calendar.getInstance();
+        result.setTimeInMillis(Timestamp.valueOf(stringData).getTime());
+        return result;
     }
 
     public static Double JSONGetDouble(JSONObject data, String field) {
@@ -145,10 +156,10 @@ public class MainUtils {
 
     public static void TextViewSetTextOrGone(TextView textView, String text){
         if (text == null){textView.setVisibility(View.GONE);}
-        else if (text.equals("")){textView.setVisibility(View.GONE);}
+        else if (text.trim().equals("")){textView.setVisibility(View.GONE);}
         else{
             textView.setVisibility(View.VISIBLE);
-            textView.setText(text);
+            textView.setText(text.trim());
         }
     }
 

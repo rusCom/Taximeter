@@ -12,6 +12,7 @@ import org.toptaxi.taximeter.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Orders {
@@ -69,11 +70,7 @@ public class Orders {
         }
 
         try {
-            Collections.sort(orderList, (order1, order2) -> {
-                if (order1.getDistance() < order2.getDistance()) return -1;
-                else if (order1.getDistance() > order2.getDistance()) return 1;
-                else return 0;
-            });
+            orderList.sort(Comparator.comparing(Order::getDistance));
         } catch (Throwable ignored) {
         }
 

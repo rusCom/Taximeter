@@ -14,6 +14,8 @@ import android.text.Html;
 import android.text.Spanned;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,6 +77,8 @@ public class MainApplication extends Application {
     HashMap<String, String> lastServerData = new HashMap<>();
     FirebaseService firebaseService;
 
+    public boolean isRunning;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -94,6 +98,8 @@ public class MainApplication extends Application {
         lastServerData.clear();
         super.onTerminate();
     }
+
+
 
 
     public RestService getRestService() {
@@ -130,11 +136,21 @@ public class MainApplication extends Application {
 
     public void startMainService() {
         if (!isMainServiceStart()) {
-            startService(new Intent(this, MainService.class));
+            isRunning = true;
+            Intent serviceIntent = new Intent(this, MainService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LogService.getInstance().log(this, "startForegroundService");
+                ContextCompat.startForegroundService(getApplicationContext(), serviceIntent);
+            }
+            else {
+                startService(serviceIntent);
+            }
+
         }
     }
 
     public void stopMainService() {
+
         stopService(new Intent(this, MainService.class));
     }
 
@@ -175,7 +191,7 @@ public class MainApplication extends Application {
             getMainAccount().parseData(dataJSON.getJSONObject("last_account"));
         }
 
-        if (dataJSON.has("profile"))
+        if (isNewData(dataJSON,"profile"))
             getProfile().parseData(dataJSON.getJSONObject("profile"));
 
         if (isNewData(dataJSON, "last_prior_orders")) {
@@ -265,24 +281,20 @@ public class MainApplication extends Application {
             if (MainApplication.getInstance().getPreferences().dispatcherMessages) {
                 mainActionItems.add(new MainActionItem(Constants.MAIN_ACTION_SEND_MESSAGE, "Написать диспетчеру"));
             }
-
-
             if (getMainAccount().getStatus() != Constants.DRIVER_ON_ORDER) { // водитель не на заказе
                 mainActionItems.add(new MainActionItem(Constants.MENU_CLOSE_APPLICATION, "Сняться с линии"));
             }
-
         }
-
 
         return mainActionItems;
     }
 
     public Order getNewOrder() {
-        return newOrder;
+        return this.newOrder;
     }
 
-    public void setNewOrder(Order newOrder) {
-        this.newOrder = newOrder;
+    public void setNewOrder(Order curOrder) {
+        this.newOrder = curOrder;
     }
 
     public void setViewOrderID(Integer viewOrderID) {
@@ -311,7 +323,7 @@ public class MainApplication extends Application {
 
     public void onDriverStatusChange(Integer driverStatus) {
         if (mainActivity != null) {
-            mainActivity.runOnUiThread(() -> mainActivity.onDriverStatusChange(driverStatus));
+            mainActivity.runOnUiThread(() -> mainActivity.setDriverStatusIcon(driverStatus));
         }
     }
 
@@ -399,9 +411,7 @@ public class MainApplication extends Application {
     }
 
     public void showToast(String message) {
-        LogService.getInstance().log("sys", message);
         if (mainActivity != null) {
-            LogService.getInstance().log("sys", message);
             mainActivity.runOnUiThread(() -> Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show());
         }
     }

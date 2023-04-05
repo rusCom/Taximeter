@@ -4,43 +4,49 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp">
+    app:cardCornerRadius="@dimen/card_view_corner_radius"
+    android:layout_margin="@dimen/main_margin_padding">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:divider="?android:listDivider"
+        android:dividerPadding="10dp"
+        android:showDividers="middle">
+
         <LinearLayout
+            android:id="@+id/llCurOrderTitleEx"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:background="@color/colorPrimary"
-            android:id="@+id/llCurOrderTitleEx">
+            android:orientation="horizontal">
+
             <TextView
+                android:id="@+id/tvCurOrderStateName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/tvCurOrderStateName"
                 android:layout_margin="@dimen/tv_route_point_margin"
+                android:layout_weight="1"
                 android:maxLines="1"
-                android:layout_weight="1"/>
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_weight="1">
+                android:layout_weight="2"
+                android:gravity="center">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/tvCurOrderTimer"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:gravity="end|center"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:id="@+id/tvCurOrderTimer"
                     android:layout_margin="@dimen/tv_route_point_margin"
-                    android:maxLines="1"/>
+                    android:gravity="end|center"
+                    android:maxLines="1"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
             </LinearLayout>
         </LinearLayout>
 
@@ -48,21 +54,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/llCurOrderTitle">
+            android:background="@color/colorAccent"
+            android:id="@+id/llOrderDataTitle">
             <TextView
+                style="@style/OrderDataTextView"
+                android:id="@+id/tvOrderDataDistance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvCurOrderPayType"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_margin="@dimen/tv_route_point_margin"
+                android:maxLines="1"
+                android:layout_weight="1"/>
+            <TextView
+                style="@style/OrderDataTextView"
+                android:id="@+id/tvOrderDataPayment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:layout_weight="1" />
             <TextView
+                style="@style/OrderDataTextView"
+                android:id="@+id/tvOrderDataDispatchingCommission"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvCurOrderPayPercent"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_margin="@dimen/tv_route_point_margin"
                 android:maxLines="1"
                 android:layout_weight="1" />
             <LinearLayout
@@ -74,51 +86,56 @@
                 android:layout_weight="1">
 
                 <TextView
+                    style="@style/OrderDataTextView"
+                    android:id="@+id/tvOrderDataCost"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:gravity="end|center"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:id="@+id/tvCurOrderCalcType"
-                    android:layout_margin="@dimen/tv_route_point_margin"
-                    android:maxLines="1"/>
+                    android:maxLines="1"
+                    android:gravity="end|center"/>
             </LinearLayout>
         </LinearLayout>
         <TextView
+            style="@style/OrderDataTextView"
+            android:id="@+id/tvOrderDataWorkDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_margin="@dimen/tv_route_point_margin"
-            android:id="@+id/tvCurOrderDate"
             app:drawableStartCompat="@mipmap/ic_conformation_time" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/rvCurOrderRoutePoints"/>
+            android:id="@+id/rvOrderDataRoutePoints"/>
 
         <TextView
+            style="@style/OrderDataTextView"
+            android:id="@+id/tvOrderDataIsHour"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_margin="@dimen/tv_route_point_margin"
-            android:id="@+id/tvCurOrderNote"
+            android:text="Почасовая оплата"
+            android:singleLine="true"
+            app:drawableStartCompat="@mipmap/ic_conformation_time"
+            app:drawableEndCompat="@drawable/baseline_help_24"/>
+        <TextView
+            style="@style/OrderDataTextView"
+            android:id="@+id/tvOrderDataNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:drawableStartCompat="@mipmap/ic_conformation_note" />
         <TextView
+            style="@style/OrderDataTextView"
+            android:id="@+id/tvOrderDataClientPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_margin="@dimen/tv_route_point_margin"
-            android:id="@+id/tvCurOrderPhone"
+            android:singleLine="true"
             app:drawableStartCompat="@mipmap/ic_conformation_phone" />
         <TextView
+            style="@style/OrderDataTextView"
+            android:id="@+id/tvOrderDataDispatchingName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_margin="@dimen/tv_route_point_margin"
-            android:id="@+id/tvCurOrderDispatchingName"
+            android:singleLine="true"
             app:drawableStartCompat="@mipmap/ic_conformation_dispatching" />
     </LinearLayout>
-
 
 </androidx.cardview.widget.CardView>

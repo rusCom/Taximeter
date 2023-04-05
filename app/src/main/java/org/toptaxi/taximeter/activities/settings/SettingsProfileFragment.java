@@ -26,7 +26,7 @@ public class SettingsProfileFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static SettingsProfileFragment mewInstance() {
+    public static SettingsProfileFragment newInstance() {
         SettingsProfileFragment fragment = new SettingsProfileFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);

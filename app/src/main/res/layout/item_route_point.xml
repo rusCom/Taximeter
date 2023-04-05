@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tvItemRoutePointName"
+    style="@style/OrderDataTextView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/cvOrderRoutePoint">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawableStart="@mipmap/ic_conformation_pickup"
-        android:id="@+id/tvItemRoutePointName"
-        android:layout_margin="@dimen/tv_route_point_margin"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        tools:ignore="UseCompatTextViewDrawableXml" />
-</androidx.cardview.widget.CardView>
+    app:drawableStartCompat="@mipmap/ic_conformation_pickup" />

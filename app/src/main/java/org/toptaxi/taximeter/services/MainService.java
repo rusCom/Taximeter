@@ -1,6 +1,5 @@
 package org.toptaxi.taximeter.services;
 
-
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
 
 import android.app.Notification;
@@ -10,10 +9,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.PowerManager;
 
 import androidx.core.app.NotificationCompat;
 
@@ -26,49 +25,25 @@ import org.toptaxi.taximeter.activities.StartApplicationActivity;
 import java.util.concurrent.TimeUnit;
 
 public class MainService extends Service {
-    private boolean isRunning = false;
-    private static final int DEFAULT_NOTIFICATION_ID = 1;
-    private NotificationManager notificationManager;
-
-    PowerManager m_powerManager = null;
-    PowerManager.WakeLock m_wakeLock = null;
-
-
-    public MainService() {
-    }
+    private static final int DEFAULT_NOTIFICATION_ID = 10242658;
 
     @Override
     public void onCreate() {
         super.onCreate();
         LogService.getInstance().log(this, "onCreate");
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         LogService.getInstance().log(this, "onStartCommand");
         MainApplication.getInstance().getLocationService().startLocationListener();
-        isRunning = true;
-        sendNotification("aTaxi.Водитель");
-        getDataTask();
-        if (m_powerManager == null) {
-            m_powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        }
-
-        if (m_wakeLock == null) {
-            m_wakeLock = m_powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    "MyApp::MyWakelockTag");
-            m_wakeLock.acquire(60 * 60 * 1000L /*60 minutes*/);
-        }
-
+        sendNotification("aТакси.Водитель");
+        startDataTask();
         return START_STICKY;
     }
 
-    //Send custom notification
-    public void sendNotification(String Text) {
 
-        //These three lines makes Notification to open main activity after clicking on it
+    public void sendNotification(String Text) {
         Intent notificationIntent = new Intent(this, StartApplicationActivity.class);
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -103,29 +78,20 @@ public class MainService extends Service {
 
         Notification notification;
         notification = notificationBuilder.build();
-        startForeground(DEFAULT_NOTIFICATION_ID, notification);
-    }
-
-    @Override
-    public void onDestroy() {
-        LogService.getInstance().log(this, "onDestroy");
-        isRunning = false;
-        MainApplication.getInstance().getMainAccount().setNullStatus();
-        MainApplication.getInstance().getRestService().httpGetThread("/driver/offline");
-        MainApplication.getInstance().getLocationService().stopLocationListener();
-        if (m_wakeLock != null) {
-            m_wakeLock.release();
-            m_wakeLock = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(DEFAULT_NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+        } else {
+            startForeground(DEFAULT_NOTIFICATION_ID, notification);
         }
     }
 
-    void getDataTask() {
-        new Thread(() -> {
 
+    private void startDataTask() {
+        new Thread(() -> {
             String lastNotificationMessage = "";
             String driverToken = MainApplication.getInstance().getMainAccount().getToken();
-
-            while (isRunning) {
+            LogService.getInstance().log("MainService", "startDataTask");
+            while (MainApplication.getInstance().isRunning) {
 
                 try {
                     JSONObject data2 = MainApplication.getInstance().getDataRestService().httpGet("/last/data").getJSONObject("result");
@@ -134,11 +100,14 @@ public class MainService extends Service {
                         data2 = MainApplication.getInstance().getDataRestService().httpGet("/last/data").getJSONObject("result");
                     }
                     if (JSONGetString(data2, "driver_token").equals(driverToken)) {
-                        MainApplication.getInstance().parseData(data2);
-                        String notificationMessage = MainApplication.getInstance().getMainAccount().getBalanceString() + " " + MainApplication.getInstance().getMainAccount().getStatusName() + " " + MainApplication.getInstance().getMainAccount().getName();
-                        if (!lastNotificationMessage.equals(notificationMessage)) {
-                            lastNotificationMessage = notificationMessage;
-                            sendNotification(notificationMessage);
+                        if (MainApplication.getInstance().isRunning) {
+                            MainApplication.getInstance().parseData(data2);
+                            String notificationMessage = MainApplication.getInstance().getMainAccount().getBalanceString() + " " + MainApplication.getInstance().getMainAccount().getStatusName() + " " + MainApplication.getInstance().getMainAccount().getName();
+                            if (!lastNotificationMessage.equals(notificationMessage)) {
+                                lastNotificationMessage = notificationMessage;
+                                sendNotification(notificationMessage);
+                            }
+                            LogService.getInstance().log("MainService", data2.toString());
                         }
                     }
 
@@ -150,10 +119,10 @@ public class MainService extends Service {
                 } catch (InterruptedException ignored) {
                 }
             }
-            //Removing any notifications
-            notificationManager.cancel(DEFAULT_NOTIFICATION_ID);
+            LogService.getInstance().log("MainService", "stop service isRunning = false");
             MainApplication.getInstance().getMainAccount().setNullStatus();
             MainApplication.getInstance().getRestService().httpGetThread("/driver/offline");
+            MainApplication.getInstance().getLocationService().stopLocationListener();
             MainApplication.getInstance().onTerminate();
             stopSelf();
         }).start();
@@ -163,5 +132,50 @@ public class MainService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LogService.getInstance().log(this, "onDestroy");
+        restartService();
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        LogService.getInstance().log(this, "onTaskRemoved");
+        restartService();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        LogService.getInstance().log(this, "onLowMemory");
+        restartService();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        LogService.getInstance().log(this, "onTrimMemory");
+        restartService();
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        LogService.getInstance().log(this, "onUnbind");
+        restartService();
+        return super.onUnbind(intent);
+    }
+
+    private void restartService() {
+        if (MainApplication.getInstance().isRunning) {
+            LogService.getInstance().log(this, "restartService");
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction("restartservice");
+            broadcastIntent.setClass(this, Restarter.class);
+            this.sendBroadcast(broadcastIntent);
+        }
     }
 }

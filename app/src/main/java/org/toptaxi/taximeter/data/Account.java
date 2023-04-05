@@ -68,6 +68,7 @@ public class Account {
 
     public void setNullStatus() {
         status = null;
+        isParsedData = false;
     }
 
     public Boolean getOnLine() {

@@ -22,11 +22,11 @@ public class SettingsSectionsPagerAdapter extends FragmentPagerAdapter {
         // Return a PlaceholderFragment (defined as a static inner class below).
 
         switch (position){
-            case 0:return SettingsAlarmFragment.newInstance("0","1");
-            case 1:return SettingsProfileFragment.mewInstance();
+            case 0:return SettingsAlarmFragment.newInstance();
+            case 1:return SettingsProfileFragment.newInstance();
         }
 
-        return SettingsAlarmFragment.newInstance("0","1");
+        return SettingsAlarmFragment.newInstance();
     }
 
     @Nullable

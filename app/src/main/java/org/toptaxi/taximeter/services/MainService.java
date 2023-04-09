@@ -102,7 +102,7 @@ public class MainService extends Service {
                     if (JSONGetString(data2, "driver_token").equals(driverToken)) {
                         if (MainApplication.getInstance().isRunning) {
                             MainApplication.getInstance().parseData(data2);
-                            String notificationMessage = MainApplication.getInstance().getMainAccount().getBalanceString() + " " + MainApplication.getInstance().getMainAccount().getStatusName() + " " + MainApplication.getInstance().getMainAccount().getName();
+                            String notificationMessage = MainApplication.getInstance().getProfile().getBalanceFormat() + " " + MainApplication.getInstance().getMainAccount().getStatusName() + " " + MainApplication.getInstance().getMainAccount().getName();
                             if (!lastNotificationMessage.equals(notificationMessage)) {
                                 lastNotificationMessage = notificationMessage;
                                 sendNotification(notificationMessage);

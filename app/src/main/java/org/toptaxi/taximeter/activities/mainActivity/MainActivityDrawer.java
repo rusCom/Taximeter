@@ -77,7 +77,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 .withOnDrawerItemClickListener(this)
                 .build();
 
-        balanceItem = new PrimaryDrawerItem().withName("Баланс").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getMainAccount().getBalanceString()).withIdentifier(Constants.MENU_BALANCE);
+        balanceItem = new PrimaryDrawerItem().withName("Баланс").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getProfile().getBalanceFormat()).withIdentifier(Constants.MENU_BALANCE);
         drawer.addItem(balanceItem);
 
         if (MainApplication.getInstance().getPreferences().corporateTaxi) {
@@ -145,7 +145,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
             } else {
                 LogService.getInstance().log(this, "updateDrawer");
 
-                balanceItem.withBadge(MainApplication.getInstance().getMainAccount().getBalanceString());
+                balanceItem.withBadge(MainApplication.getInstance().getProfile().getBalanceFormat());
                 drawer.updateItem(balanceItem);
 
                 if (MainApplication.getInstance().getPreferences().corporateTaxi) {

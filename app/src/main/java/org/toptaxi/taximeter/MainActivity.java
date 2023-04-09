@@ -30,6 +30,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.toptaxi.taximeter.activities.OrdersOnCompleteActivity;
 import org.toptaxi.taximeter.activities.mainActivity.MainActivityDrawer;
 import org.toptaxi.taximeter.adapters.MainActionAdapter;
+import org.toptaxi.taximeter.dialogs.PaymentsDialog;
 import org.toptaxi.taximeter.tools.bottomsheets.MainBottomSheetRecycler;
 import org.toptaxi.taximeter.adapters.OnMainActionClickListener;
 import org.toptaxi.taximeter.adapters.RVCurOrdersAdapter;
@@ -197,8 +198,9 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         MainApplication.getInstance().getCurOrders().setOnOrdersChangeListener(this);
         onLocationDataChange();
 
-        if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink() != null
-                && MainApplication.getInstance().getMainAccount().getBalance() <= 0
+        // Если баланс водителя нулевой, показываем окно пополнения баланса
+        LogService.getInstance().log("MainActivity", "ShowNullBalanceDialog", MainApplication.getInstance().getProfile().getBalance().toString());
+        if (MainApplication.getInstance().getProfile().getBalance() <= 0
                 && (!isShowNullBalanceDialog)) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.execute(() -> {
@@ -220,9 +222,16 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setMessage("Для продолжения работы и возможности принятия заказов необходимо пополнить баланс");
         alertDialog.setPositiveButton("Пополнить", (dialogInterface, i) -> {
-            Uri address = Uri.parse(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
-            Intent openLinkIntent = new Intent(Intent.ACTION_VIEW, address);
-            startActivity(openLinkIntent);
+            if (PaymentsDialog.getInstance().getPaymentsAvailable()){
+                PaymentsDialog.getInstance().showPaymentDialog(this);
+            }
+            else if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink() != null) {
+                goToURL(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
+            }
+            else {
+                callIntent(MainApplication.getInstance().getPreferences().getDispatcherPhone());
+            }
+
         });
         alertDialog.setNegativeButton("Отмена", null);
         alertDialog.create();
@@ -520,7 +529,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
 
     private void generateCurOrder() {
         Order viewOrder = MainApplication.getInstance().getCurOrder();
-        if (viewOrder.getState() == null)return;
+        if (viewOrder.getState() == null) return;
         if (lastCurOrderData.equals(viewOrder.JSONDataToCheckNew)) {
             ((TextView) findViewById(R.id.tvCurOrderTimer)).setText(viewOrder.getTimer());
         } else {

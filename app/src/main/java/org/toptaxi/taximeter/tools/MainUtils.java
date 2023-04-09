@@ -143,7 +143,6 @@ public class MainUtils {
         result.setTimeInMillis(Timestamp.valueOf(stringData).getTime());
         return result;
     }
-
     public static Double JSONGetDouble(JSONObject data, String field) {
         Double result = null;
         if (data.has(field)) {
@@ -151,6 +150,12 @@ public class MainUtils {
                 result = data.getDouble(field);
             } catch (JSONException ignored) {}
         }
+        return result;
+    }
+
+    public static Double JSONGetDouble(JSONObject data, String field, Double def) {
+        Double result = JSONGetDouble(data, field);
+        if (result == null)return def;
         return result;
     }
 

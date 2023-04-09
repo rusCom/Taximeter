@@ -2,6 +2,7 @@ package org.toptaxi.taximeter.data;
 
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetBool;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetCalendar;
+import static org.toptaxi.taximeter.tools.MainUtils.JSONGetDouble;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetInteger;
 
 import android.os.Build;
@@ -13,6 +14,7 @@ import org.toptaxi.taximeter.services.FirebaseService;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.DateTimeTools;
 
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -22,10 +24,12 @@ public class Profile {
     public Integer taximeterFreeOrderCount;
     public Integer tariffPlanID;
     public Calendar tariffPlanEndDate;
+    private Double balance;
 
     public void parseData(JSONObject data) throws JSONException {
         pushNotificationActive = JSONGetBool(data, "push_notification_active", true);
         taximeterFreeOrderCount = JSONGetInteger(data, "free_order_count", 20);
+        balance = JSONGetDouble(data, "balance", 0.0);
 
         tariffPlanID = 1;
         if (data.has("tariff_plan")){
@@ -60,6 +64,23 @@ public class Profile {
         if (newData.length() != 0){
             MainApplication.getInstance().getRestService().httpPostThread("/profile/set", newData);
         }
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public String getBalanceFormat(){
+        if (balance == null){
+            return "0.00";
+        }
+        try {
+            return new DecimalFormat("###,##0.00").format(balance);
+        }
+        catch (Exception ignored){
+            MainApplication.getInstance().getRestService().serverError("Account.getBalanceString", balance.toString());
+        }
+        return balance.toString();
     }
 
     public boolean showActivateTariffPlan(){

@@ -18,7 +18,6 @@ import java.text.DecimalFormat;
 
 public class Account {
     private String Token;
-    private Double Balance;
     public Double balanceCorporateTaxi;
     private String Name;
     private String serName;
@@ -36,7 +35,6 @@ public class Account {
 
     public void parseData(JSONObject data) {
         LogService.getInstance().log(this, data.toString());
-        Balance = JSONGetDouble(data, "balance");
         Name = JSONGetString(data, "name");
         serName = JSONGetString(data, "ser_name");
         status = JSONGetInteger(data, "status", 0);
@@ -60,7 +58,7 @@ public class Account {
     }
 
     public String getMainActivityCaption() {
-        String result = new DecimalFormat("###,##0.00").format(Balance);
+        String result = MainApplication.getInstance().getProfile().getBalanceFormat();
         result += " " + MainUtils.getRubSymbol();
         result += " " + getStatusName();
         return result;
@@ -84,26 +82,11 @@ public class Account {
         return status;
     }
 
-    public String getBalanceString() {
-        if (Balance == null){
-            return "0.00";
-        }
-        try {
-            return new DecimalFormat("###,##0.00").format(Balance);
-        }
-        catch (Exception ignored){
-            MainApplication.getInstance().getRestService().serverError("Account.getBalanceString", Balance.toString());
-        }
-        return Balance.toString();
-    }
 
     public String getBalanceCorporateTaxiString() {
         return new DecimalFormat("###,#00.00").format(balanceCorporateTaxi);
     }
 
-    public Double getBalance() {
-        return Balance;
-    }
 
     public String getName() {
         return Name;

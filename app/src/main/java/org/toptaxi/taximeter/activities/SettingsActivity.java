@@ -1,13 +1,16 @@
 package org.toptaxi.taximeter.activities;
 
 import android.os.Bundle;
-import com.google.android.material.tabs.TabLayout;
+
 import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.tabs.TabLayout;
+
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.activities.settings.SettingsSectionsPagerAdapter;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends MainAppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

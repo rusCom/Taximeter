@@ -88,7 +88,7 @@ public class MainApplication extends Application {
 
         locationService = new LocationService(this);
         ServerDate = Calendar.getInstance();
-        restService = new RestService(this);
+        restService = new RestService();
         profile = new Profile();
     }
 
@@ -108,7 +108,7 @@ public class MainApplication extends Application {
 
     public void setDataRestService(JSONArray restHosts) {
         if (dataRestService == null) {
-            dataRestService = new RestService(this);
+            dataRestService = new RestService();
         }
         dataRestService.setRestHost(restHosts);
     }

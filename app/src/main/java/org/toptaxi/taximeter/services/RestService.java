@@ -1,6 +1,5 @@
 package org.toptaxi.taximeter.services;
 
-import android.content.Context;
 import android.os.Build;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -32,7 +31,7 @@ public class RestService {
     private int restIndex;
 
 
-    public RestService(Context context) {
+    public RestService() {
         httpClient = new OkHttpClient();
         header = new JSONObject();
         reloadHeader();
@@ -40,10 +39,6 @@ public class RestService {
         restHost.add(MainApplication.getInstance().getResources().getString(R.string.mainRestHost));
         restHost.add(MainApplication.getInstance().getResources().getString(R.string.reserveRestHost));
         restIndex = 0;
-    }
-
-    public String getRestHost(){
-        return restHost.get(0);
     }
 
     public void setRestHost(JSONArray hosts) {

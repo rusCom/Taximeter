@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
@@ -45,11 +46,9 @@ import java.util.List;
 public class MainApplication extends Application {
     protected static String TAG = "#########" + MainApplication.class.getName();
     protected static MainApplication mainApplication;
-
     public static MainApplication getInstance() {
         return mainApplication;
     }
-
     private Integer MainActivityCurView;
     private OnMainDataChangeListener onMainDataChangeListener;
     private OnPriorOrdersChange onPriorOrdersChange;
@@ -60,23 +59,19 @@ public class MainApplication extends Application {
     private Orders curOrders, priorOrders, completeOrders;
     MainActivity mainActivity;
     private Messages mainMessages;
-    String curOrderData = "", completeOrdersData = "";
+    String curOrderData = "";
     Integer viewOrderID;
     private Order newOrder, curOrder, hisOrderView;
     final Handler uiHandler = new Handler(Looper.getMainLooper());
     public int lastRequestUID = 0;
     private Calendar ServerDate;
-
     private RestService restService;
     private RestService dataRestService;
     private LocationService locationService;
-
     private String appVersion;
     private Integer appVersionCode;
-
     HashMap<String, String> lastServerData = new HashMap<>();
     FirebaseService firebaseService;
-
     public boolean isRunning;
 
     @Override
@@ -201,6 +196,24 @@ public class MainApplication extends Application {
             }
         }
 
+        if (isNewData(dataJSON, "last_orders_complete")){
+            getCompleteOrders().setFromJSONPrior(dataJSON.getJSONArray("last_orders_complete"));
+            LogService.getInstance().log(this, "parserData", "completeOrdersCount = " + getCompleteOrders().getCount());
+            if ((onCompleteOrdersChange != null)) {
+                uiHandler.post(() -> onCompleteOrdersChange.OnCompleteOrdersChange());
+            }
+            if (getMainActivity() != null){
+                if ((getMainActivityCurView() == Constants.CUR_VIEW_CUR_ORDER) && (getCurOrder().getMainAction().equals("set_order_done"))){
+                    getMainActivity().onCompleteOrdersChange(getCompleteOrders().getCount());
+                }
+            }
+        }
+
+        if (dataJSON.has("last_orders")){
+            getCurOrders().setFromJSON(dataJSON.getJSONArray("last_orders"));
+        }
+
+
 
         if (dataJSON.has("last_his_messages")) {
             getMainMessages().setFromJSON(dataJSON.getJSONArray("last_his_messages"));
@@ -216,21 +229,9 @@ public class MainApplication extends Application {
             getMainMessages().OnNewMessages(dataJSON.getJSONArray("last_messages"));
         }
 
-        if (dataJSON.has("last_orders")) {
-            getCurOrders().setFromJSON(dataJSON.getJSONArray("last_orders"));
-        }
 
-        if (dataJSON.has("last_orders_complete")) {
-            if (!completeOrdersData.equals(dataJSON.getJSONArray("last_orders_complete").toString())) {
-                completeOrdersData = dataJSON.getJSONArray("last_orders_complete").toString();
-                getCompleteOrders().setFromJSONPrior(dataJSON.getJSONArray("last_orders_complete"));
-                if ((onCompleteOrdersChange != null)) {
-                    uiHandler.post(() -> onCompleteOrdersChange.OnCompleteOrdersChange());
-                }
-            }
-        } else if (onCompleteOrdersChange != null) {
-            uiHandler.post(() -> onCompleteOrdersChange.OnCompleteOrdersNull());
-        }
+
+
 
 
         if (dataJSON.has("last_cur_order")) {
@@ -383,7 +384,7 @@ public class MainApplication extends Application {
     public void setOnMainDataChangeListener(OnMainDataChangeListener onMainDataChangeListener) {
         this.onMainDataChangeListener = onMainDataChangeListener;
         if (onMainDataChangeListener != null) {
-            onMainDataChangeListener.OnMainCurViewChange(MainActivityCurView);
+            onMainDataChangeListener.OnMainCurViewChange();
         }
 
     }
@@ -395,7 +396,7 @@ public class MainApplication extends Application {
         if (!mainActivityCurView.equals(MainActivityCurView)) {
             MainActivityCurView = mainActivityCurView;
             if (onMainDataChangeListener != null)
-                uiHandler.post(() -> onMainDataChangeListener.OnMainCurViewChange(MainActivityCurView));
+                uiHandler.post(() -> onMainDataChangeListener.OnMainCurViewChange());
         }
     }
 

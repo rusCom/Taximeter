@@ -77,21 +77,23 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 .withOnDrawerItemClickListener(this)
                 .build();
 
-        balanceItem = new PrimaryDrawerItem().withName("Баланс").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getProfile().getBalanceFormat()).withIdentifier(Constants.MENU_BALANCE);
-        drawer.addItem(balanceItem);
+        if (MainApplication.getInstance().getPreferences().isBalanceShow()){
+            balanceItem = new PrimaryDrawerItem().withName("Баланс").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getProfile().getBalanceFormat()).withIdentifier(Constants.MENU_BALANCE);
+            drawer.addItem(balanceItem);
+            if (MainApplication.getInstance().getPreferences().corporateTaxi) {
+                balanceCorporateTaxiItem = new PrimaryDrawerItem().withName("Баланс Корпоративное такси").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getMainAccount().getBalanceCorporateTaxiString()).withIdentifier(Constants.MENU_BALANCE_CORPORATE);
+                drawer.addItem(balanceCorporateTaxiItem);
+            }
 
-        if (MainApplication.getInstance().getPreferences().corporateTaxi) {
-            balanceCorporateTaxiItem = new PrimaryDrawerItem().withName("Баланс Корпоративное такси").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getMainAccount().getBalanceCorporateTaxiString()).withIdentifier(Constants.MENU_BALANCE_CORPORATE);
-            drawer.addItem(balanceCorporateTaxiItem);
+            if (MainApplication.getInstance().getPreferences().useUnlimitedTariffPlans()) {
+                tariffPlanItem = new PrimaryDrawerItem().withName(MainApplication.getInstance().getProfile().getTariffPlanCaption()).withIcon(FontAwesome.Icon.faw_fire).withSelectable(false).withIdentifier(Constants.MENU_TARIFF_PLAN);
+                drawer.addItem(tariffPlanItem);
+            }
+
+            drawer.addItem(new DividerDrawerItem());
         }
 
 
-        if (MainApplication.getInstance().getPreferences().useUnlimitedTariffPlans()) {
-            tariffPlanItem = new PrimaryDrawerItem().withName(MainApplication.getInstance().getProfile().getTariffPlanCaption()).withIcon(FontAwesome.Icon.faw_fire).withSelectable(false);
-            drawer.addItem(tariffPlanItem);
-        }
-
-        drawer.addItem(new DividerDrawerItem());
 
         // Если у нас есть телефон диспетчера, то занчит ему можно и писать
         if (MainApplication.getInstance().getPreferences().dispatcherMessages) {
@@ -109,12 +111,15 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
 
         drawer.addItem(new DividerDrawerItem());
-        if (PaymentsDialog.getInstance().getPaymentsAvailable()){
-            drawer.addItem(new PrimaryDrawerItem().withName("Пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT));
+        if (MainApplication.getInstance().getPreferences().isBalanceShow()){
+            if (PaymentsDialog.getInstance().getPaymentsAvailable()){
+                drawer.addItem(new PrimaryDrawerItem().withName("Пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT));
+            }
+            if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink()!= null) {
+                drawer.addItem(new PrimaryDrawerItem().withName("Как пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT_INSTRUCTION));
+            }
         }
-        if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink()!= null) {
-            drawer.addItem(new PrimaryDrawerItem().withName("Как пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT_INSTRUCTION));
-        }
+
         if (!MainApplication.getInstance().getPreferences().instructionLink.equals("")) {
             drawer.addItem(new PrimaryDrawerItem().withName("Инструкция по работе").withIcon(FontAwesome.Icon.faw_question).withSelectable(false).withIdentifier(Constants.MENU_INSTRUCTION));
         }
@@ -145,12 +150,18 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
             } else {
                 LogService.getInstance().log(this, "updateDrawer");
 
-                balanceItem.withBadge(MainApplication.getInstance().getProfile().getBalanceFormat());
-                drawer.updateItem(balanceItem);
+                if (MainApplication.getInstance().getPreferences().isBalanceShow()){
+                    balanceItem.withBadge(MainApplication.getInstance().getProfile().getBalanceFormat());
+                    drawer.updateItem(balanceItem);
 
-                if (MainApplication.getInstance().getPreferences().corporateTaxi) {
-                    balanceCorporateTaxiItem.withBadge(MainApplication.getInstance().getMainAccount().getBalanceCorporateTaxiString());
-                    drawer.updateItem(balanceCorporateTaxiItem);
+                    if (MainApplication.getInstance().getPreferences().corporateTaxi) {
+                        balanceCorporateTaxiItem.withBadge(MainApplication.getInstance().getMainAccount().getBalanceCorporateTaxiString());
+                        drawer.updateItem(balanceCorporateTaxiItem);
+                    }
+                    if (tariffPlanItem != null){
+                        tariffPlanItem.withName(MainApplication.getInstance().getProfile().getTariffPlanCaption());
+                        drawer.updateItem(tariffPlanItem);
+                    }
                 }
 
 
@@ -159,10 +170,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                     drawer.updateItem(messagesItem);
                 }
 
-                if (tariffPlanItem != null){
-                    tariffPlanItem.withName(MainApplication.getInstance().getProfile().getTariffPlanCaption());
-                    drawer.updateItem(tariffPlanItem);
-                }
+
             }
         } else {
             generateDrawer();
@@ -181,7 +189,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 themeItem.withName(MainApplication.getInstance().getPreferences().getThemeName());
                 drawer.updateItem(themeItem);
                 break;
-            case Constants.MENU_ACITVATE_UNLIM:
+            case Constants.MENU_TARIFF_PLAN:
                 mainActivity.onTariffPlanClick();
                 break;
             case Constants.MENU_MESSAGES:

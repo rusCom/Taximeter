@@ -270,7 +270,10 @@ public class RestService {
                     .build();
             response = httpClient.newCall(request).execute();
         } catch (Exception exception) {
-            MainApplication.getInstance().getRestService().serverError("restCallGet", ExceptionUtils.getStackTrace(exception));
+            if (!url.contains("server_error")){
+                MainApplication.getInstance().getRestService().serverError("restCallGet", ExceptionUtils.getStackTrace(exception));
+            }
+
         }
         return response;
     }

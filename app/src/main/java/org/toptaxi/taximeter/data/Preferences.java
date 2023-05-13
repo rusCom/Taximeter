@@ -1,6 +1,7 @@
 package org.toptaxi.taximeter.data;
 
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetBool;
+import static org.toptaxi.taximeter.tools.MainUtils.JSONGetInteger;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
 
 import android.content.SharedPreferences;
@@ -47,6 +48,8 @@ public class Preferences {
     public Long corporateTaxiCheckOrderDialogLastShow;
     public Boolean dispatcherMessages = false;
     public String hourInfoText = "";
+    private boolean balanceShow = true;
+    private boolean longDistanceMessage = false;
 
     private final List<TariffPlan> driverTariffPlans;
 
@@ -72,8 +75,8 @@ public class Preferences {
         this.dispatcherPhone = JSONGetString(data, "dispatcher_phone");
         this.licenseAgreementLink = JSONGetString(data, "license_agreement_link");
         this.privacyPolicyLink = JSONGetString(data, "privacy_policy_link");
-        this.systemDataTimer = MainUtils.JSONGetInteger(data, "system_data_timer", 5);
-        this.systemTemplateMessagesTimeout = MainUtils.JSONGetInteger(data, "system_template_messages_timeout", 60);
+        this.systemDataTimer = JSONGetInteger(data, "system_data_timer", 5);
+        this.systemTemplateMessagesTimeout = JSONGetInteger(data, "system_template_messages_timeout", 60);
         this.paymentInstructionLink = JSONGetString(data, "payment_instruction_link");
         this.instructionLink = JSONGetString(data, "instruction_link");
         this.vkGroupLink = JSONGetString(data, "vk_group_link");
@@ -83,6 +86,8 @@ public class Preferences {
         this.useRating = MainUtils.JSONGetBool(data, "use_rating");
         this.dispatcherMessages = JSONGetBool(data, "dispatcher_messages");
         this.hourInfoText = JSONGetString(data, "hour_info_text");
+        this.balanceShow = JSONGetBool(data, "balance_show", true);
+        this.longDistanceMessage = JSONGetBool(data, "long_distance_message");
 
         dispatcherTemplateMessages.clear();
         driverTariffPlans.clear();
@@ -136,6 +141,14 @@ public class Preferences {
             }
         }
         return result;
+    }
+
+    public boolean isLongDistanceMessage() {
+        return longDistanceMessage;
+    }
+
+    public boolean isBalanceShow() {
+        return balanceShow;
     }
 
     public String getLicenseAgreementLink() {

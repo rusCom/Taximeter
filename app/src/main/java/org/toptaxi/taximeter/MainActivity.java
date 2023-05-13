@@ -35,7 +35,6 @@ import org.toptaxi.taximeter.tools.bottomsheets.MainBottomSheetRecycler;
 import org.toptaxi.taximeter.adapters.OnMainActionClickListener;
 import org.toptaxi.taximeter.adapters.RVCurOrdersAdapter;
 import org.toptaxi.taximeter.adapters.RecyclerItemClickListener;
-import org.toptaxi.taximeter.adapters.RoutePointsAdapter;
 import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.data.Orders;
 import org.toptaxi.taximeter.data.TariffPlan;
@@ -60,7 +59,6 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
     protected Toolbar mainToolbar;
     MenuItem miGPSFixed, miGPSNotFixed, miGPSOff, miDriverOffline, miDriverOnOrder, miDriverOnLine;
     RVCurOrdersAdapter curOrdersAdapter;
-    RoutePointsAdapter viewOrderPointsAdapter, curOrderPointsAdapter;
     public AlertDialog mainActionsDialog;
     GoogleMap googleMap;
     FontFitTextView tvCurOrderClientCost;
@@ -69,9 +67,8 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
     RecyclerView rvCurOrders;
     FloatingActionButton fabMainActions;
     MainActivityDrawer mainActivityDrawer;
-
-    String lastCurOrderData = "";
-
+    String lastCurOrderData = "", lastMainActivityCaption = "";
+    int lastMainActivityCurView = -1;
     boolean isShowNullBalanceDialog = false;
 
     static {
@@ -121,44 +118,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 })
         );
 
-        /*
-        RecyclerView rvViewOrderRoutePoints = findViewById(R.id.rvOrderDataRoutePoints);
-        rvViewOrderRoutePoints.setLayoutManager(new LinearLayoutManager(this));
-        viewOrderPointsAdapter = new RoutePointsAdapter();
-        rvViewOrderRoutePoints.setAdapter(viewOrderPointsAdapter);
 
-        RecyclerView rvCurOrderRoutePoints = findViewById(R.id.rvOrderDataRoutePoints);
-        rvCurOrderRoutePoints.setLayoutManager(new LinearLayoutManager(this));
-        curOrderPointsAdapter = new RoutePointsAdapter();
-        rvCurOrderRoutePoints.setAdapter(curOrderPointsAdapter);
-        rvCurOrderRoutePoints.addOnItemTouchListener(
-                new RecyclerItemClickListener(this, (view, position) -> {
-                    final RoutePoint routePoint = MainApplication.getInstance().getCurOrder().getRoutePoint(position);
-                    final CharSequence[] items = {"Показать маршрут"};
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle("Выберите действие");
-                    builder.setItems(items, (dialog, item) -> {
-
-                        if (item == 0) {
-                            try {
-                                Uri uri = Uri.parse("dgis://2gis.ru/routeSearch/rsType/car/to/" + routePoint.getLongitude() + "," + routePoint.getLatitude());
-                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                startActivity(intent);
-                            } catch (Exception e) {
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setData(Uri.parse("market://details?id=ru.dublgis.dgismobile"));
-                                startActivity(intent);
-                            }
-                        }
-                    });
-                    AlertDialog alert = builder.create();
-                    alert.show();
-
-                })
-        );
-
-
-         */
         tvCurOrderClientCost = findViewById(R.id.tvCurOrderClientPrice);
         (findViewById(R.id.tvOrderDataClientPhone)).setOnClickListener(view -> callIntent(((TextView) findViewById(R.id.tvOrderDataClientPhone)).getText().toString()));
 
@@ -190,7 +150,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         LogService.getInstance().log(this, "onResume");
         MainApplication.getInstance().setMainActivity(this);
         mainActivityDrawer.updateDrawer();
-        OnMainCurViewChange(0);
+        OnMainCurViewChange();
 
 
         // MainApplication.getInstance().getLocationService().setOnLocationDataChange(this);
@@ -199,7 +159,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         onLocationDataChange();
 
         // Если баланс водителя нулевой, показываем окно пополнения баланса
-        LogService.getInstance().log("MainActivity", "ShowNullBalanceDialog", MainApplication.getInstance().getProfile().getBalance().toString());
+        // LogService.getInstance().log("MainActivity", "ShowNullBalanceDialog", MainApplication.getInstance().getProfile().getBalance().toString());
         if (MainApplication.getInstance().getProfile().getBalance() <= 0
                 && (!isShowNullBalanceDialog)) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -222,13 +182,11 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setMessage("Для продолжения работы и возможности принятия заказов необходимо пополнить баланс");
         alertDialog.setPositiveButton("Пополнить", (dialogInterface, i) -> {
-            if (PaymentsDialog.getInstance().getPaymentsAvailable()){
+            if (PaymentsDialog.getInstance().getPaymentsAvailable()) {
                 PaymentsDialog.getInstance().showPaymentDialog(this);
-            }
-            else if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink() != null) {
+            } else if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink() != null) {
                 goToURL(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
-            }
-            else {
+            } else {
                 callIntent(MainApplication.getInstance().getPreferences().getDispatcherPhone());
             }
 
@@ -368,34 +326,43 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
     }
 
     @Override
-    public void OnMainCurViewChange(int curViewType) {
-        LogService.getInstance().log(this, "onMainCurViewChange", String.valueOf(MainApplication.getInstance().getMainActivityCurView()));
+    public void OnMainCurViewChange() {
+        if (lastMainActivityCurView != MainApplication.getInstance().getMainActivityCurView()) {
+            lastMainActivityCurView = MainApplication.getInstance().getMainActivityCurView();
+            LogService.getInstance().log(this, "onMainCurViewChange", String.valueOf(MainApplication.getInstance().getMainActivityCurView()));
 
-        viewCurOrders.setVisibility(View.GONE);
-        viewViewOrder.setVisibility(View.GONE);
-        viewCurOrder.setVisibility(View.GONE);
-        fabMainActions.setVisibility(View.GONE);
+            viewCurOrders.setVisibility(View.GONE);
+            viewViewOrder.setVisibility(View.GONE);
+            viewCurOrder.setVisibility(View.GONE);
+            fabMainActions.setVisibility(View.GONE);
+
+            // mainToolbar.sh
 
 
-        switch (MainApplication.getInstance().getMainActivityCurView()) {
-            case Constants.CUR_VIEW_CUR_ORDERS:
-                viewCurOrders.setVisibility(View.VISIBLE);
-                fabMainActions.setVisibility(View.VISIBLE);
-                break;
-            case Constants.CUR_VIEW_VIEW_ORDER:
-                viewViewOrder.setVisibility(View.VISIBLE);
-                viewOrderLastState = MainApplication.getInstance().getViewOrder().getCheck();
-                generateViewOrder();
-                break;
-            case Constants.CUR_VIEW_CUR_ORDER:
-                viewCurOrder.setVisibility(View.VISIBLE);
-                //viewOrderLastState = MainApplication.getInstance().getViewOrder().Check;
-                viewOrderLastState = -1;
-                generateCurOrder();
-                break;
+            switch (MainApplication.getInstance().getMainActivityCurView()) {
+                case Constants.CUR_VIEW_CUR_ORDERS:
+                    viewCurOrders.setVisibility(View.VISIBLE);
+                    fabMainActions.setVisibility(View.VISIBLE);
+                    break;
+                case Constants.CUR_VIEW_VIEW_ORDER:
+                    viewViewOrder.setVisibility(View.VISIBLE);
+                    viewOrderLastState = MainApplication.getInstance().getViewOrder().getCheck();
+                    generateViewOrder();
+                    break;
+                case Constants.CUR_VIEW_CUR_ORDER:
+                    viewCurOrder.setVisibility(View.VISIBLE);
+                    //viewOrderLastState = MainApplication.getInstance().getViewOrder().Check;
+                    viewOrderLastState = -1;
+                    generateCurOrder();
+                    break;
+            }
         }
-        LogService.getInstance().log(this, "setTitle", MainApplication.getInstance().getMainAccount().getMainActivityCaption());
-        this.setTitle(MainApplication.getInstance().getMainAccount().getMainActivityCaption());
+        if (!lastMainActivityCaption.equals(MainApplication.getInstance().getMainAccount().getMainActivityCaption())) {
+            lastMainActivityCaption = MainApplication.getInstance().getMainAccount().getMainActivityCaption();
+            LogService.getInstance().log(this, "setTitle", MainApplication.getInstance().getMainAccount().getMainActivityCaption());
+            this.setTitle(MainApplication.getInstance().getMainAccount().getMainActivityCaption());
+        }
+
     }
 
     @Override
@@ -510,6 +477,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             rvCurOrders.setVisibility(View.VISIBLE);
             rvCurOrders.getRecycledViewPool().clear();
             // curOrdersAdapter.notifyItemRangeInserted(0, MainApplication.getInstance().getCurOrders().getCount());
+            // curOrdersAdapter.notifyItemRangeChanged(0, MainApplication.getInstance().getCurOrders().getCount()); // .notifyDataSetChanged();
             curOrdersAdapter.notifyDataSetChanged();
         }
 
@@ -525,6 +493,14 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         googleMap = map;
         if (MainApplication.getInstance().getMainActivityCurView() == Constants.CUR_VIEW_VIEW_ORDER)
             generateViewOrder();
+    }
+
+    public void onCompleteOrdersChange(int orderCount) {
+        if (orderCount == 0) {
+            runOnUiThread(() -> btnCompleteOrders.setVisibility(View.GONE));
+        } else {
+            runOnUiThread(() -> btnCompleteOrders.setVisibility(View.VISIBLE));
+        }
     }
 
     private void generateCurOrder() {
@@ -550,6 +526,8 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             ((TextView) findViewById(R.id.tvCurOrderTimer)).setText(viewOrder.getTimer());
 
             ((FontFitTextView) findViewById(R.id.tvCurOrderClientPrice)).setText(viewOrder.getCostString());
+
+            LogService.getInstance().log(this, "generateCurOrder", "mainAction = " + viewOrder.getMainAction());
 
             switch (viewOrder.getMainAction()) {
                 case "apply_deny":
@@ -589,7 +567,6 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                     break;
             }
         }
-
     }
 
     private void generateViewOrder() {
@@ -597,7 +574,8 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         final Order viewOrder = MainApplication.getInstance().getViewOrder();
         if (viewOrder == null) {
             mpOrderStateChange.start();
-            MainApplication.getInstance().showToast("Заказ забрал другой водитель");
+            showToast("Заказ забрал другой водитель");
+
             MainApplication.getInstance().setMainActivityCurView(Constants.CUR_VIEW_CUR_ORDERS);
 
         } else {
@@ -627,8 +605,8 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                         alertDialog.setTitle("Внимание");
                         if (viewOrder.corporateTaxi && MainApplication.getInstance().getPreferences().isShowCorporateTaxiCheckOrderDialog()) {
                             alertDialog.setMessage(MainApplication.getInstance().getPreferences().corporateTaxiCheckOrderDialog);
-
-
+                        } else if (MainApplication.getInstance().getPreferences().isLongDistanceMessage() && viewOrder.getPickUpDistance() > 5000) {
+                            alertDialog.setMessage("До заказа более 5 километров. Время подачи до клиента не более 10 минут. Вы уверены, что хотите принять данный заказ?");
                         } else {
                             alertDialog.setMessage("Принять данный заказ?");
                         }

@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,9 +18,10 @@ import org.toptaxi.taximeter.adapters.RVCurOrdersAdapter;
 import org.toptaxi.taximeter.adapters.RecyclerItemClickListener;
 import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.dialogs.CheckOrderOnCompleteDialog;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 import org.toptaxi.taximeter.tools.OnCompleteOrdersChange;
 
-public class OrdersOnCompleteActivity extends AppCompatActivity implements OnCompleteOrdersChange, RecyclerItemClickListener.OnItemClickListener, CheckOrderOnCompleteDialog.OnCheckOrderOnComplete {
+public class OrdersOnCompleteActivity extends MainAppCompatActivity implements OnCompleteOrdersChange, RecyclerItemClickListener.OnItemClickListener, CheckOrderOnCompleteDialog.OnCheckOrderOnComplete {
     RecyclerView rvOrders;
     RVCurOrdersAdapter ordersAdapter;
 
@@ -28,13 +29,24 @@ public class OrdersOnCompleteActivity extends AppCompatActivity implements OnCom
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders);
-        setTitle("Заказы по выполнению");
+
+
+        Toolbar mainToolbar = findViewById(R.id.activity_orders_toolbar);
+        setSupportActionBar(mainToolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Заказы по выполнению");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            mainToolbar.setNavigationOnClickListener(view -> onBackPressed());
+        }
+
         rvOrders = findViewById(R.id.rvActivityOrders);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvOrders.setLayoutManager(llm);
         ordersAdapter = new RVCurOrdersAdapter(2);
         rvOrders.setAdapter(ordersAdapter);
         rvOrders.addOnItemTouchListener(new RecyclerItemClickListener(this, this));
+
 
     }
 
@@ -56,22 +68,16 @@ public class OrdersOnCompleteActivity extends AppCompatActivity implements OnCom
     @Override
     public void OnCompleteOrdersChange() {
         if (MainApplication.getInstance().getCompleteOrders().getCount() > 0)
-            ordersAdapter.notifyDataSetChanged();
+            ordersAdapter.notifyItemRangeChanged(0, MainApplication.getInstance().getCompleteOrders().getCount());
         else
             finish();
 
     }
 
     @Override
-    public void OnCompleteOrdersNull() {
-        MainApplication.getInstance().setOnCompleteOrdersChange(null);
-        finish();
-    }
-
-    @Override
     public void onItemClick(View view, int position) {
         Order order = MainApplication.getInstance().getCompleteOrders().getOrder(position);
-        if (order.getCheck() == 0){
+        if (order.getCheck() == 0) {
             CheckOrderOnCompleteDialog checkOrderOnCompleteDialog = new CheckOrderOnCompleteDialog(this);
             checkOrderOnCompleteDialog.SetOrderInfo(order);
             checkOrderOnCompleteDialog.setOnCheckOrderOnComplete(this);
@@ -84,7 +90,7 @@ public class OrdersOnCompleteActivity extends AppCompatActivity implements OnCom
         new CheckOrderTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, curOrder);
     }
 
-    private class CheckOrderTask extends AsyncTask<Order, Void, JSONObject>{
+    private class CheckOrderTask extends AsyncTask<Order, Void, JSONObject> {
         ProgressDialog progressDialog;
         Context mContext;
 
@@ -97,7 +103,7 @@ public class OrdersOnCompleteActivity extends AppCompatActivity implements OnCom
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (progressDialog != null)progressDialog.show();
+            if (progressDialog != null) progressDialog.show();
         }
 
         @Override
@@ -108,14 +114,13 @@ public class OrdersOnCompleteActivity extends AppCompatActivity implements OnCom
         @Override
         protected void onPostExecute(JSONObject dotResponse) {
             super.onPostExecute(dotResponse);
-            if (OrdersOnCompleteActivity.this.isFinishing())return;
-            if (progressDialog != null && progressDialog.isShowing())progressDialog.dismiss();
+            if (OrdersOnCompleteActivity.this.isFinishing()) return;
+            if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
 
             try {
-                if (dotResponse.getInt("status_code") == 200){
+                if (dotResponse.getInt("status_code") == 200) {
                     MainApplication.getInstance().parseData(dotResponse.getJSONObject("result"));
-                }
-                else {
+                } else {
                     MainApplication.getInstance().showToast(dotResponse.getString("result"));
                 }
                 finish();

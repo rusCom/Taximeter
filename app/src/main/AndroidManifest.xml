@@ -77,7 +77,7 @@
 
         <activity android:name=".activities.HisOrdersActivity" />
         <activity android:name=".activities.HisOrderActivity" />
-        <activity android:name=".activities.OrdersOnCompleteActivity" />
+        <activity android:name=".activities.OrdersOnCompleteActivity" android:theme="@style/AppTheme.NoActionBar" />
         <service
             android:name=".services.MyFirebaseMessagingService"
             android:exported="false">

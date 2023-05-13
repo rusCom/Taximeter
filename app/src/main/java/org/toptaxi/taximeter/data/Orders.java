@@ -11,7 +11,6 @@ import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -70,7 +69,7 @@ public class Orders {
         }
 
         try {
-            orderList.sort(Comparator.comparing(Order::getDistance));
+            orderList.sort(Comparator.comparing(Order::getPickUpDistance));
         } catch (Throwable ignored) {
         }
 
@@ -93,7 +92,7 @@ public class Orders {
                         if ((order.getCost() >= MainApplication.getInstance().getPreferences().getNewOrderAlarmCost()) &
                                 (
                                         MainApplication.getInstance().getPreferences().getNewOrderAlarmDistance() == -1 |
-                                                order.getDistance() <= (MainApplication.getInstance().getPreferences().getNewOrderAlarmDistance() * 1000)
+                                                order.getPickUpDistance() <= (MainApplication.getInstance().getPreferences().getNewOrderAlarmDistance() * 1000)
                                 )
                         ) {
                             isNewOrderAlarm = true;
@@ -104,8 +103,6 @@ public class Orders {
             }
 
         }
-
-
         if (onOrdersChangeListener != null) {
             uiHandler.post(() -> onOrdersChangeListener.OnOrdersChange());
         }

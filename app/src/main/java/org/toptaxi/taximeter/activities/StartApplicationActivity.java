@@ -1,6 +1,7 @@
 package org.toptaxi.taximeter.activities;
 
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetInteger;
+import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -130,6 +131,10 @@ public class StartApplicationActivity extends AppCompatActivity {
             runOnUiThread(() -> tvAction.setText("Запуск приложения ..."));
             JSONObject result = MainApplication.getInstance().getRestService().httpGet("/profile/auth");
             if (isFinished) return;
+            if (JSONGetString(result, "status_code").equals("500")){
+                result = MainApplication.getInstance().getRestService().httpGet("/profile/auth");
+                if (isFinished) return;
+            }
 
             try {
                 JSONObject data = result.getJSONObject("result");

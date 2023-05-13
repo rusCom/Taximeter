@@ -26,7 +26,7 @@ public class Constants {
     public static final int MENU_DISPATCHING_CALL       = 200;
     public static final int MENU_SUPPORT_CALL           = 201;
     public static final int MENU_BALANCE                = 202;
-    public static final int MENU_ACITVATE_UNLIM         = 203;
+    public static final int MENU_TARIFF_PLAN            = 203;
     public static final int MENU_CUR_ORDER              = 204;
     public static final int MENU_THEME                  = 206;
     public static final int MENU_MESSAGES               = 207;

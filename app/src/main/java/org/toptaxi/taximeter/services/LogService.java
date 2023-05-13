@@ -31,9 +31,9 @@ public class LogService {
     public void log(String className, String method, String data) {
         if (isLog(className)) {
             if (data.equals("")) {
-                Log.d("####### " + className, method);
+                Log.d("#######", className + "->" + method);
             } else {
-                Log.d("####### " + className + ": " + method, data);
+                Log.d("#######",  className + "->" + method + ": " + data);
             }
         }
     }
@@ -54,6 +54,8 @@ public class LogService {
                 return false;
             case "MainActivity":
                 return false;
+            case "MainApplication":
+                return false;
             case "PriorOrderActivity":
                 return false;
             case "FirebaseService":
@@ -68,8 +70,7 @@ public class LogService {
                 return false;
             case "MainService":
                 return false;
-            case "MainApplication":
-                return false;
+
 
             case "sys":
                 return true;

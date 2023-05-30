@@ -9,6 +9,8 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import org.toptaxi.taximeter.MainApplication;
 
+import java.util.Objects;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "#########" + MyFirebaseMessagingService.class.getName();
 
@@ -22,10 +24,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        LogService.getInstance().log("sys", "onMessageReceived");
         Log.d(TAG, "onMessageReceived " + remoteMessage.getFrom());
 
         if (remoteMessage.getData().size() > 0){
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            Log.d(TAG, "Message data payload: " + remoteMessage.getData().get("action"));
+            if (Objects.equals(remoteMessage.getData().get("action"), "location")){
+                MainApplication.getInstance().getRestService().httpGet("/location");
+            }
         }
 
         if (remoteMessage.getNotification() != null) {

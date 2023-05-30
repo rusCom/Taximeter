@@ -4,19 +4,16 @@ import static org.toptaxi.taximeter.tools.MainUtils.JSONGetBool;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetCalendar;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetDouble;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetInteger;
-
-import android.os.Build;
+import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
-import org.toptaxi.taximeter.services.FirebaseService;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.DateTimeTools;
+import org.toptaxi.taximeter.tools.MainUtils;
 
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 public class Profile {
@@ -25,11 +22,18 @@ public class Profile {
     public Integer tariffPlanID;
     public Calendar tariffPlanEndDate;
     private Double balance;
+    private Integer status;
+    private String callSign;
+    private String fullName;
 
     public void parseData(JSONObject data) throws JSONException {
         pushNotificationActive = JSONGetBool(data, "push_notification_active", true);
-        taximeterFreeOrderCount = JSONGetInteger(data, "free_order_count", 20);
-        balance = JSONGetDouble(data, "balance", 0.0);
+        taximeterFreeOrderCount = JSONGetInteger(data, "free_order_count", 10);
+        balance = JSONGetDouble(data, "balance");
+        status = JSONGetInteger(data, "status", 0);
+        callSign = JSONGetString(data, "callsign");
+        fullName = JSONGetString(data, "name");
+
 
         tariffPlanID = 1;
         if (data.has("tariff_plan")){
@@ -66,8 +70,30 @@ public class Profile {
         }
     }
 
-    public Double getBalance() {
-        return balance;
+    public Boolean isBalanceShow(){
+        return balance != null;
+    }
+
+    public Boolean isShowNullBalanceDialog(){
+        if (balance == null)return false;
+        return balance <= 50;
+    }
+
+    public String getNotificationMessageTitle(){
+        if (balance == null)return getStatusName() + " [" + callSign + "]" + fullName;
+        return getBalanceFormat() + MainUtils.getRubSymbol() + " " + getStatusName() + " [" + callSign + "]" + fullName;
+    }
+
+    public String getMainActivityCaption() {
+        if (balance == null)return getStatusName();
+        String result = getBalanceFormat();
+        result += " " + MainUtils.getRubSymbol();
+        result += " " + getStatusName();
+        return result;
+    }
+
+    public String getDrawerName(){
+        return "[" + callSign + "] " + fullName;
     }
 
     public String getBalanceFormat(){
@@ -81,6 +107,23 @@ public class Profile {
             MainApplication.getInstance().getRestService().serverError("Account.getBalanceString", balance.toString());
         }
         return balance.toString();
+    }
+
+    public String getStatusName() {
+        String result = "";
+        if (status == null){return "";}
+        switch (status) {
+            case 0:
+                result = "Занят";
+                break;
+            case 1:
+                result = "На автораздаче";
+                break;
+            case 2:
+                result = "На заказе";
+                break;
+        }
+        return result;
     }
 
     public boolean showActivateTariffPlan(){

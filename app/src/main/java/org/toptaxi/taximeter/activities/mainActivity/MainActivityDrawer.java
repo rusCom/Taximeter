@@ -21,6 +21,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import org.toptaxi.taximeter.MainActivity;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
+import org.toptaxi.taximeter.activities.AboutActivity;
 import org.toptaxi.taximeter.activities.BalanceActivity;
 import org.toptaxi.taximeter.activities.HisOrdersActivity;
 import org.toptaxi.taximeter.activities.InviteDriverActivity;
@@ -48,7 +49,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
     private void generateDrawer() {
         LogService.getInstance().log(this, "generateNewDrawer");
-        fullName = MainApplication.getInstance().getMainAccount().getName();
+        fullName = MainApplication.getInstance().getProfile().getDrawerName();
         carName = MainApplication.getInstance().getMainAccount().getSerName();
 
         profile = new ProfileDrawerItem()
@@ -77,7 +78,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 .withOnDrawerItemClickListener(this)
                 .build();
 
-        if (MainApplication.getInstance().getPreferences().isBalanceShow()){
+        if (MainApplication.getInstance().getProfile().isBalanceShow()){
             balanceItem = new PrimaryDrawerItem().withName("Баланс").withIcon(FontAwesome.Icon.faw_rub).withSelectable(false).withBadge(MainApplication.getInstance().getProfile().getBalanceFormat()).withIdentifier(Constants.MENU_BALANCE);
             drawer.addItem(balanceItem);
             if (MainApplication.getInstance().getPreferences().corporateTaxi) {
@@ -111,7 +112,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
 
         drawer.addItem(new DividerDrawerItem());
-        if (MainApplication.getInstance().getPreferences().isBalanceShow()){
+        if (MainApplication.getInstance().getProfile().isBalanceShow()){
             if (PaymentsDialog.getInstance().getPaymentsAvailable()){
                 drawer.addItem(new PrimaryDrawerItem().withName("Пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT));
             }
@@ -131,26 +132,27 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
             drawer.addItem(new PrimaryDrawerItem().withName("Позвонить диспетчеру").withIcon(FontAwesome.Icon.faw_phone).withSelectable(false).withIdentifier(Constants.MENU_DISPATCHING_CALL));
         }
         if (!MainApplication.getInstance().getPreferences().getSupportPhone().equals("")) {
-            drawer.addItem(new PrimaryDrawerItem().withName("Позвонить в администрацию").withIcon(FontAwesome.Icon.faw_phone).withSelectable(false).withIdentifier(Constants.MENU_SUPPORT_CALL));
+            drawer.addItem(new PrimaryDrawerItem().withName("Техподдержка").withIcon(R.drawable.baseline_support_24).withSelectable(false).withIdentifier(Constants.MENU_SUPPORT_CALL));
         }
         drawer.addItem(new PrimaryDrawerItem().withName("Настройки").withIcon(FontAwesome.Icon.faw_cog).withSelectable(false).withIdentifier(Constants.MENU_SETTINGS));
         themeItem = new PrimaryDrawerItem().withName(MainApplication.getInstance().getPreferences().getThemeName()).withSelectable(false).withIcon(FontAwesome.Icon.faw_exchange).withIdentifier(Constants.MENU_THEME);
         drawer.addItem(themeItem);
         drawer.addItem(new DividerDrawerItem());
-        drawer.addItem(new PrimaryDrawerItem().withName("ver. " + MainApplication.getInstance().getAppVersion()).withIcon(FontAwesome.Icon.faw_creative_commons).withEnabled(false).withSelectable(false));
+        drawer.addItem(new PrimaryDrawerItem().withName("О приложении").withIcon(R.drawable.baseline_info_24).withSelectable(false).withIdentifier(Constants.MENU_ABOUT));
+        // drawer.addItem(new PrimaryDrawerItem().withName("ver. " + MainApplication.getInstance().getAppVersion()).withIcon(FontAwesome.Icon.faw_creative_commons).withEnabled(false).withSelectable(false));
 
     }
 
     public void updateDrawer() {
         if (drawer != null) {
-            if (!fullName.equals(MainApplication.getInstance().getMainAccount().getName())) {
+            if (!fullName.equals(MainApplication.getInstance().getProfile().getDrawerName())) {
                 generateDrawer();
             } else if (!carName.equals(MainApplication.getInstance().getMainAccount().getSerName())) {
                 generateDrawer();
             } else {
                 LogService.getInstance().log(this, "updateDrawer");
 
-                if (MainApplication.getInstance().getPreferences().isBalanceShow()){
+                if (MainApplication.getInstance().getProfile().isBalanceShow()){
                     balanceItem.withBadge(MainApplication.getInstance().getProfile().getBalanceFormat());
                     drawer.updateItem(balanceItem);
 
@@ -215,7 +217,8 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 mainActivity.startActivity(settingsIntent);
                 break;
             case Constants.MENU_SUPPORT_CALL:
-                mainActivity.callIntent(MainApplication.getInstance().getPreferences().getSupportPhone());
+                // mainActivity.callIntent(MainApplication.getInstance().getPreferences().getSupportPhone());
+                mainActivity.onSupportContactClick();
                 break;
             case Constants.MENU_DISPATCHING_CALL:
                 mainActivity.callIntent(MainApplication.getInstance().getPreferences().getDispatcherPhone());
@@ -234,6 +237,9 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 break;
             case Constants.MENU_VK_GROUP:
                 mainActivity.goToURL(MainApplication.getInstance().getPreferences().vkGroupLink);
+                break;
+            case Constants.MENU_ABOUT:
+                mainActivity.startActivity(new Intent(mainActivity, AboutActivity.class));
                 break;
         }
         return false;

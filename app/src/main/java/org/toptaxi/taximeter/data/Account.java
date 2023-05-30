@@ -12,14 +12,12 @@ import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
-import org.toptaxi.taximeter.tools.MainUtils;
 
 import java.text.DecimalFormat;
 
 public class Account {
     private String Token;
     public Double balanceCorporateTaxi;
-    private String Name;
     private String serName;
     private Integer status = 0, lastStatus = -1;
     private String NotReadMessageCount;
@@ -35,7 +33,6 @@ public class Account {
 
     public void parseData(JSONObject data) {
         LogService.getInstance().log(this, data.toString());
-        Name = JSONGetString(data, "name");
         serName = JSONGetString(data, "ser_name");
         status = JSONGetInteger(data, "status", 0);
         NotReadMessageCount = JSONGetString(data, "nrmc");
@@ -57,12 +54,6 @@ public class Account {
         isParsedData = true;
     }
 
-    public String getMainActivityCaption() {
-        String result = MainApplication.getInstance().getProfile().getBalanceFormat();
-        result += " " + MainUtils.getRubSymbol();
-        result += " " + getStatusName();
-        return result;
-    }
 
     public void setNullStatus() {
         status = null;
@@ -87,35 +78,12 @@ public class Account {
         return new DecimalFormat("###,#00.00").format(balanceCorporateTaxi);
     }
 
-
-    public String getName() {
-        return Name;
-    }
-
     public String getSerName() {
         return serName;
     }
 
     public String getToken() {
         return Token;
-    }
-
-
-    public String getStatusName() {
-        String result = "";
-        if (status == null){return "";}
-        switch (status) {
-            case 0:
-                result = "Занят";
-                break;
-            case 1:
-                result = "На автораздаче";
-                break;
-            case 2:
-                result = "На заказе";
-                break;
-        }
-        return result;
     }
 
     public void setToken(String token) {

@@ -37,11 +37,12 @@ public class Constants {
     public static final int MENU_FAQ                    = 212;
     public static final int MENU_SETTINGS               = 214;
     public static final int MENU_PAYMENT_INSTRUCTION    = 216;
-    public static final int MENU_PAYMENT                = 221;
     public static final int MENU_VK_GROUP               = 217;
     public static final int MENU_INSTRUCTION            = 218;
     public static final int MENU_CLOSE_APPLICATION      = 219;
     public static final int MENU_BALANCE_CORPORATE      = 220;
+    public static final int MENU_PAYMENT                = 221;
+    public static final int MENU_ABOUT                  = 222;
 
     public static final int MAIN_ACTION_GO_ONLINE       = 100;
     public static final int MAIN_ACTION_GO_OFFLINE      = 101;

@@ -69,6 +69,12 @@ public class MainAppCompatActivity extends AppCompatActivity {
         }
     }
 
+    public void callIntent(String phone) {
+        Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone));
+        dialIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(dialIntent);
+    }
+
     public void showSimpleDialog(String dialogText) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(dialogText);

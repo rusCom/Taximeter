@@ -14,9 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
-import org.toptaxi.taximeter.tools.MainUtils;
 import org.toptaxi.taximeter.dialogs.PaymentsDialog;
-import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
+import org.toptaxi.taximeter.tools.MainUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +47,9 @@ public class Preferences {
     public Long corporateTaxiCheckOrderDialogLastShow;
     public Boolean dispatcherMessages = false;
     public String hourInfoText = "";
-    private boolean balanceShow = true;
     private boolean longDistanceMessage = false;
-
     private final List<TariffPlan> driverTariffPlans;
+
 
 
     public Preferences() {
@@ -86,7 +84,6 @@ public class Preferences {
         this.useRating = MainUtils.JSONGetBool(data, "use_rating");
         this.dispatcherMessages = JSONGetBool(data, "dispatcher_messages");
         this.hourInfoText = JSONGetString(data, "hour_info_text");
-        this.balanceShow = JSONGetBool(data, "balance_show", true);
         this.longDistanceMessage = JSONGetBool(data, "long_distance_message");
 
         dispatcherTemplateMessages.clear();
@@ -147,10 +144,6 @@ public class Preferences {
         return longDistanceMessage;
     }
 
-    public boolean isBalanceShow() {
-        return balanceShow;
-    }
-
     public String getLicenseAgreementLink() {
         return licenseAgreementLink;
     }
@@ -201,8 +194,7 @@ public class Preferences {
 
     public Boolean isDriverInvite() {
         if (driverInviteText.equals("")) return false;
-        if (driverInviteCaption.equals("")) return false;
-        return true;
+        return !driverInviteCaption.equals("");
     }
 
     public String getDispatcherPhone() {

@@ -42,7 +42,7 @@ public class MainBottomSheetRecycler extends BottomSheetDialogFragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        MainCardDataAdapter tariffPlansAdapter = new MainCardDataAdapter(listItems,
+        MainCardDataAdapter mainCardDataAdapter = new MainCardDataAdapter(listItems,
                 mainCardViewData -> {
                     bottomSheetDialog.dismiss();
                     if (clickListener != null) {
@@ -50,7 +50,7 @@ public class MainBottomSheetRecycler extends BottomSheetDialogFragment {
                     }
                 });
 
-        recyclerView.setAdapter(tariffPlansAdapter);
+        recyclerView.setAdapter(mainCardDataAdapter);
 
         if (getContext() != null){
             RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);

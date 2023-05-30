@@ -14,9 +14,10 @@
 
         <ImageView
             android:id="@+id/mainCardViewImageViewBegin"
-            android:visibility="gone"
             android:layout_width="70dp"
-            android:layout_height="70dp" />
+            android:layout_height="70dp"
+            android:padding="3dp"
+            android:visibility="visible" />
 
         <LinearLayout
             android:layout_width="match_parent"

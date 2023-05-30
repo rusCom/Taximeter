@@ -89,19 +89,45 @@ public class LocationService implements LocationListener {
     }
 
     public Location getLocation() {
+        if (location == null){
+            if (ContextCompat.checkSelfPermission(MainApplication.getInstance(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                Location lastKnownLocationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                Location lastKnownLocationPASSIVE = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                if ((lastKnownLocationGPS != null) && (lastKnownLocationPASSIVE != null)){
+                    if (lastKnownLocationGPS.getTime() > lastKnownLocationPASSIVE.getTime()){
+                        return lastKnownLocationGPS;
+                    }
+                    else {
+                        return lastKnownLocationPASSIVE;
+                    }
+                } else if (lastKnownLocationGPS != null ) {
+                    return lastKnownLocationGPS;
+                }
+                else {
+                    return lastKnownLocationPASSIVE;
+                }
+
+            }
+
+
+        }
         return location;
     }
+
+
 
     public JSONObject toJSON(){
         JSONObject data = new JSONObject();
         try {
-            if (location != null){
-                data.put("lt", location.getLatitude());
-                data.put("ln", location.getLongitude());
-                data.put("accuracy", location.getAccuracy());
-                data.put("bearing", location.getBearing());
-                data.put("speed", location.getSpeed());
+            Location location1 = getLocation();
+            if (location1 != null){
+                data.put("lt", location1.getLatitude());
+                data.put("ln", location1.getLongitude());
+                data.put("accuracy", location1.getAccuracy());
+                data.put("bearing", location1.getBearing());
+                data.put("speed", location1.getSpeed());
             }
+
 
         } catch (JSONException e) {
             e.printStackTrace();

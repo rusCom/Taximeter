@@ -331,7 +331,7 @@ public class MainApplication extends Application {
     public void onAccountDataChange() {
         if (mainActivity != null) {
             mainActivity.runOnUiThread(() -> mainActivity.mainActivityDrawer.updateDrawer());
-            mainActivity.runOnUiThread(() -> mainActivity.setTitle(MainApplication.getInstance().getMainAccount().getMainActivityCaption()));
+            mainActivity.runOnUiThread(() -> mainActivity.setTitle(MainApplication.getInstance().getProfile().getMainActivityCaption()));
         }
     }
 

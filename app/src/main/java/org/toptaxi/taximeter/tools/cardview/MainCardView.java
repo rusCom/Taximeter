@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,8 +56,19 @@ public class MainCardView extends MaterialCardView {
     private void initData(){
         mainTextView.setText(mainCardViewData.getMainText());
         mainTextView.setVisibility(VISIBLE);
-        noteTextView.setText(mainCardViewData.getNoteText());
-        noteTextView.setVisibility(VISIBLE);
+        if (mainCardViewData.getNoteText() != null){
+            if (!mainCardViewData.getNoteText().isEmpty()){
+                noteTextView.setText(mainCardViewData.getNoteText());
+                noteTextView.setVisibility(VISIBLE);
+            }
+        }
+        if (mainCardViewData.getImageResourceID() !=null){
+            imageViewBegin.setImageResource(mainCardViewData.getImageResourceID());
+            imageViewBegin.setVisibility(VISIBLE);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(110 ,110);
+            imageViewBegin.setLayoutParams(layoutParams);
+        }
+
 
         if (mainCardViewClickListener != null){
             findViewById(R.id.mainCardViewCard).setOnClickListener(v -> mainCardViewClickListener.clickItem(mainCardViewData));

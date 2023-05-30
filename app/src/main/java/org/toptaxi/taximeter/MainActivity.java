@@ -30,6 +30,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.toptaxi.taximeter.activities.OrdersOnCompleteActivity;
 import org.toptaxi.taximeter.activities.mainActivity.MainActivityDrawer;
 import org.toptaxi.taximeter.adapters.MainActionAdapter;
+import org.toptaxi.taximeter.data.SupportContactItem;
 import org.toptaxi.taximeter.dialogs.PaymentsDialog;
 import org.toptaxi.taximeter.tools.bottomsheets.MainBottomSheetRecycler;
 import org.toptaxi.taximeter.adapters.OnMainActionClickListener;
@@ -48,6 +49,7 @@ import org.toptaxi.taximeter.tools.OnMainDataChangeListener;
 import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -137,12 +139,6 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         mainActivityDrawer = new MainActivityDrawer(this, mainToolbar);
     }
 
-    public void callIntent(String phone) {
-        Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone));
-        dialIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(dialIntent);
-    }
-
 
     @Override
     protected void onResume() {
@@ -160,7 +156,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
 
         // Если баланс водителя нулевой, показываем окно пополнения баланса
         // LogService.getInstance().log("MainActivity", "ShowNullBalanceDialog", MainApplication.getInstance().getProfile().getBalance().toString());
-        if (MainApplication.getInstance().getProfile().getBalance() <= 0
+        if ((MainApplication.getInstance().getProfile().isShowNullBalanceDialog())
                 && (!isShowNullBalanceDialog)) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.execute(() -> {
@@ -357,10 +353,10 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                     break;
             }
         }
-        if (!lastMainActivityCaption.equals(MainApplication.getInstance().getMainAccount().getMainActivityCaption())) {
-            lastMainActivityCaption = MainApplication.getInstance().getMainAccount().getMainActivityCaption();
-            LogService.getInstance().log(this, "setTitle", MainApplication.getInstance().getMainAccount().getMainActivityCaption());
-            this.setTitle(MainApplication.getInstance().getMainAccount().getMainActivityCaption());
+        if (!lastMainActivityCaption.equals(MainApplication.getInstance().getProfile().getMainActivityCaption())) {
+            lastMainActivityCaption = MainApplication.getInstance().getProfile().getMainActivityCaption();
+            LogService.getInstance().log(this, "setTitle", MainApplication.getInstance().getProfile().getMainActivityCaption());
+            this.setTitle(MainApplication.getInstance().getProfile().getMainActivityCaption());
         }
 
     }
@@ -405,6 +401,37 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             );
             myBottomSheetFragment.show(getSupportFragmentManager(), myBottomSheetFragment.getTag());
         }
+    }
+
+    public void onSupportContactClick() {
+        List<SupportContactItem> supportContactItemList = new ArrayList<>();
+        supportContactItemList.add(new SupportContactItem("phone"));
+        supportContactItemList.add(new SupportContactItem("whatsapp"));
+        supportContactItemList.add(new SupportContactItem("telegram"));
+            ArrayList<IMainCardViewData> cards = new ArrayList<>(supportContactItemList);
+            MainBottomSheetRecycler myBottomSheetFragment = new MainBottomSheetRecycler(
+                    cards,
+                    mainCardViewData -> {
+                        SupportContactItem supportContactItem = (SupportContactItem) mainCardViewData;
+                        supportContactItem.onClick();
+                        LogService.getInstance().log("sys", supportContactItem.getMainText());
+                        /*
+                        TariffPlan tariffPlan = (TariffPlan) mainCardViewData;
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainApplication.getInstance().getMainActivity());
+                        alertDialog.setTitle("Покупка смены");
+                        alertDialog.setMessage("Купить смену \"" + tariffPlan.Name + "\" за " +
+                                MainUtils.getSummaString(tariffPlan.Cost) + "?");
+                        alertDialog.setPositiveButton("Да", (dialogInterface, i1) -> {
+                            httpGetResult("/tariff/activate?tariff_id=" + tariffPlan.ID);
+                        });
+                        alertDialog.setNegativeButton("Нет", null);
+                        alertDialog.create();
+                        alertDialog.show();
+                        */
+                    }
+            );
+            myBottomSheetFragment.show(getSupportFragmentManager(), myBottomSheetFragment.getTag());
+
     }
 
     public void onLocationDataChange() {

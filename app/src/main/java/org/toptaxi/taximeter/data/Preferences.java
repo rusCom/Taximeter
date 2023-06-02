@@ -176,6 +176,7 @@ public class Preferences {
     }
 
     public String getPaymentInstructionLink() {
+        if (paymentInstructionLink == null)return null;
         if (paymentInstructionLink.equals(""))return null;
         return paymentInstructionLink;
     }
@@ -223,27 +224,19 @@ public class Preferences {
 
     public int getTheme() {
         Log.d(TAG, "curTheme = " + curTheme);
-        switch (curTheme) {
-            case 0:
-                return AppCompatDelegate.MODE_NIGHT_NO;
-            case 1:
-                return AppCompatDelegate.MODE_NIGHT_YES;
-            case 2:
-                return AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
-        }
-        return AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+        return switch (curTheme) {
+            case 0 -> AppCompatDelegate.MODE_NIGHT_NO;
+            case 1 -> AppCompatDelegate.MODE_NIGHT_YES;
+            default -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+        };
     }
 
     public String getThemeName() {
-        switch (curTheme) {
-            case 0:
-                return "Дневная";
-            case 1:
-                return "Ночная";
-            case 2:
-                return "Подсветка";
-        }
-        return "Подсветка";
+        return switch (curTheme) {
+            case 0 -> "Дневная";
+            case 1 -> "Ночная";
+            default -> "Подсветка";
+        };
     }
 
     public Boolean getNewOrderAlarmCheck() {

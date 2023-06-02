@@ -261,10 +261,14 @@ public class Order {
     }
 
     public Integer getPickUpDistance() {
+        if (pickUpDistance == null)return 0;
         return pickUpDistance;
     }
 
     public String getDistanceString() {
+        if (pickUpDistance == null){
+            return "";
+        }
         if (pickUpDistance == 0) {
             return "";
         }

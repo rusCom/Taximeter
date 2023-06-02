@@ -3,7 +3,6 @@ package org.toptaxi.taximeter;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,15 +29,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.toptaxi.taximeter.activities.OrdersOnCompleteActivity;
 import org.toptaxi.taximeter.activities.mainActivity.MainActivityDrawer;
 import org.toptaxi.taximeter.adapters.MainActionAdapter;
-import org.toptaxi.taximeter.data.SupportContactItem;
-import org.toptaxi.taximeter.dialogs.PaymentsDialog;
-import org.toptaxi.taximeter.tools.bottomsheets.MainBottomSheetRecycler;
 import org.toptaxi.taximeter.adapters.OnMainActionClickListener;
 import org.toptaxi.taximeter.adapters.RVCurOrdersAdapter;
 import org.toptaxi.taximeter.adapters.RecyclerItemClickListener;
 import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.data.Orders;
+import org.toptaxi.taximeter.data.SupportContactItem;
 import org.toptaxi.taximeter.data.TariffPlan;
+import org.toptaxi.taximeter.dialogs.PaymentsDialog;
 import org.toptaxi.taximeter.services.LocationService;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
@@ -46,6 +44,7 @@ import org.toptaxi.taximeter.tools.FontFitTextView;
 import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 import org.toptaxi.taximeter.tools.MainUtils;
 import org.toptaxi.taximeter.tools.OnMainDataChangeListener;
+import org.toptaxi.taximeter.tools.bottomsheets.MainBottomSheetRecycler;
 import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
 
 import java.util.ArrayList;
@@ -336,21 +335,21 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
 
 
             switch (MainApplication.getInstance().getMainActivityCurView()) {
-                case Constants.CUR_VIEW_CUR_ORDERS:
+                case Constants.CUR_VIEW_CUR_ORDERS -> {
                     viewCurOrders.setVisibility(View.VISIBLE);
                     fabMainActions.setVisibility(View.VISIBLE);
-                    break;
-                case Constants.CUR_VIEW_VIEW_ORDER:
+                }
+                case Constants.CUR_VIEW_VIEW_ORDER -> {
                     viewViewOrder.setVisibility(View.VISIBLE);
                     viewOrderLastState = MainApplication.getInstance().getViewOrder().getCheck();
                     generateViewOrder();
-                    break;
-                case Constants.CUR_VIEW_CUR_ORDER:
+                }
+                case Constants.CUR_VIEW_CUR_ORDER -> {
                     viewCurOrder.setVisibility(View.VISIBLE);
                     //viewOrderLastState = MainApplication.getInstance().getViewOrder().Check;
                     viewOrderLastState = -1;
                     generateCurOrder();
-                    break;
+                }
             }
         }
         if (!lastMainActivityCaption.equals(MainApplication.getInstance().getProfile().getMainActivityCaption())) {
@@ -408,29 +407,15 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         supportContactItemList.add(new SupportContactItem("phone"));
         supportContactItemList.add(new SupportContactItem("whatsapp"));
         supportContactItemList.add(new SupportContactItem("telegram"));
-            ArrayList<IMainCardViewData> cards = new ArrayList<>(supportContactItemList);
-            MainBottomSheetRecycler myBottomSheetFragment = new MainBottomSheetRecycler(
-                    cards,
-                    mainCardViewData -> {
-                        SupportContactItem supportContactItem = (SupportContactItem) mainCardViewData;
-                        supportContactItem.onClick();
-                        LogService.getInstance().log("sys", supportContactItem.getMainText());
-                        /*
-                        TariffPlan tariffPlan = (TariffPlan) mainCardViewData;
-                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainApplication.getInstance().getMainActivity());
-                        alertDialog.setTitle("Покупка смены");
-                        alertDialog.setMessage("Купить смену \"" + tariffPlan.Name + "\" за " +
-                                MainUtils.getSummaString(tariffPlan.Cost) + "?");
-                        alertDialog.setPositiveButton("Да", (dialogInterface, i1) -> {
-                            httpGetResult("/tariff/activate?tariff_id=" + tariffPlan.ID);
-                        });
-                        alertDialog.setNegativeButton("Нет", null);
-                        alertDialog.create();
-                        alertDialog.show();
-                        */
-                    }
-            );
-            myBottomSheetFragment.show(getSupportFragmentManager(), myBottomSheetFragment.getTag());
+        ArrayList<IMainCardViewData> cards = new ArrayList<>(supportContactItemList);
+        MainBottomSheetRecycler myBottomSheetFragment = new MainBottomSheetRecycler(
+                cards,
+                mainCardViewData -> {
+                    SupportContactItem supportContactItem = (SupportContactItem) mainCardViewData;
+                    supportContactItem.onClick();
+                }
+        );
+        myBottomSheetFragment.show(getSupportFragmentManager(), myBottomSheetFragment.getTag());
 
     }
 
@@ -441,15 +426,9 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             miGPSNotFixed.setVisible(false);
             miGPSOff.setVisible(false);
             switch (GPSState) {
-                case LocationService.GPS_FIXED:
-                    miGPSFixed.setVisible(true);
-                    break;
-                case LocationService.GPS_NOT_FIXED:
-                    miGPSNotFixed.setVisible(true);
-                    break;
-                case LocationService.GPS_OFF:
-                    miGPSOff.setVisible(true);
-                    break;
+                case LocationService.GPS_FIXED -> miGPSFixed.setVisible(true);
+                case LocationService.GPS_NOT_FIXED -> miGPSNotFixed.setVisible(true);
+                case LocationService.GPS_OFF -> miGPSOff.setVisible(true);
             }
         }
 
@@ -481,15 +460,9 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             miDriverOnLine.setVisible(false);
             miDriverOnOrder.setVisible(false);
             switch (driverStatus) {
-                case Constants.DRIVER_OFFLINE:
-                    miDriverOffline.setVisible(true);
-                    break;
-                case Constants.DRIVER_ONLINE:
-                    miDriverOnLine.setVisible(true);
-                    break;
-                case Constants.DRIVER_ON_ORDER:
-                    miDriverOnOrder.setVisible(true);
-                    break;
+                case Constants.DRIVER_OFFLINE -> miDriverOffline.setVisible(true);
+                case Constants.DRIVER_ONLINE -> miDriverOnLine.setVisible(true);
+                case Constants.DRIVER_ON_ORDER -> miDriverOnOrder.setVisible(true);
             }
         }
     }
@@ -524,9 +497,15 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
 
     public void onCompleteOrdersChange(int orderCount) {
         if (orderCount == 0) {
-            runOnUiThread(() -> btnCompleteOrders.setVisibility(View.GONE));
+            runOnUiThread(() -> {
+                btnCompleteOrders.setVisibility(View.GONE);
+                fabMainActions.setVisibility(View.VISIBLE);
+            });
         } else {
-            runOnUiThread(() -> btnCompleteOrders.setVisibility(View.VISIBLE));
+            runOnUiThread(() -> {
+                btnCompleteOrders.setVisibility(View.VISIBLE);
+                fabMainActions.setVisibility(View.GONE);
+            });
         }
     }
 
@@ -557,32 +536,30 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             LogService.getInstance().log(this, "generateCurOrder", "mainAction = " + viewOrder.getMainAction());
 
             switch (viewOrder.getMainAction()) {
-                case "apply_deny":
+                case "apply_deny" -> {
                     fabMainActions.setVisibility(View.GONE);
-
                     btnCurOrderMainAction.setVisibility(View.VISIBLE);
                     btnCurOrderMainAction.setText("Принять");
                     btnCurOrderMainAction.setOnClickListener(view -> httpGetResult("/last/orders/apply"));
-
                     btnCurOrderAction.setVisibility(View.VISIBLE);
                     btnCurOrderAction.setText("Отказаться");
                     btnCurOrderAction.setOnClickListener(view -> httpGetResult("/last/orders/deny"));
-                    break;
-                case "set_driver_at_client":
+                }
+                case "set_driver_at_client" -> {
                     btnCurOrderMainAction.setVisibility(View.VISIBLE);
                     btnCurOrderMainAction.setText("Подъехал");
                     btnCurOrderAction.setVisibility(View.GONE);
                     btnCurOrderMainAction.setOnClickListener(view -> httpGetResult("/last/orders/waiting"));
                     fabMainActions.setVisibility(View.VISIBLE);
-                    break;
-                case "set_client_in_car":
+                }
+                case "set_client_in_car" -> {
                     btnCurOrderMainAction.setVisibility(View.VISIBLE);
                     btnCurOrderMainAction.setText("Клиент в машине");
                     btnCurOrderAction.setVisibility(View.GONE);
                     btnCurOrderMainAction.setOnClickListener(view -> httpGetResult("/last/orders/executed"));
                     fabMainActions.setVisibility(View.VISIBLE);
-                    break;
-                case "set_order_done":
+                }
+                case "set_order_done" -> {
                     if (MainApplication.getInstance().getCompleteOrders().getCount() > 0)
                         btnCompleteOrders.setVisibility(View.VISIBLE);
                     else btnCompleteOrders.setVisibility(View.GONE);
@@ -590,8 +567,12 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                     btnCurOrderMainAction.setText("Выполнил");
                     btnCurOrderAction.setVisibility(View.GONE);
                     btnCurOrderMainAction.setOnClickListener(view -> httpGetResult("/last/orders/done"));
-                    fabMainActions.setVisibility(View.GONE);
-                    break;
+                    if (MainApplication.getInstance().getCompleteOrders().getCount() == 0)
+                        fabMainActions.setVisibility(View.GONE);
+                    else
+                        fabMainActions.setVisibility(View.VISIBLE);
+
+                }
             }
         }
     }

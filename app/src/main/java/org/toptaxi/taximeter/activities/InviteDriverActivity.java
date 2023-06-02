@@ -20,6 +20,7 @@ public class InviteDriverActivity extends AppCompatActivity {
     }
 
     public void btnShareClick(View view){
+        MainApplication.getInstance().getRestService().httpGetThread("/invite/click");
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");

@@ -11,8 +11,8 @@ android {
         applicationId "org.toptaxi.taximeter"
         minSdk 24
         targetSdk 33
-        versionCode 44
-        versionName "44"
+        versionCode 45
+        versionName "45"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -113,15 +113,9 @@ public class Profile {
         String result = "";
         if (status == null){return "";}
         switch (status) {
-            case 0:
-                result = "Занят";
-                break;
-            case 1:
-                result = "На автораздаче";
-                break;
-            case 2:
-                result = "На заказе";
-                break;
+            case 0 -> result = "Занят";
+            case 1 -> result = "На автораздаче";
+            case 2 -> result = "На заказе";
         }
         return result;
     }

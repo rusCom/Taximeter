@@ -28,6 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.tinkoff.acquiring.sdk.TinkoffAcquiring;
+import ru.tinkoff.acquiring.sdk.localization.AsdkSource;
+import ru.tinkoff.acquiring.sdk.localization.Language;
 import ru.tinkoff.acquiring.sdk.models.enums.CheckType;
 import ru.tinkoff.acquiring.sdk.models.options.CustomerOptions;
 import ru.tinkoff.acquiring.sdk.models.options.FeaturesOptions;
@@ -335,10 +337,13 @@ public class PaymentsDialog {
         orderOptions.setAmount(Money.ofCoins(summa));
         orderOptions.setTitle("Пополнение баланса");
         orderOptions.setRecurrentPayment(false);
+
         FeaturesOptions featuresOptions = new FeaturesOptions();
         featuresOptions.setTinkoffPayEnabled(false);
         featuresOptions.setFpsEnabled(true);
         featuresOptions.setEmailRequired(false);
+        featuresOptions.setLocalizationSource(new AsdkSource(Language.RU));
+        featuresOptions.setUseSecureKeyboard(true);
 
         CustomerOptions customerOptions = new CustomerOptions();
         customerOptions.setCustomerKey(MainApplication.getInstance().getMainAccount().getToken());
@@ -352,7 +357,7 @@ public class PaymentsDialog {
 
 
         try {
-            TinkoffAcquiring tinkoffAcquiring = new TinkoffAcquiring(activity.getApplicationContext(), terminalKey, publicKey);
+            TinkoffAcquiring tinkoffAcquiring = new TinkoffAcquiring(MainApplication.getInstance(), terminalKey, publicKey);
             if (payType.equals("sbp")){
                 tinkoffAcquiring.payWithSbp(activity, paymentOptions, 254);
             } else if (payType.equals("tinkoff")) {
@@ -360,7 +365,7 @@ public class PaymentsDialog {
                 tinkoffAcquiring.openPaymentScreen(activity, paymentOptions, 154);
             }
         }
-        catch (Exception exception){
+        catch (RuntimeException exception){
             MainApplication.getInstance().getRestService().serverError("tinkoffPay", ExceptionUtils.getStackTrace(exception));
             activity.runOnUiThread(()->activity.showToast("Ошибка платежной системы. Попробуйте попозже.\n" + exception.getLocalizedMessage()));
         }

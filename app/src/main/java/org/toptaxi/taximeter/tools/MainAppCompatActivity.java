@@ -52,7 +52,10 @@ public class MainAppCompatActivity extends AppCompatActivity {
     public void dismissProgressDialog() {
         if (progressDialog != null) {
             if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
+                try {
+                    progressDialog.dismiss();
+                } catch (Exception ignored) {
+                }
             }
         }
     }
@@ -83,7 +86,7 @@ public class MainAppCompatActivity extends AppCompatActivity {
         builder.show();
     }
 
-    protected void httpGetResult(String path){
+    protected void httpGetResult(String path) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             MainApplication.getInstance().getRestService().httpGet(this, path);

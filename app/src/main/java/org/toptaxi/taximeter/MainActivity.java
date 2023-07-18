@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -361,6 +362,12 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // LogService.getInstance().log("sys", "onActivityResult");
+    }
+
+    @Override
     public void OnCurOrderDataChange(Order curOrder) {
         generateCurOrder();
     }
@@ -478,7 +485,11 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             rvCurOrders.getRecycledViewPool().clear();
             // curOrdersAdapter.notifyItemRangeInserted(0, MainApplication.getInstance().getCurOrders().getCount());
             // curOrdersAdapter.notifyItemRangeChanged(0, MainApplication.getInstance().getCurOrders().getCount()); // .notifyDataSetChanged();
-            curOrdersAdapter.notifyDataSetChanged();
+            try {
+                curOrdersAdapter.notifyDataSetChanged();
+            } catch (IndexOutOfBoundsException ignored) {
+            }
+
         }
 
         if (MainApplication.getInstance().getMainActivityCurView() == Constants.CUR_VIEW_VIEW_ORDER)

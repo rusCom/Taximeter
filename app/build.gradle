@@ -11,8 +11,8 @@ android {
         applicationId "org.toptaxi.taximeter"
         minSdk 24
         targetSdk 33
-        versionCode 45
-        versionName "45"
+        versionCode 46
+        versionName "46"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -51,18 +51,18 @@ dependencies {
     implementation 'com.mikepenz:fontawesome-typeface:4.7.0.2@aar'
     implementation "com.mikepenz:materialdrawer:6.1.2"
 
-    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
 
-    implementation 'ru.tinkoff.acquiring:ui:2.13.0'
-    implementation 'ru.tinkoff.acquiring:threeds-sdk:2.13.0'
-    implementation 'ru.tinkoff.acquiring:threeds-wrapper:2.13.0'
+    implementation 'ru.tinkoff.acquiring:ui:2.13.3'
+    implementation 'ru.tinkoff.acquiring:threeds-sdk:2.13.3'
+    implementation 'ru.tinkoff.acquiring:threeds-wrapper:2.13.3'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
-    implementation 'com.google.firebase:firebase-messaging:23.1.2'
+    implementation 'com.google.firebase:firebase-messaging:23.2.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

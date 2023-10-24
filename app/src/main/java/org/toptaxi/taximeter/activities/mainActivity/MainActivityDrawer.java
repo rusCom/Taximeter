@@ -24,7 +24,7 @@ import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.activities.AboutActivity;
 import org.toptaxi.taximeter.activities.BalanceActivity;
 import org.toptaxi.taximeter.activities.HisOrdersActivity;
-import org.toptaxi.taximeter.activities.InviteDriverActivity;
+import org.toptaxi.taximeter.activities.InviteActivity;
 import org.toptaxi.taximeter.activities.MessagesActivity;
 import org.toptaxi.taximeter.activities.SettingsActivity;
 import org.toptaxi.taximeter.activities.StatisticsActivity;
@@ -106,6 +106,9 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
         drawer.addItem(new PrimaryDrawerItem().withName("Статистика|Рейтинг").withIcon(FontAwesome.Icon.faw_cube).withSelectable(false).withIdentifier(Constants.MENU_STATISTICS));
         if (MainApplication.getInstance().getPreferences().isDriverInvite()) {
             drawer.addItem(new PrimaryDrawerItem().withName("Пригласить друга").withIcon(FontAwesome.Icon.faw_share_alt).withSelectable(false).withIdentifier(Constants.MENU_DRIVER_INVITE));
+        }
+        if (MainApplication.getInstance().getPreferences().isClientInvite()) {
+            drawer.addItem(new PrimaryDrawerItem().withName("Пригласить клиента").withIcon(FontAwesome.Icon.faw_share_alt).withSelectable(false).withIdentifier(Constants.MENU_CLIENT_INVITE));
         }
 
         drawer.addItem(new PrimaryDrawerItem().withName("История заказов").withIcon(FontAwesome.Icon.faw_history).withSelectable(false).withIdentifier(Constants.MENU_HIS_ORDERS));
@@ -209,8 +212,13 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 mainActivity.startActivity(new Intent(mainActivity, StatisticsActivity.class));
                 break;
             case Constants.MENU_DRIVER_INVITE:
-                Intent shareDriverIntent = new Intent(mainActivity, InviteDriverActivity.class);
+                Intent shareDriverIntent = new Intent(mainActivity, InviteActivity.class);
                 mainActivity.startActivity(shareDriverIntent);
+                break;
+            case Constants.MENU_CLIENT_INVITE:
+                Intent shareClientIntent = new Intent(mainActivity, InviteActivity.class);
+                shareClientIntent.putExtra("type", "client");
+                mainActivity.startActivity(shareClientIntent);
                 break;
             case Constants.MENU_SETTINGS:
                 Intent settingsIntent = new Intent(mainActivity, SettingsActivity.class);

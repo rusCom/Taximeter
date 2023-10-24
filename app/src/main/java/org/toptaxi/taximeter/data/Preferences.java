@@ -39,6 +39,8 @@ public class Preferences {
     public Integer systemTemplateMessagesTimeout = 60;
     private String driverInviteCaption = "";
     private String driverInviteText = "";
+    private String clientInviteCaption = "";
+    private String clientInviteText = "";
     private Boolean useRating = false;
     public Boolean corporateTaxi = false;
     public String corporateTaxiBalanceButtonDialog;
@@ -81,6 +83,8 @@ public class Preferences {
         this.checkPriorErrorText = JSONGetString(data, "check_prior_error_text");
         this.driverInviteCaption = JSONGetString(data, "driver_invite_caption");
         this.driverInviteText = JSONGetString(data, "driver_invite_text");
+        this.clientInviteCaption = JSONGetString(data, "client_invite_caption");
+        this.clientInviteText = JSONGetString(data, "client_invite_text");
         this.useRating = MainUtils.JSONGetBool(data, "use_rating");
         this.dispatcherMessages = JSONGetBool(data, "dispatcher_messages");
         this.hourInfoText = JSONGetString(data, "hour_info_text");
@@ -196,6 +200,19 @@ public class Preferences {
     public Boolean isDriverInvite() {
         if (driverInviteText.equals("")) return false;
         return !driverInviteCaption.equals("");
+    }
+
+    public String getClientInviteCaption() {
+        return clientInviteCaption;
+    }
+
+    public String getClientInviteText() {
+        return clientInviteText;
+    }
+
+    public Boolean isClientInvite() {
+        if (clientInviteText.equals("")) return false;
+        return !clientInviteCaption.equals("");
     }
 
     public String getDispatcherPhone() {

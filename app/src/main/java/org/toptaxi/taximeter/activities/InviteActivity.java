@@ -22,6 +22,9 @@ public class InviteActivity extends AppCompatActivity {
         if (arguments != null) {
             inviteType = arguments.getString("type", "driver");
         }
+        else {
+            inviteType = "driver";
+        }
         if (inviteType.equals("driver")){
             inviteCaption = MainApplication.getInstance().getPreferences().getDriverInviteCaption();
             inviteText = MainApplication.getInstance().getPreferences().getDriverInviteText();

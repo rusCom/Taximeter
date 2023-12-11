@@ -23,6 +23,7 @@ import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.activities.AboutActivity;
 import org.toptaxi.taximeter.activities.BalanceActivity;
+import org.toptaxi.taximeter.activities.GuaranteedIncomeActivity;
 import org.toptaxi.taximeter.activities.HisOrdersActivity;
 import org.toptaxi.taximeter.activities.InviteActivity;
 import org.toptaxi.taximeter.activities.MessagesActivity;
@@ -113,6 +114,9 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
         drawer.addItem(new PrimaryDrawerItem().withName("История заказов").withIcon(FontAwesome.Icon.faw_history).withSelectable(false).withIdentifier(Constants.MENU_HIS_ORDERS));
 
+        if (MainApplication.getInstance().getPreferences().isGuaranteedIncome()){
+            drawer.addItem(new PrimaryDrawerItem().withName("Гарантированный доход").withIcon(FontAwesome.Icon.faw_angle_double_up).withSelectable(false).withIdentifier(Constants.MENU_GUARANTEED_INCOME));
+        }
 
         drawer.addItem(new DividerDrawerItem());
         if (MainApplication.getInstance().getProfile().isBalanceShow()){
@@ -223,6 +227,10 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
             case Constants.MENU_SETTINGS:
                 Intent settingsIntent = new Intent(mainActivity, SettingsActivity.class);
                 mainActivity.startActivity(settingsIntent);
+                break;
+            case Constants.MENU_GUARANTEED_INCOME:
+                Intent guaranteedIncomeIntent = new Intent(mainActivity, GuaranteedIncomeActivity.class);
+                mainActivity.startActivity(guaranteedIncomeIntent);
                 break;
             case Constants.MENU_SUPPORT_CALL:
                 // mainActivity.callIntent(MainApplication.getInstance().getPreferences().getSupportPhone());

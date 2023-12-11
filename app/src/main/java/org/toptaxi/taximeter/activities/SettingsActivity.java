@@ -2,6 +2,7 @@ package org.toptaxi.taximeter.activities;
 
 import android.os.Bundle;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;

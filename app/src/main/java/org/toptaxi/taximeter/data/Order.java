@@ -1,6 +1,7 @@
 package org.toptaxi.taximeter.data;
 
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetBool;
+import static org.toptaxi.taximeter.tools.MainUtils.JSONGetDouble;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetInteger;
 import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
 
@@ -34,14 +35,14 @@ public class Order {
     protected static String TAG = "#########" + Order.class.getName();
     private Integer IsFree = 0, Timer, ID, lastRequestUID = 0, State, Check, pickUpDistance;
     private String Note = "", ClientPhone = "", MainAction = "", StateName = "";
-    private Double Cost;
+    private Double cost, dispatchingCommissionSumma;
     private Boolean IsNew = false;
     private Calendar WorkDate;
     private long NewOrderTimer = 15000;
     String GUID;
     public Boolean corporateTaxi = false;
     private Boolean isHour;
-    public String payment = "", dispatchingName;
+    public String payment = "", dispatchingName, dispatchingCommissionType;
     public Integer dispatchingCommission;
     private List<RoutePoint> routePoints;
     public String JSONDataToCheckNew = "";
@@ -58,12 +59,14 @@ public class Order {
         payment = JSONGetString(data, "payment");
         dispatchingName = JSONGetString(data, "dispatching_name");
         dispatchingCommission = JSONGetInteger(data, "dispatching_commission");
+        dispatchingCommissionSumma = JSONGetDouble(data, "dispatching_commission_summa");
+        dispatchingCommissionType = JSONGetString(data, "dispatching_commission_type", "percent");
         isHour = JSONGetBool(data, "is_hour");
         pickUpDistance = JSONGetInteger(data, "pick_up_distance");
 
 
         if (data.has("phone")) this.ClientPhone = data.getString("phone");
-        if (data.has("cost")) this.Cost = data.getDouble("cost");
+        if (data.has("cost")) this.cost = data.getDouble("cost");
         if (data.has("state")) this.State = data.getInt("state");
         if (data.has("check")) this.Check = data.getInt("check");
         if (data.has("note")) this.Note = data.getString("note");
@@ -103,11 +106,13 @@ public class Order {
         if (dispatchingCommission == null) {
             return "";
         }
+        if (dispatchingCommissionType.equals("fix"))
+            return dispatchingCommission + MainUtils.getRubSymbol();
         return dispatchingCommission + "%";
     }
 
     public Double getCost() {
-        return Cost;
+        return cost;
     }
 
     public Integer getState() {
@@ -257,7 +262,7 @@ public class Order {
     }
 
     public String getCostString() {
-        return new DecimalFormat("###,###").format(Cost) + " " + MainUtils.getRubSymbol();
+        return new DecimalFormat("###,###").format(cost) + " " + MainUtils.getRubSymbol();
     }
 
     public Integer getPickUpDistance() {

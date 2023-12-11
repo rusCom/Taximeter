@@ -1,0 +1,135 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_margin"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical">
+
+        <Button
+            android:id="@+id/btnMinusDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:textColor="@color/md_black_1000"
+            android:gravity="center"
+            android:textStyle="bold" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textViewCurDate"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="20"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:id="@+id/btnPlusDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:textColor="@color/md_black_1000"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/guaranteedIncomeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"
+                    android:text="Выполнено:"/>
+                <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/linerLayoutGuaranteedIncomeActivity">
+                    <ProgressBar
+                        android:id="@+id/progressBarOrderCount"
+                        android:layout_width="300dp"
+                        android:layout_height="300dp"
+                        android:indeterminateOnly="false"
+                        android:layout_gravity="center"
+                        android:progressDrawable="@drawable/circle"
+                        android:progress="0"/>
+                    <TextView
+                        android:id="@+id/textViewOrderCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:layout_gravity="center"
+                        android:textAlignment="center"/>
+
+                </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_margin" />
+
+                <params.com.stepprogressview.StepProgressView
+                    android:id="@+id/stepProgressView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:markers="10,15,20,25"
+                    app:totalProgress="26"
+                    app:currentProgress="0"
+                    app:markerWidth="3dp"
+                    app:textMargin="10dp"
+                    app:textSize="@dimen/acq_large_text_size"
+                    app:markerColor="@color/md_white_1000"
+                    app:progressColor="@color/primaryIndigo"/>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_margin" />
+
+                <TextView
+                    android:id="@+id/textViewAdditionalSumma"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:layout_gravity="center"
+                    android:textAlignment="center" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_margin" />
+
+                <TextView
+                    android:id="@+id/textViewRulesLink"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</LinearLayout>

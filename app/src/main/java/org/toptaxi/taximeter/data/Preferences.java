@@ -26,6 +26,7 @@ public class Preferences {
     private Integer curTheme;
     private final List<String> dispatcherTemplateMessages;
     private Boolean newOrderAlarmCheck;
+    private Boolean dispatchingCommissionSummaViewType;
     private Integer newOrderAlarmDistance, newOrderAlarmCost;
     private String supportPhone = "";
     private String licenseAgreementLink = "";
@@ -42,6 +43,7 @@ public class Preferences {
     private String clientInviteCaption = "";
     private String clientInviteText = "";
     private Boolean useRating = false;
+    private JSONObject guaranteedIncome;
     public Boolean corporateTaxi = false;
     public String corporateTaxiBalanceButtonDialog;
     public String corporateTaxiCheckOrderDialog;
@@ -54,6 +56,7 @@ public class Preferences {
 
 
 
+
     public Preferences() {
         sPref = PreferenceManager.getDefaultSharedPreferences(MainApplication.getInstance());
         curTheme = sPref.getInt("curTheme", 0);
@@ -63,6 +66,7 @@ public class Preferences {
         dispatcherTemplateMessages = new ArrayList<>();
 
         newOrderAlarmCheck = sPref.getBoolean("newOrderAlarmCheck", true);
+        dispatchingCommissionSummaViewType = sPref.getBoolean("dispatchingCommissionSummaViewType", true);
         newOrderAlarmDistance = sPref.getInt("newOrderAlarmDistance", 2);
         newOrderAlarmCost = sPref.getInt("newOrderAlarmCost", 100);
 
@@ -89,6 +93,10 @@ public class Preferences {
         this.dispatcherMessages = JSONGetBool(data, "dispatcher_messages");
         this.hourInfoText = JSONGetString(data, "hour_info_text");
         this.longDistanceMessage = JSONGetBool(data, "long_distance_message");
+
+        if (data.has("guaranteed_income")){
+            this.guaranteedIncome = data.getJSONObject("guaranteed_income");
+        }
 
         dispatcherTemplateMessages.clear();
         driverTariffPlans.clear();
@@ -142,6 +150,14 @@ public class Preferences {
             }
         }
         return result;
+    }
+
+    public Boolean isGuaranteedIncome() {
+        return guaranteedIncome != null;
+    }
+
+    public JSONObject getGuaranteedIncome() {
+        return guaranteedIncome;
     }
 
     public boolean isLongDistanceMessage() {
@@ -215,6 +231,7 @@ public class Preferences {
         return !clientInviteCaption.equals("");
     }
 
+
     public String getDispatcherPhone() {
         return dispatcherPhone;
     }
@@ -260,6 +277,10 @@ public class Preferences {
         return newOrderAlarmCheck;
     }
 
+    public Boolean getDispatchingCommissionSummaViewType() {
+        return dispatchingCommissionSummaViewType;
+    }
+
     public Integer getNewOrderAlarmDistance() {
         return newOrderAlarmDistance;
     }
@@ -268,15 +289,17 @@ public class Preferences {
         return newOrderAlarmCost;
     }
 
-    public void setNewOrderAlarm(Boolean newOrderAlarmCheck, Integer newOrderAlarmDistance, Integer newOrderAlarmCost) {
+    public void setNewPreferencesData(Boolean newOrderAlarmCheck, Integer newOrderAlarmDistance, Integer newOrderAlarmCost, Boolean dispatchingCommissionSummaViewType) {
         this.newOrderAlarmCheck = newOrderAlarmCheck;
         this.newOrderAlarmDistance = newOrderAlarmDistance;
         this.newOrderAlarmCost = newOrderAlarmCost;
+        this.dispatchingCommissionSummaViewType = dispatchingCommissionSummaViewType;
 
         SharedPreferences.Editor editor = sPref.edit();
         editor.putBoolean("newOrderAlarmCheck", this.newOrderAlarmCheck);
         editor.putInt("newOrderAlarmDistance", this.newOrderAlarmDistance);
         editor.putInt("newOrderAlarmCost", this.newOrderAlarmCost);
+        editor.putBoolean("dispatchingCommissionSummaViewType", this.dispatchingCommissionSummaViewType);
         editor.apply();
 
     }

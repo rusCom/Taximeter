@@ -22,9 +22,12 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:allowBackup">
         <activity
-            android:name=".activities.AboutActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:name=".activities.GuaranteedIncomeActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.AboutActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"

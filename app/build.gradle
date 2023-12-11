@@ -9,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId "org.toptaxi.taximeter"
-        minSdk 24
+        minSdk 26
         targetSdk 34
-        versionCode 49
-        versionName "49"
+        versionCode 50
+        versionName "50"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -30,9 +30,11 @@ android {
     namespace 'org.toptaxi.taximeter'
 }
 
+
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation platform('com.google.firebase:firebase-bom:31.2.3')
+    implementation platform('com.google.firebase:firebase-bom:32.6.0')
 
     implementation 'androidx.core:core:1.12.0'
     implementation 'androidx.cardview:cardview:1.0.0'
@@ -41,6 +43,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0-alpha03'
     implementation "androidx.annotation:annotation:1.7.0"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
 
     implementation 'com.google.android.material:material:1.10.0'
 
@@ -51,7 +54,9 @@ dependencies {
     implementation 'com.mikepenz:fontawesome-typeface:4.7.0.2@aar'
     implementation "com.mikepenz:materialdrawer:6.1.2"
 
-    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation 'com.params.progressview:step-progress:1.0.2'
+
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 
     implementation 'ru.tinkoff.acquiring:ui:2.13.3'
     implementation 'ru.tinkoff.acquiring:threeds-sdk:2.13.3'
@@ -60,7 +65,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
 
     implementation 'com.google.firebase:firebase-messaging:23.3.1'
     testImplementation 'junit:junit:4.13.2'

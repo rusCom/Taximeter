@@ -44,6 +44,7 @@ public class Constants {
     public static final int MENU_PAYMENT                = 221;
     public static final int MENU_ABOUT                  = 222;
     public static final int MENU_CLIENT_INVITE          = 223;
+    public static final int MENU_GUARANTEED_INCOME      = 224;
 
     public static final int MAIN_ACTION_GO_ONLINE       = 100;
     public static final int MAIN_ACTION_GO_OFFLINE      = 101;

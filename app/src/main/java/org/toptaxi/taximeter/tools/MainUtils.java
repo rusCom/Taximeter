@@ -54,23 +54,32 @@ public class MainUtils {
         return result;
     }
 
-    public static String getSummaString(int summa){
+    public static String getSummaString(int summa) {
         return new DecimalFormat("###,##0").format(summa) + " " + getRubSymbol();
+    }
+
+    public static String getOrderCountName(int count) {
+        return switch (count) {
+            case 1, 21, 31, 41 -> "заказ";
+            case 2, 3, 4, 22, 23, 24, 32, 33, 34, 42, 43, 44 -> "заказа";
+            default -> "заказов";
+        };
+
     }
 
     public static Boolean JSONGetBool(JSONObject data, String field, Boolean def) {
         Boolean result = JSONGetBoolean(data, field);
-        if (result == null)return def;
+        if (result == null) return def;
         return result;
     }
 
     public static Boolean JSONGetBool(JSONObject data, String field) {
         Boolean result = JSONGetBoolean(data, field);
-        if (result == null)return false;
+        if (result == null) return false;
         return result;
     }
 
-    private static Boolean JSONGetBoolean(JSONObject data, String field){
+    private static Boolean JSONGetBoolean(JSONObject data, String field) {
         Boolean result = null;
         if (data.has(field)) {
             try {
@@ -101,8 +110,8 @@ public class MainUtils {
 
     public static String JSONGetString(JSONObject data, String field) {
         String result = "";
-        if (field.startsWith("result_")){
-            if (data.has("result")){
+        if (field.startsWith("result_")) {
+            if (data.has("result")) {
                 try {
                     JSONObject resultObject = data.getJSONObject("result");
                     field = field.replace("result_", "");
@@ -110,8 +119,7 @@ public class MainUtils {
                 } catch (JSONException ignored) {
                 }
             }
-        }
-        else if (data.has(field)) {
+        } else if (data.has(field)) {
             try {
                 result = data.getString(field);
             } catch (JSONException ignored) {
@@ -130,60 +138,63 @@ public class MainUtils {
 
     public static Integer JSONGetInteger(JSONObject data, String field) {
         String strResult = JSONGetString(data, field);
-        if (strResult.equals(""))return null;
+        if (strResult.equals("")) return null;
         return Integer.parseInt(strResult);
     }
 
-    public static Calendar JSONGetCalendar(JSONObject data, String field){
+    public static Calendar JSONGetCalendar(JSONObject data, String field) {
         String stringData = JSONGetString(data, field);
-        if (stringData.equals(""))return null;
+        if (stringData.equals("")) return null;
         stringData = stringData.replace("T", " ");
 
         Calendar result = Calendar.getInstance();
         result.setTimeInMillis(Timestamp.valueOf(stringData).getTime());
         return result;
     }
+
     public static Double JSONGetDouble(JSONObject data, String field) {
         Double result = null;
         if (data.has(field)) {
             try {
                 result = data.getDouble(field);
-            } catch (JSONException ignored) {}
+            } catch (JSONException ignored) {
+            }
         }
         return result;
     }
 
     public static Double JSONGetDouble(JSONObject data, String field, Double def) {
         Double result = JSONGetDouble(data, field);
-        if (result == null)return def;
+        if (result == null) return def;
         return result;
     }
 
-    public static void TextViewSetTextOrGone(TextView textView, String text){
-        if (text == null){textView.setVisibility(View.GONE);}
-        else if (text.trim().equals("")){textView.setVisibility(View.GONE);}
-        else{
+    public static void TextViewSetTextOrGone(TextView textView, String text) {
+        if (text == null) {
+            textView.setVisibility(View.GONE);
+        } else if (text.trim().equals("")) {
+            textView.setVisibility(View.GONE);
+        } else {
             textView.setVisibility(View.VISIBLE);
             textView.setText(text.trim());
         }
     }
 
-    public static void TextViewSetTextOrGone(TextView textView, View divider,String text){
-        if (text.equals("")){
+    public static void TextViewSetTextOrGone(TextView textView, View divider, String text) {
+        if (text.equals("")) {
             textView.setVisibility(View.GONE);
             divider.setVisibility(View.GONE);
-        }
-        else{
+        } else {
             textView.setVisibility(View.VISIBLE);
             divider.setVisibility(View.VISIBLE);
             textView.setText(text);
         }
     }
 
-    public static boolean isJSONArrayHaveValue(JSONArray jsonArray, String value){
-        for (int itemID = 0; itemID < jsonArray.length(); itemID++){
+    public static boolean isJSONArrayHaveValue(JSONArray jsonArray, String value) {
+        for (int itemID = 0; itemID < jsonArray.length(); itemID++) {
             try {
-                if (jsonArray.getString(itemID).equals(value)){
+                if (jsonArray.getString(itemID).equals(value)) {
                     return true;
                 }
             } catch (JSONException e) {
@@ -208,7 +219,7 @@ public class MainUtils {
             result = "8" + result.substring(1);
         }
 
-        if (!result.startsWith("89")){
+        if (!result.startsWith("89")) {
             return "";
         }
 
@@ -223,13 +234,12 @@ public class MainUtils {
         try {
             context.getPackageManager().getApplicationInfo(packageName, 0);
             return true;
-        }
-        catch (PackageManager.NameNotFoundException e) {
+        } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
     }
 
-    public static void openPlayMarketIntent(Context context, String appName){
+    public static void openPlayMarketIntent(Context context, String appName) {
         try {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appName)));
         } catch (android.content.ActivityNotFoundException anfe) {

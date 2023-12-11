@@ -58,60 +58,28 @@ public class SettingsAlarmFragment extends Fragment {
         switchNewOrder.setChecked(MainApplication.getInstance().getPreferences().getNewOrderAlarmCheck());
         switchPushNotifications.setChecked(MainApplication.getInstance().getProfile().pushNotificationActive);
         switch (MainApplication.getInstance().getPreferences().getNewOrderAlarmDistance()) {
-            case 1:
-                seekBarNewOrderDistance.setProgress(0);
-                break;
-            case 2:
-                seekBarNewOrderDistance.setProgress(1);
-                break;
-            case 3:
-                seekBarNewOrderDistance.setProgress(2);
-                break;
-            case 5:
-                seekBarNewOrderDistance.setProgress(3);
-                break;
-            case 10:
-                seekBarNewOrderDistance.setProgress(4);
-                break;
-            case 15:
-                seekBarNewOrderDistance.setProgress(5);
-                break;
-            case -1:
-                seekBarNewOrderDistance.setProgress(6);
-                break;
+            case 1 -> seekBarNewOrderDistance.setProgress(0);
+            case 2 -> seekBarNewOrderDistance.setProgress(1);
+            case 3 -> seekBarNewOrderDistance.setProgress(2);
+            case 5 -> seekBarNewOrderDistance.setProgress(3);
+            case 10 -> seekBarNewOrderDistance.setProgress(4);
+            case 15 -> seekBarNewOrderDistance.setProgress(5);
+            case -1 -> seekBarNewOrderDistance.setProgress(6);
         }
 
         switch (MainApplication.getInstance().getPreferences().getNewOrderAlarmCost()) {
-            case 100:
-                seekBarNewOrderCost.setProgress(0);
-                break;
-            case 300:
-                seekBarNewOrderCost.setProgress(1);
-                break;
-            case 500:
-                seekBarNewOrderCost.setProgress(2);
-                break;
-            case 1500:
-                seekBarNewOrderCost.setProgress(3);
-                break;
-            case 3000:
-                seekBarNewOrderCost.setProgress(4);
-                break;
+            case 100 -> seekBarNewOrderCost.setProgress(0);
+            case 300 -> seekBarNewOrderCost.setProgress(1);
+            case 500 -> seekBarNewOrderCost.setProgress(2);
+            case 1500 -> seekBarNewOrderCost.setProgress(3);
+            case 3000 -> seekBarNewOrderCost.setProgress(4);
         }
         seekBarFreeOrderCountValue = MainApplication.getInstance().getProfile().taximeterFreeOrderCount;
         switch (MainApplication.getInstance().getProfile().taximeterFreeOrderCount) {
-            case 10:
-                seekBarFreeOrderCount.setProgress(0);
-                break;
-            case 15:
-                seekBarFreeOrderCount.setProgress(1);
-                break;
-            case 20:
-                seekBarFreeOrderCount.setProgress(2);
-                break;
-            case 30:
-                seekBarFreeOrderCount.setProgress(3);
-                break;
+            case 10 -> seekBarFreeOrderCount.setProgress(0);
+            case 15 -> seekBarFreeOrderCount.setProgress(1);
+            case 20 -> seekBarFreeOrderCount.setProgress(2);
+            case 30 -> seekBarFreeOrderCount.setProgress(3);
         }
 
         seekBarNewOrderDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -181,33 +149,31 @@ public class SettingsAlarmFragment extends Fragment {
         seekBarNewOrderCost.setEnabled(switchNewOrder.isChecked());
         int distance = -1, cost = 100;
         switch (seekBarNewOrderDistance.getProgress()) {
-            case 0:
+            case 0 -> {
                 tvNewOrderDistance.setText("1 км.");
                 distance = 1;
-                break;
-            case 1:
+            }
+            case 1 -> {
                 tvNewOrderDistance.setText("2 км.");
                 distance = 2;
-                break;
-            case 2:
+            }
+            case 2 -> {
                 tvNewOrderDistance.setText("3 км.");
                 distance = 3;
-                break;
-            case 3:
+            }
+            case 3 -> {
                 tvNewOrderDistance.setText("5 км.");
                 distance = 5;
-                break;
-            case 4:
+            }
+            case 4 -> {
                 tvNewOrderDistance.setText("10 км.");
                 distance = 10;
-                break;
-            case 5:
+            }
+            case 5 -> {
                 tvNewOrderDistance.setText("15 км.");
                 distance = 15;
-                break;
-            case 6:
-                tvNewOrderDistance.setText("Все");
-                break;
+            }
+            case 6 -> tvNewOrderDistance.setText("Все");
         }
         switch (seekBarNewOrderCost.getProgress()) {
             case 0:
@@ -228,25 +194,25 @@ public class SettingsAlarmFragment extends Fragment {
         tvNewOrderCost.setText(cost + " руб.");
 
         switch (seekBarFreeOrderCount.getProgress()) {
-            case 0:
+            case 0 -> {
                 tvFreeOrderCountValue.setText("10");
                 seekBarFreeOrderCountValue = 10;
-                break;
-            case 1:
+            }
+            case 1 -> {
                 tvFreeOrderCountValue.setText("15");
                 seekBarFreeOrderCountValue = 15;
-                break;
-            case 2:
+            }
+            case 2 -> {
                 tvFreeOrderCountValue.setText("20");
                 seekBarFreeOrderCountValue = 20;
-                break;
-            case 3:
+            }
+            case 3 -> {
                 tvFreeOrderCountValue.setText("30");
                 seekBarFreeOrderCountValue = 30;
-                break;
+            }
         }
 
-        MainApplication.getInstance().getPreferences().setNewOrderAlarm(switchNewOrder.isChecked(), distance, cost);
+        MainApplication.getInstance().getPreferences().setNewPreferencesData(switchNewOrder.isChecked(), distance, cost, true);
     }
 
     @Override

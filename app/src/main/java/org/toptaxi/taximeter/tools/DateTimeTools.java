@@ -59,20 +59,20 @@ public class DateTimeTools {
     }
 
     public static String getSklonMonthName(Calendar date){
-        switch (date.get(Calendar.MONTH)){
-            case 0:return "января";
-            case 1:return "февраля";
-            case 2:return "марта";
-            case 3:return "апреля";
-            case 4:return "майя";
-            case 5:return "июня";
-            case 6:return "июля";
-            case 7:return "августа";
-            case 8:return "сентября";
-            case 9:return "октября";
-            case 10:return "ноября";
-            case 11:return "декабря";
-            default:return "ХЗ";
-        }
+        return switch (date.get(Calendar.MONTH)) {
+            case 0 -> "января";
+            case 1 -> "февраля";
+            case 2 -> "марта";
+            case 3 -> "апреля";
+            case 4 -> "майя";
+            case 5 -> "июня";
+            case 6 -> "июля";
+            case 7 -> "августа";
+            case 8 -> "сентября";
+            case 9 -> "октября";
+            case 10 -> "ноября";
+            case 11 -> "декабря";
+            default -> "ХЗ";
+        };
     }
 }

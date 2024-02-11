@@ -39,17 +39,11 @@ public class OnMainActionClickListener implements AdapterView.OnItemClickListene
             ((MainActivity) context).mainActionsDialog.cancel();
 
             switch (mainActionItem.getAction()) {
-                case Constants.MAIN_ACTION_GO_ONLINE:
-                    MainApplication.getInstance().getMainActivity().driverGoOffLine();
-                    break;
-                case Constants.MAIN_ACTION_GO_OFFLINE:
-                    MainApplication.getInstance().getMainActivity().driverGoOffLine();
-                    break;
-                case Constants.MAIN_ACTION_TARIFF_PLAN:
-                    MainApplication.getInstance().getMainActivity().onTariffPlanClick();
-                    break;
-                case Constants.MAIN_ACTION_PRIOR_ORDER:
-
+                case Constants.MAIN_ACTION_GO_ONLINE, Constants.MAIN_ACTION_GO_OFFLINE ->
+                        MainApplication.getInstance().getMainActivity().driverGoOffLine();
+                case Constants.MAIN_ACTION_TARIFF_PLAN ->
+                        MainApplication.getInstance().getMainActivity().onTariffPlanClick();
+                case Constants.MAIN_ACTION_PRIOR_ORDER -> {
                     if (MainApplication.getInstance().getMainAccount().getCheckPriorOrder()) {
                         Intent priorOrders = new Intent(MainApplication.getInstance().getMainActivity(), PriorOrderActivity.class);
                         MainApplication.getInstance().getMainActivity().startActivity(priorOrders);
@@ -61,15 +55,15 @@ public class OnMainActionClickListener implements AdapterView.OnItemClickListene
                         adb.create();
                         adb.show();
                     }
-                    break;
-                case Constants.MAIN_ACTION_SEND_MESSAGE:
+                }
+                case Constants.MAIN_ACTION_SEND_MESSAGE -> {
                     Intent messagesIntent = new Intent(MainApplication.getInstance().getMainActivity(), MessagesActivity.class);
                     MainApplication.getInstance().getMainActivity().startActivity(messagesIntent);
-                    break;
-                case Constants.MENU_TEMPLATE_MESSAGE:
+                }
+                case Constants.MENU_TEMPLATE_MESSAGE -> {
                     String message = textViewItem.getText().toString();
                     Integer res = MainApplication.getInstance().getMainMessages().checkSendingTemplateMessage(message);
-                    if (res == 0){
+                    if (res == 0) {
                         try {
                             message = URLEncoder.encode(message, "UTF-8");
                         } catch (UnsupportedEncodingException ignored) {
@@ -77,18 +71,14 @@ public class OnMainActionClickListener implements AdapterView.OnItemClickListene
                         sendMessageThread(message);
 
                         // MainApplication.getInstance().getRestService().httpGetResult("/last/messages/send?text=" + message);
-                    }
-                    else {
+                    } else {
                         MainApplication.getInstance().showToast("Повторная отправка сообщения доступна через " + (60 - res) + " секунд. Ожидайте ответа.");
                     }
-
-                    break;
-                case Constants.MAIN_ACTION_ORDERS_COMPLETE:
-                    MainApplication.getInstance().getMainActivity().startActivity(new Intent(MainApplication.getInstance().getMainActivity(), OrdersOnCompleteActivity.class));
-                    break;
-                case Constants.MENU_CLOSE_APPLICATION:
-                    MainApplication.getInstance().getMainActivity().onBackPressed();
-                    break;
+                }
+                case Constants.MAIN_ACTION_ORDERS_COMPLETE ->
+                        MainApplication.getInstance().getMainActivity().startActivity(new Intent(MainApplication.getInstance().getMainActivity(), OrdersOnCompleteActivity.class));
+                case Constants.MENU_CLOSE_APPLICATION ->
+                        MainApplication.getInstance().getMainActivity().onBackPressed();
             }
         }
     }

@@ -7,7 +7,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,13 +14,10 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,12 +33,13 @@ import org.json.JSONObject;
 import org.toptaxi.taximeter.MainActivity;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
+import org.toptaxi.taximeter.activities.registration.RegistrationMainActivity;
+import org.toptaxi.taximeter.activities.registration.RegistrationStateActivity;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
 import org.toptaxi.taximeter.tools.LockOrientation;
 import org.toptaxi.taximeter.tools.MainUtils;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -99,7 +96,6 @@ public class StartApplicationActivity extends AppCompatActivity {
         }
 
 
-
         LogService.getInstance().log(this, "checkPermissions", "startInit");
 
         if (startApplication) {
@@ -131,7 +127,7 @@ public class StartApplicationActivity extends AppCompatActivity {
             runOnUiThread(() -> tvAction.setText("Запуск приложения ..."));
             JSONObject result = MainApplication.getInstance().getRestService().httpGet("/profile/auth");
             if (isFinished) return;
-            if (JSONGetString(result, "status_code").equals("500")){
+            if (JSONGetString(result, "status_code").equals("500")) {
                 result = MainApplication.getInstance().getRestService().httpGet("/profile/auth");
                 if (isFinished) return;
             }
@@ -140,33 +136,50 @@ public class StartApplicationActivity extends AppCompatActivity {
                 JSONObject data = result.getJSONObject("result");
                 if (result.getString("status_code").equals("200")) {
                     runOnUiThread(() -> tvAction.setText("Обработка данных ..."));
-                    MainApplication.getInstance().parseData(data);
 
+                    if (data.has("reg_state")) {
+                        if (data.getString("reg_state").equals("new")){
+                            Intent intent = new Intent(this, RegistrationMainActivity.class);
+                            intent.putExtra("json_data", data.toString());
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        }
+                        else {
+                            Intent intent = new Intent(this, RegistrationStateActivity.class);
+                            intent.putExtra("json_data", data.toString());
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        }
 
-                    if (data.has("application")) {
-                        JSONObject application = data.getJSONObject("application");
-                        Integer necessaryVersion = JSONGetInteger(application, "android_necessary_version", 0);
-                        Integer desirableVersion = JSONGetInteger(application, "android_desirable_version", 0);
-                        if (MainApplication.getInstance().getAppVersionCode() < necessaryVersion) {
-                            runOnUiThread(this::showNewNecessaryVersionDialog);
-                            isFinished = true;
-                        } else if (MainApplication.getInstance().getAppVersionCode() < desirableVersion && !isShowNewVersionDialog) {
-                            runOnUiThread(this::showNewDesirableVersionDialog);
-                            isFinished = true;
+                    } else {
+                        if (data.has("application")) {
+                            JSONObject application = data.getJSONObject("application");
+                            Integer necessaryVersion = JSONGetInteger(application, "android_necessary_version", 0);
+                            Integer desirableVersion = JSONGetInteger(application, "android_desirable_version", 0);
+                            if (MainApplication.getInstance().getAppVersionCode() < necessaryVersion) {
+                                runOnUiThread(this::showNewNecessaryVersionDialog);
+                                isFinished = true;
+                            } else if (MainApplication.getInstance().getAppVersionCode() < desirableVersion && !isShowNewVersionDialog) {
+                                runOnUiThread(this::showNewDesirableVersionDialog);
+                                isFinished = true;
+                            }
+                        }
+
+                        if (!isFinished) {
+                            // TODO когда на сервере переведем получение данных в запрос auth убрать данный пункт
+                            JSONObject data2 = MainApplication.getInstance().getRestService().httpGet("/last/data").getJSONObject("result");
+                            MainApplication.getInstance().parseData(data2);
+                            runOnUiThread(() -> tvAction.setText("Запуск приложения ..."));
+
+                            MainApplication.getInstance().startMainService();
+                            Intent intent = new Intent(this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
                         }
                     }
 
-                    if (!isFinished) {
-                        // TODO когда на сервере переведем получение данных в запрос auth убрать данный пункт
-                        JSONObject data2 = MainApplication.getInstance().getRestService().httpGet("/last/data").getJSONObject("result");
-                        MainApplication.getInstance().parseData(data2);
-                        runOnUiThread(() -> tvAction.setText("Запуск приложения ..."));
+                    MainApplication.getInstance().parseData(data);
 
-                        MainApplication.getInstance().startMainService();
-                        Intent intent = new Intent(this, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    }
 
                 } else if (result.getString("status_code").equals("401")) {
                     MainApplication.getInstance().getPreferences().parseData(data);

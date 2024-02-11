@@ -2,6 +2,7 @@ package org.toptaxi.taximeter.data;
 
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 import org.toptaxi.taximeter.tools.MainUtils;
 import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
 
@@ -12,23 +13,31 @@ public class SupportContactItem implements IMainCardViewData {
         this.type = type;
     }
 
-    public void onClick(){
+    public void onClick(MainAppCompatActivity mainAppCompatActivity){
         String phone = MainApplication.getInstance().getPreferences().getSupportPhone();
         switch (type){
-            case "phone" -> MainApplication.getInstance().getMainActivity().callIntent(phone);
-            case "whatsapp" -> MainApplication.getInstance().getMainActivity().goToURL("https://wa.me/" + convertPhoneToWhatsApp(phone));
-            case "telegram" -> MainApplication.getInstance().getMainActivity().goToURL("https://t.me/" + convertPhoneToTelegram(phone));
+            case "phone" -> mainAppCompatActivity.callIntent(phone);
+            case "whatsapp" -> mainAppCompatActivity.goToURL("https://wa.me/" + convertPhoneToWhatsApp(phone));
+            case "telegram" -> mainAppCompatActivity.goToURL("https://t.me/" + convertPhoneToTelegram(phone));
+        }
+    }
+
+    public void onClick(MainAppCompatActivity mainAppCompatActivity, String phone){
+        switch (type){
+            case "phone" -> mainAppCompatActivity.callIntent(phone);
+            case "whatsapp" -> mainAppCompatActivity.goToURL("https://wa.me/" + convertPhoneToWhatsApp(phone));
+            case "telegram" -> mainAppCompatActivity.goToURL("https://t.me/" + convertPhoneToTelegram(phone));
         }
     }
 
 
-    private String convertPhoneToWhatsApp(String phone){
+    public static String convertPhoneToWhatsApp(String phone){
         phone = MainUtils.convertPhone(phone);
         phone = "7" + phone.substring(1);
         return phone;
     }
 
-    private String convertPhoneToTelegram(String phone){
+    public static String convertPhoneToTelegram(String phone){
         phone = MainUtils.convertPhone(phone);
         phone = "+7" + phone.substring(1);
         return phone;

@@ -10,6 +10,7 @@ import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -18,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -74,11 +76,7 @@ public class RestService {
             e.printStackTrace();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return Base64.getEncoder().encodeToString(header.toString().getBytes());
-        } else {
-            return android.util.Base64.encodeToString(header.toString().getBytes(), android.util.Base64.NO_WRAP);
-        }
+        return Base64.getEncoder().encodeToString(header.toString().getBytes());
 
     }
 
@@ -115,7 +113,7 @@ public class RestService {
         });
     }
 
-    public void serverError(String method, String data){
+    public void serverError(String method, String data) {
         httpGetThread("/server_error?method=" + method + "&data=" + data);
     }
 
@@ -129,7 +127,7 @@ public class RestService {
     }
 
     public JSONObject httpGet(MainAppCompatActivity mainAppCompatActivity, String path) {
-        if (mainAppCompatActivity != null){
+        if (mainAppCompatActivity != null) {
             mainAppCompatActivity.runOnUiThread(mainAppCompatActivity::showProgressDialog);
         }
         JSONObject response = httpGetHost(path);
@@ -143,36 +141,35 @@ public class RestService {
             }
         }
         LogService.getInstance().log(this, "httpGet", "path = '" + path + "'; response = '" + response + "'");
-        if (mainAppCompatActivity != null){
+        if (mainAppCompatActivity != null) {
             mainAppCompatActivity.runOnUiThread(mainAppCompatActivity::dismissProgressDialog);
         }
 
         try {
-            if (response.getString("status").equals("OK")){
+            if (response.getString("status").equals("OK")) {
                 if (response.has("result")) {
                     MainApplication.getInstance().parseData(response.getJSONObject("result"));
                 }
-            }
-            else {
-                if (mainAppCompatActivity != null){
-                    if (response.has("result")){
+            } else {
+                if (mainAppCompatActivity != null) {
+                    if (response.has("result")) {
                         String errorText = response.getString("result");
-                        mainAppCompatActivity.runOnUiThread(()->mainAppCompatActivity.showToast(errorText));
-                    }
-                    else {
+                        mainAppCompatActivity.runOnUiThread(() -> mainAppCompatActivity.showToast(errorText));
+                    } else {
                         JSONObject finalResponse = response;
-                        mainAppCompatActivity.runOnUiThread(()->mainAppCompatActivity.showToast(finalResponse.toString()));
+                        mainAppCompatActivity.runOnUiThread(() -> mainAppCompatActivity.showToast(finalResponse.toString()));
                     }
                 }
             }
         } catch (JSONException e) {
-            if (mainAppCompatActivity != null){
-                mainAppCompatActivity.runOnUiThread(()->mainAppCompatActivity.showToast(e.getMessage()));
+            if (mainAppCompatActivity != null) {
+                mainAppCompatActivity.runOnUiThread(() -> mainAppCompatActivity.showToast(e.getMessage()));
             }
         }
 
         return response;
     }
+
 
     public JSONObject httpGet(String path) {
         JSONObject response = httpGetHost(path);
@@ -185,6 +182,7 @@ public class RestService {
             }
         }
         LogService.getInstance().log(this, "httpGet", "path = '" + path + "'; response = '" + response + "'");
+        // LogService.getInstance().log("sys", "httpGet", "path = '" + path + "'; response = '" + response + "'");
         return response;
     }
 
@@ -270,7 +268,7 @@ public class RestService {
                     .build();
             response = httpClient.newCall(request).execute();
         } catch (Exception exception) {
-            if (!url.contains("server_error")){
+            if (!url.contains("server_error")) {
                 MainApplication.getInstance().getRestService().serverError("restCallGet", ExceptionUtils.getStackTrace(exception));
             }
 
@@ -291,6 +289,33 @@ public class RestService {
         } catch (IOException ignored) {
         }
         return response;
+    }
+
+    public void sendFile(String path, String memberId, String sourceImageFile) {
+        try {
+            String url = restHost.get(restIndex) + path;
+            File sourceFile = new File(sourceImageFile);
+            final MediaType MEDIA_TYPE = sourceImageFile.endsWith("png") ?
+                    MediaType.parse("image/png") : MediaType.parse("image/jpeg");
+            //LogService.getInstance().log("sys", url);
+            //LogService.getInstance().log("sys", MEDIA_TYPE.toString());
+
+            RequestBody requestBody = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart(memberId, sourceImageFile, RequestBody.create(sourceFile, MEDIA_TYPE))
+                    // .addFormDataPart("result", "my_image")
+                    .build();
+            Request request = new Request.Builder()
+                    .header("authorization", "Bearer " + getHeader())
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+            Response response = httpClient.newCall(request).execute();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+
+
     }
 
 

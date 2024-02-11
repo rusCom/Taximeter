@@ -7,6 +7,9 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -15,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
+import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.services.LogService;
 
 import java.util.concurrent.ExecutorService;
@@ -22,10 +26,13 @@ import java.util.concurrent.Executors;
 
 public class MainAppCompatActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
+    protected boolean isCheckProfileAuth = true;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // Утановка текущего поворота экрана
         new LockOrientation(this).lock();
     }
@@ -33,12 +40,13 @@ public class MainAppCompatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Если по какой-либо причине данные по водителю не загружены, то загружаем их. Бывает такое, когда из спящего режима востанавливается приложение
-        if (!MainApplication.getInstance().getMainAccount().isParsedData) {
-            httpGetResult("/profile/auth");
-            MainApplication.getInstance().startMainService();
+        if (isCheckProfileAuth){
+            // Если по какой-либо причине данные по водителю не загружены, то загружаем их. Бывает такое, когда из спящего режима востанавливается приложение
+            if (!MainApplication.getInstance().getMainAccount().isParsedData) {
+                httpGetResult("/profile/auth");
+                MainApplication.getInstance().startMainService();
+            }
         }
-
     }
 
     public void showProgressDialog() {
@@ -47,6 +55,7 @@ public class MainAppCompatActivity extends AppCompatActivity {
             progressDialog.setMessage("Получение данных ...");
         }
         progressDialog.show();
+
     }
 
     public void dismissProgressDialog() {
@@ -89,8 +98,33 @@ public class MainAppCompatActivity extends AppCompatActivity {
     protected void httpGetResult(String path) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
-            MainApplication.getInstance().getRestService().httpGet(this, path);
+            runOnUiThread(this::showProgressDialog);
+            JSONObject result = MainApplication.getInstance().getRestService().httpGet(path);
+            runOnUiThread(this::dismissProgressDialog);
         });
+    }
+
+    protected void httpGetResult(String path, int requestUID) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            runOnUiThread(this::showProgressDialog);
+            JSONObject result = MainApplication.getInstance().getRestService().httpGet(path);
+            runOnUiThread(this::dismissProgressDialog);
+            onHttpGetResult(result, requestUID);
+            runOnUiThread(() -> onHttpGetResult(result, requestUID));
+        });
+    }
+
+    protected void httpPostResult(String path, JSONObject data) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            runOnUiThread(this::showProgressDialog);
+            JSONObject result = MainApplication.getInstance().getRestService().httpPost(path, data);
+            runOnUiThread(this::dismissProgressDialog);
+        });
+    }
+
+    protected void onHttpGetResult(JSONObject data, int requestUID){
 
     }
 }

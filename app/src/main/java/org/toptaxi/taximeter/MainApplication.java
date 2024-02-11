@@ -6,13 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
@@ -133,19 +131,13 @@ public class MainApplication extends Application {
         if (!isMainServiceStart()) {
             isRunning = true;
             Intent serviceIntent = new Intent(this, MainService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LogService.getInstance().log(this, "startForegroundService");
-                ContextCompat.startForegroundService(getApplicationContext(), serviceIntent);
-            }
-            else {
-                startService(serviceIntent);
-            }
-
+            LogService.getInstance().log(this, "startForegroundService");
+            ContextCompat.startForegroundService(getApplicationContext(), serviceIntent);
         }
     }
 
     public void stopMainService() {
-
+        isRunning = false;
         stopService(new Intent(this, MainService.class));
     }
 
@@ -457,11 +449,7 @@ public class MainApplication extends Application {
 
 
     public static Spanned fromHtml(String source) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            return Html.fromHtml(source);
-        }
+        return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
     }
 
 

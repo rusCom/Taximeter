@@ -1,4 +1,4 @@
-package org.toptaxi.taximeter.activities;
+package org.toptaxi.taximeter.activities.settings;
 
 import android.os.Bundle;
 

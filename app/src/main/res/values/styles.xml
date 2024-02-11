@@ -63,4 +63,22 @@
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
+    <style name="CustomTextInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:maxLines">1</item>
+        <item name="android:inputType">text</item>
+        <item name="android:imeOptions">actionNext</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/activity_margin</item>
+    </style>
+
+    <style name="circleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+
+
+
+
 </resources>

@@ -195,6 +195,10 @@ public class Preferences {
         return supportPhone;
     }
 
+    public void setSupportPhone(String supportPhone) {
+        this.supportPhone = supportPhone;
+    }
+
     public String getPaymentInstructionLink() {
         if (paymentInstructionLink == null)return null;
         if (paymentInstructionLink.equals(""))return null;

@@ -12,8 +12,6 @@ public class Restarter extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         new Handler(Looper.getMainLooper())
-                .postDelayed(() -> {
-                    MainApplication.getInstance().startMainService();
-                }, 1000);
+                .postDelayed(() -> MainApplication.getInstance().startMainService(), 1000);
     }
 }

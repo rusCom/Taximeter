@@ -179,9 +179,6 @@ public class GuaranteedIncomeActivity extends AppCompatActivity implements Swipe
 
                     progressPercent = (int) ((float) orderCount / Float.valueOf(Collections.max(stepsList)) * 100f);
 
-                    LogService.getInstance().log("sys", "curStepOrderCount = " + String.valueOf(curStepOrderCount));
-                    LogService.getInstance().log("sys", "progressPercent = " + String.valueOf(progressPercent));
-                    // LogService.getInstance().log("sys", "additionalSumma = " + String.valueOf(progressPercent));
 
                 } catch (JSONException ignored) {
                 }

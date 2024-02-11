@@ -299,14 +299,14 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         } else {
             String alertText = "", action = "";
             switch (MainApplication.getInstance().getMainAccount().getStatus()) {
-                case Constants.DRIVER_OFFLINE:
+                case Constants.DRIVER_OFFLINE -> {
                     alertText = "Встать на автораздачу?";
                     action = "/driver/free";
-                    break;
-                case Constants.DRIVER_ONLINE:
+                }
+                case Constants.DRIVER_ONLINE -> {
                     alertText = "Сняться с автораздачи?";
                     action = "/driver/busy";
-                    break;
+                }
             }
             if (!alertText.equals("")) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -364,7 +364,6 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // LogService.getInstance().log("sys", "onActivityResult");
     }
 
     @Override
@@ -419,11 +418,10 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 cards,
                 mainCardViewData -> {
                     SupportContactItem supportContactItem = (SupportContactItem) mainCardViewData;
-                    supportContactItem.onClick();
+                    supportContactItem.onClick(this);
                 }
         );
         myBottomSheetFragment.show(getSupportFragmentManager(), myBottomSheetFragment.getTag());
-
     }
 
     public void onLocationDataChange() {
@@ -616,7 +614,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
             Button btnOrderMainAction = findViewById(R.id.btnOrderMainAction);
 
             switch (viewOrder.getCheck()) {
-                case 0:
+                case 0 -> {
                     btnOrderMainAction.setText("Взять заказ");
                     btnOrderMainAction.setEnabled(true);
                     btnOrderMainAction.setOnClickListener(view -> {
@@ -640,15 +638,15 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                         alertDialog.show();
 
                     });
-                    break;
-                case 1:
+                }
+                case 1 -> {
                     btnOrderMainAction.setText("Заказ на автораздаче");
                     btnOrderMainAction.setEnabled(false);
-                    break;
-                case 2:
+                }
+                case 2 -> {
                     btnOrderMainAction.setText("Заказ Вам не доступен");
                     btnOrderMainAction.setEnabled(false);
-                    break;
+                }
             }
             if (viewOrderLastState != viewOrder.getCheck()) {
                 mpOrderStateChange.start();

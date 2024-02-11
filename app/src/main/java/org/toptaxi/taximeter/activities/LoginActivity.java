@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Html;
@@ -22,8 +23,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.text.HtmlCompat;
 
+import com.android.installreferrer.api.InstallReferrerClient;
+import com.android.installreferrer.api.InstallReferrerStateListener;
+import com.android.installreferrer.api.ReferrerDetails;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONObject;
@@ -45,6 +51,8 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private TextView tvActivityLoginDocuments;
     ProgressDialog progressDialog;
+    InstallReferrerClient referrerClient;
+    String referrerUrl;
 
 
     @Override
@@ -65,36 +73,61 @@ public class LoginActivity extends AppCompatActivity {
 
 
         Button btnActivityLoginProfileRegistration = findViewById(R.id.btnActivityLoginProfileRegistration);
-        // btnActivityLoginProfileRegistration.setTextSize((float) (btnActivityLoginProfileRegistration.getTextSize() * 1.5));
 
-
-
-        btnActivityLoginProfileLogin.setOnClickListener(this::profileLoginClick);
+        btnActivityLoginProfileLogin.setOnClickListener(view -> profileLoginClick(false));
         btnActivityLoginProfileRegistration.setOnClickListener(this::profileRegistrationClick);
 
         llActivityLoginProgress.setVisibility(View.GONE);
 
         setDocumentsText();
 
+        referrerClient = InstallReferrerClient.newBuilder(this).build();
+        referrerClient.startConnection(new InstallReferrerStateListener() {
+            @Override
+            public void onInstallReferrerSetupFinished(int responseCode) {
+                if (responseCode == InstallReferrerClient.InstallReferrerResponse.OK) {
+                    try {
+                        ReferrerDetails response = referrerClient.getInstallReferrer();
+                        referrerUrl = response.getInstallReferrer();
+                    } catch (RemoteException ignored) {
+                    }
+                }
+            }
+
+            @Override
+            public void onInstallReferrerServiceDisconnected() {
+
+            }
+        });
+
+
+        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+
 
     }
 
-    public void setDocumentsText(){
-        if (!MainApplication.getInstance().getPreferences().getLicenseAgreementLink().equals(""))
-        {
+    OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            setResult(RESULT_CANCELED);
+            finish();
+        }
+    };
+
+    public void setDocumentsText() {
+        if (!MainApplication.getInstance().getPreferences().getLicenseAgreementLink().equals("")) {
             String text = "<html>Нажимая кнопку \"Получить код\" и “Вход”,  Вы соглашаетесь с " +
                     "\"<a href=\"" + MainApplication.getInstance().getPreferences().getLicenseAgreementLink() + "\">Лицензионным соглашением</a>\"";
-            if (!MainApplication.getInstance().getPreferences().getPrivacyPolicyLink().equals("")){
+            if (!MainApplication.getInstance().getPreferences().getPrivacyPolicyLink().equals("")) {
                 text += ", а также с обработкой персональной информации на условиях " +
-                "\"<a href=\"" + MainApplication.getInstance().getPreferences().getPrivacyPolicyLink() + "\">Политики конфиденциальности</a>\"";
+                        "\"<a href=\"" + MainApplication.getInstance().getPreferences().getPrivacyPolicyLink() + "\">Политики конфиденциальности</a>\"";
             }
             text += "</html>";
-            tvActivityLoginDocuments.setText(Html.fromHtml(text));
+            tvActivityLoginDocuments.setText(Html.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY));
             tvActivityLoginDocuments.setVisibility(View.VISIBLE);
             tvActivityLoginDocuments.setMovementMethod(LinkMovementMethod.getInstance());
             tvActivityLoginDocuments.setLinkTextColor(Color.BLUE);
-        }
-        else {
+        } else {
             tvActivityLoginDocuments.setVisibility(View.GONE);
         }
 
@@ -122,12 +155,6 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        setResult(RESULT_CANCELED);
-        finish();
-    }
 
     @Override
     protected void onResume() {
@@ -166,19 +193,17 @@ public class LoginActivity extends AppCompatActivity {
             ilActivityLoginPhone.setError(getString(R.string.errorPhoneNotEntered));
             edActivityLoginPhone.requestFocus();
             return false;
-        }
-        else if(MainUtils.convertPhone(phone).equals("")){
+        } else if (MainUtils.convertPhone(phone).equals("")) {
             ilActivityLoginPhone.setError("Введен не корректный номер телефона");
             edActivityLoginPhone.requestFocus();
             return false;
-        }
-        else {
+        } else {
             ilActivityLoginPhone.setErrorEnabled(false);
         }
         return true;
     }
 
-    public void profileLoginClick(View view) {
+    public void profileLoginClick(boolean force) {
         if (validatePhone()) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("accountPhone", edActivityLoginPhone.getText().toString().trim());
@@ -187,7 +212,14 @@ public class LoginActivity extends AppCompatActivity {
             executorService.execute(() -> {
                 LogService.getInstance().log("LoginActivity", "profileLoginClick");
                 runOnUiThread(this::showLoadingDialog);
-                JSONObject data = MainApplication.getInstance().getRestService().httpGet("/profile/login?phone=" + edActivityLoginPhone.getText().toString().trim());
+                String url = "/profile/login?phone=" + edActivityLoginPhone.getText().toString().trim();
+                if (force) {
+                    url += "&force=true&";
+                    if (referrerUrl != null) {
+                        url += referrerUrl;
+                    }
+                }
+                JSONObject data = MainApplication.getInstance().getRestService().httpGet(url);
                 runOnUiThread(this::dismissLoadingDialog);
                 LogService.getInstance().log("LoginActivity", data.toString());
                 if (JSONGetString(data, "status").equals("OK")) {
@@ -207,27 +239,27 @@ public class LoginActivity extends AppCompatActivity {
 
                      */
 
-                    executorService.execute(()->{
+                    executorService.execute(() -> {
                         String waitType = "Повторный запрос доступен через ";
                         int Timer = JSONGetInteger(data, "result_timeout", 90);
-                        if (JSONGetString(data, "result_type").equals("call")){
+                        if (JSONGetString(data, "result_type").equals("call")) {
                             waitType = "Ожидайте звонка от робота. Надо ответить на звонок и прослушать код для входа. " + waitType;
                         }
-                        runOnUiThread(()->{
+                        runOnUiThread(() -> {
                             llActivityLoginProgress.setVisibility(View.VISIBLE);
                             btnActivityLoginProfileLogin.setVisibility(View.GONE);
                         });
-                        while (Timer > 0){
+                        while (Timer > 0) {
                             String message = waitType + " " + Timer + " секунд.";
-                            runOnUiThread(()-> tvActivityLoginTimer.setText(message));
+                            runOnUiThread(() -> tvActivityLoginTimer.setText(message));
                             try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException ignored) {
                             }
-                            Timer --;
+                            Timer--;
                         }
 
-                        runOnUiThread(()->{
+                        runOnUiThread(() -> {
                             llActivityLoginProgress.setVisibility(View.GONE);
                             btnActivityLoginProfileLogin.setVisibility(View.VISIBLE);
                         });
@@ -261,7 +293,7 @@ public class LoginActivity extends AppCompatActivity {
             if (JSONGetString(data, "status").equals("OK")) {
                 MainApplication.getInstance().getMainAccount().setToken(JSONGetString(data, "result"));
                 MainApplication.getInstance().getRestService().reloadHeader();
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     setResult(RESULT_OK);
                     finish();
                 });
@@ -276,8 +308,8 @@ public class LoginActivity extends AppCompatActivity {
     private void showRegisterDialog(final String supportPhone, final String registrationApp) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Водитель с данным номером телефона не зарегестрирован. Для регистрации необходимо позвонить по номеру: "
-                + supportPhone + " или пройти самостоятельную регистрацию онлайню.");
+        builder.setMessage("Водитель с данным номером телефона не зарегистрирован в аТакси. Для регистрации необходимо позвонить по номеру: \n"
+                + supportPhone + " или пройти регистрацию онлайн.");
         builder.setCancelable(true);
         builder.setPositiveButton("Позвонить", (dialog, which) -> {
             Intent callIntent = new Intent(Intent.ACTION_DIAL);
@@ -290,17 +322,38 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         builder.setNeutralButton("Регистрация", (dialog, which) -> {
+            AlertDialog.Builder builderReg = new AlertDialog.Builder(this);
+            String message = "Для регистрации онлайн необходимо будет предоставить фотографии следующих документов:\n" +
+                    " - паспорт гражданина РФ;\n" +
+                    " - водительское удостоверние РФ;\n" +
+                    " - свидетельство о регистрации автомобиля.\n" +
+                    "Так же обращаем Ваше внимание, что необходим стаж вождения не менее 3 лет.";
+
+            builderReg.setMessage(message);
+            builderReg.setCancelable(true);
+            builderReg.setPositiveButton("Зарегестрироваться", (dialog2, which2) -> {
+                profileLoginClick(true);
+            });
+            builderReg.show();
+
+
+
+
+            /*
+
             Intent launchIntent = getPackageManager().getLaunchIntentForPackage(registrationApp);
             if (launchIntent != null) {
                 startActivity(launchIntent);//null pointer check in case package name was not found
-            }
-            else {
+            } else {
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + registrationApp)));
                 } catch (android.content.ActivityNotFoundException activityNotFoundException) {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + registrationApp)));
                 }
             }
+
+             */
+
 
         });
         builder.setNegativeButton("Отмена", (dialog, which) -> {

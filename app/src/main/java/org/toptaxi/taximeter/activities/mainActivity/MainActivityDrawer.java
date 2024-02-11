@@ -27,7 +27,7 @@ import org.toptaxi.taximeter.activities.GuaranteedIncomeActivity;
 import org.toptaxi.taximeter.activities.HisOrdersActivity;
 import org.toptaxi.taximeter.activities.InviteActivity;
 import org.toptaxi.taximeter.activities.MessagesActivity;
-import org.toptaxi.taximeter.activities.SettingsActivity;
+import org.toptaxi.taximeter.activities.settings.SettingsActivity;
 import org.toptaxi.taximeter.activities.StatisticsActivity;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;

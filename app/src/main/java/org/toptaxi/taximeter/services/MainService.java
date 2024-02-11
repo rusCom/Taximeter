@@ -55,17 +55,15 @@ public class MainService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "aTaxi.Водитель";
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "aTaxi.Водитель", NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "aTaxi.Водитель", NotificationManager.IMPORTANCE_HIGH);
 
-            // Configure the notification channel.
-            notificationChannel.setDescription("aTaxi.Водитель");
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-            notificationChannel.enableVibration(true);
-            notificationManager.createNotificationChannel(notificationChannel);
-        }
+        // Configure the notification channel.
+        notificationChannel.setDescription("aTaxi.Водитель");
+        notificationChannel.enableLights(true);
+        notificationChannel.setLightColor(Color.RED);
+        notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+        notificationChannel.enableVibration(true);
+        notificationManager.createNotificationChannel(notificationChannel);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         notificationBuilder.setContentIntent(contentIntent)

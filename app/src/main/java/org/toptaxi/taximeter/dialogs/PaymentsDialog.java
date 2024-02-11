@@ -116,7 +116,6 @@ public class PaymentsDialog {
         buttonTinkoffPayment.setVisibility(View.GONE);
 
 
-
         bottomSheetView.findViewById(R.id.btnPayment100).setOnClickListener(v -> ednPaymentAmount.setText("100"));
         bottomSheetView.findViewById(R.id.btnPayment300).setOnClickListener(v -> ednPaymentAmount.setText("300"));
         bottomSheetView.findViewById(R.id.btnPayment500).setOnClickListener(v -> ednPaymentAmount.setText("500"));
@@ -199,11 +198,14 @@ public class PaymentsDialog {
                                     sbpShowMessage.set(true);
                                     dialog.dismiss();
                                     bottomSheetDialog.dismiss();
+
                                     tinkoffPay(activity,
                                             "sbp",
                                             JSONGetString(response, "result_terminal_key"),
                                             JSONGetString(response, "result_public_key"),
                                             JSONGetString(response, "result_number"), amountInteger);
+
+
                                 });
                                 builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
                                 builder.show();
@@ -211,11 +213,14 @@ public class PaymentsDialog {
 
                         } else {
                             bottomSheetDialog.dismiss();
+
                             tinkoffPay(activity,
                                     "sbp",
                                     JSONGetString(response, "result_terminal_key"),
                                     JSONGetString(response, "result_public_key"),
                                     JSONGetString(response, "result_number"), amountInteger);
+
+
                         }
                     }
 
@@ -276,7 +281,7 @@ public class PaymentsDialog {
             });
         }
 
-        if (tinkoffAvailable){
+        if (tinkoffAvailable) {
             buttonTinkoffPayment.setVisibility(View.VISIBLE);
             AtomicReference<Boolean> tinkoffShowMessage = new AtomicReference<>(false);
             buttonTinkoffPayment.setOnClickListener(view -> {
@@ -302,11 +307,14 @@ public class PaymentsDialog {
                                     sbpShowMessage.set(true);
                                     dialog.dismiss();
                                     bottomSheetDialog.dismiss();
+
                                     tinkoffPay(activity,
                                             "tinkoff",
                                             JSONGetString(response, "result_terminal_key"),
                                             JSONGetString(response, "result_public_key"),
                                             JSONGetString(response, "result_number"), amountInteger);
+
+
                                 });
                                 builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
                                 builder.show();
@@ -314,11 +322,14 @@ public class PaymentsDialog {
 
                         } else {
                             bottomSheetDialog.dismiss();
+
                             tinkoffPay(activity,
                                     "tinkoff",
                                     JSONGetString(response, "result_terminal_key"),
                                     JSONGetString(response, "result_public_key"),
                                     JSONGetString(response, "result_number"), amountInteger);
+
+
                         }
                     }
 
@@ -331,7 +342,9 @@ public class PaymentsDialog {
         bottomSheetDialog.show();
     }
 
-    private void tinkoffPay(MainAppCompatActivity activity, String payType, String terminalKey, String publicKey, String orderID, long summa){
+    private void tinkoffPay(MainAppCompatActivity activity, String payType, String terminalKey, String publicKey, String orderID, long summa) {
+
+
         OrderOptions orderOptions = new OrderOptions();
         orderOptions.setOrderId(orderID);
         orderOptions.setAmount(Money.ofCoins(summa));
@@ -355,20 +368,22 @@ public class PaymentsDialog {
         paymentOptions.setCustomer(customerOptions);
 
 
-
         try {
-            TinkoffAcquiring tinkoffAcquiring = new TinkoffAcquiring(MainApplication.getInstance(), terminalKey, publicKey);
-            if (payType.equals("sbp")){
+
+            var tinkoffAcquiring = new TinkoffAcquiring(MainApplication.getInstance(), terminalKey, publicKey);
+            if (payType.equals("sbp")) {
                 tinkoffAcquiring.payWithSbp(activity, paymentOptions, 254);
             } else if (payType.equals("tinkoff")) {
                 featuresOptions.setFpsEnabled(false);
                 tinkoffAcquiring.openPaymentScreen(activity, paymentOptions, 154);
             }
-        }
-        catch (RuntimeException exception){
+
+        } catch (RuntimeException exception) {
             MainApplication.getInstance().getRestService().serverError("tinkoffPay", ExceptionUtils.getStackTrace(exception));
-            activity.runOnUiThread(()->activity.showToast("Ошибка платежной системы. Попробуйте попозже.\n" + exception.getLocalizedMessage()));
+            activity.runOnUiThread(() -> activity.showToast("Ошибка платежной системы. Попробуйте попозже.\n" + exception.getLocalizedMessage()));
         }
+
+
     }
 
     public void showAnotherPaymentDialog(MainAppCompatActivity activity) {
@@ -376,7 +391,6 @@ public class PaymentsDialog {
         View bottomSheetView = LayoutInflater.from(activity)
                 .inflate(R.layout.dialog_another_payments_available,
                         activity.findViewById(R.id.modalBottomAddPayment));
-
 
 
         if (qiwiTerminal.equals("")) {

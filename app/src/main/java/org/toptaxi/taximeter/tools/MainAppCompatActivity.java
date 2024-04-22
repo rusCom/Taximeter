@@ -40,7 +40,7 @@ public class MainAppCompatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (isCheckProfileAuth){
+        if (isCheckProfileAuth) {
             // Если по какой-либо причине данные по водителю не загружены, то загружаем их. Бывает такое, когда из спящего режима востанавливается приложение
             if (!MainApplication.getInstance().getMainAccount().isParsedData) {
                 httpGetResult("/profile/auth");
@@ -70,7 +70,8 @@ public class MainAppCompatActivity extends AppCompatActivity {
     }
 
     public void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_LONG).show());
+
     }
 
     public void goToURL(String url) {
@@ -101,6 +102,14 @@ public class MainAppCompatActivity extends AppCompatActivity {
             runOnUiThread(this::showProgressDialog);
             JSONObject result = MainApplication.getInstance().getRestService().httpGet(path);
             runOnUiThread(this::dismissProgressDialog);
+            if (!JSONGetString(result, "status").equals("OK")) {
+                showToast(JSONGetString(result, "result"));
+            } else {
+                try {
+                    MainApplication.getInstance().parseData(result.getJSONObject("result"));
+                } catch (JSONException ignored) {
+                }
+            }
         });
     }
 
@@ -124,7 +133,7 @@ public class MainAppCompatActivity extends AppCompatActivity {
         });
     }
 
-    protected void onHttpGetResult(JSONObject data, int requestUID){
+    protected void onHttpGetResult(JSONObject data, int requestUID) {
 
     }
 }

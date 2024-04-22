@@ -44,7 +44,7 @@ public class StatisticsActivity extends AppCompatActivity {
             tabHost.addTab(tabSpec);
             findViewById(R.id.tvStatisticsRating).setVisibility(View.VISIBLE);
         } else findViewById(R.id.tvStatisticsRating).setVisibility(View.GONE);
-
+        /*
         if (MainApplication.getInstance().getPreferences().isDriverInvite()) {
             tabSpec = tabHost.newTabSpec("/last/statistics/share");
             tabSpec.setIndicator("Друзья");
@@ -54,6 +54,9 @@ public class StatisticsActivity extends AppCompatActivity {
         } else {
             findViewById(R.id.tvStatisticsShare).setVisibility(View.VISIBLE);
         }
+        findViewById(R.id.tvStatisticsShare).setVisibility(View.GONE);
+
+         */
 
         // обработчик переключения вкладок
         tabHost.setOnTabChangedListener(tabId -> {

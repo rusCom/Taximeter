@@ -19,6 +19,7 @@ import org.toptaxi.taximeter.tools.cardview.MainCardDataAdapter;
 import org.toptaxi.taximeter.tools.cardview.IMainCardViewClickListener;
 import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainBottomSheetRecycler extends BottomSheetDialogFragment {
@@ -28,6 +29,16 @@ public class MainBottomSheetRecycler extends BottomSheetDialogFragment {
     public MainBottomSheetRecycler(List<IMainCardViewData> listItems, IMainCardViewClickListener clickListener) {
         this.listItems = listItems;
         this.clickListener = clickListener;
+    }
+
+    public MainBottomSheetRecycler(IMainCardViewClickListener clickListener) {
+        this.listItems = new ArrayList<>();
+        this.clickListener = clickListener;
+    }
+
+    public void addItem(String tag, String mainText){
+        MainBottomSheetRecyclerItem mainBottomSheetRecyclerItem = new MainBottomSheetRecyclerItem(tag, mainText);
+        this.listItems.add(mainBottomSheetRecyclerItem);
     }
 
     @NonNull

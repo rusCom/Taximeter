@@ -30,6 +30,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import org.toptaxi.taximeter.R;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -150,16 +153,17 @@ public class CheckPhotoActivity extends AppCompatActivity {
         }
 
         File root = android.os.Environment.getExternalStorageDirectory();
-
-
-        File photoDir = new File(root.getAbsolutePath() + "/DCIM/Camera");
-        if (!photoDir.exists()){
-            photoDir.mkdir();
-        }
         Date date = new Date();
         String timeStamp = String.valueOf(date.getTime());
-        String photoFilePath = photoDir.getAbsolutePath() + "/" + timeStamp + ".jpg";
+        String photoFilePath = root.getAbsolutePath() + "/DCIM/aTaxi/" + timeStamp + ".jpg";
         File photoFile = new File(photoFilePath);
+
+        try {
+            Files.createDirectories(Paths.get(photoFile.getAbsolutePath()));
+        } catch (IOException exception) {
+            Toast.makeText(CheckPhotoActivity.this, "Error: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         imageCapture.takePicture(
                 new ImageCapture.OutputFileOptions.Builder(photoFile).build(),

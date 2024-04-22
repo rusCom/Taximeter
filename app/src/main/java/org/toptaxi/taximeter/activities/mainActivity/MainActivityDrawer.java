@@ -105,11 +105,8 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
 
         drawer.addItem(new PrimaryDrawerItem().withName("Статистика|Рейтинг").withIcon(FontAwesome.Icon.faw_cube).withSelectable(false).withIdentifier(Constants.MENU_STATISTICS));
-        if (MainApplication.getInstance().getPreferences().isDriverInvite()) {
-            drawer.addItem(new PrimaryDrawerItem().withName("Пригласить друга").withIcon(FontAwesome.Icon.faw_share_alt).withSelectable(false).withIdentifier(Constants.MENU_DRIVER_INVITE));
-        }
-        if (MainApplication.getInstance().getPreferences().isClientInvite()) {
-            drawer.addItem(new PrimaryDrawerItem().withName("Пригласить клиента").withIcon(FontAwesome.Icon.faw_share_alt).withSelectable(false).withIdentifier(Constants.MENU_CLIENT_INVITE));
+        if (MainApplication.getInstance().getPreferences().isInvite()) {
+            drawer.addItem(new PrimaryDrawerItem().withName("Пригласить друга").withIcon(FontAwesome.Icon.faw_share_alt).withSelectable(false).withIdentifier(Constants.MENU_INVITE));
         }
 
         drawer.addItem(new PrimaryDrawerItem().withName("История заказов").withIcon(FontAwesome.Icon.faw_history).withSelectable(false).withIdentifier(Constants.MENU_HIS_ORDERS));
@@ -128,17 +125,17 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
             }
         }
 
-        if (!MainApplication.getInstance().getPreferences().instructionLink.equals("")) {
+        if (!MainApplication.getInstance().getPreferences().instructionLink.isEmpty()) {
             drawer.addItem(new PrimaryDrawerItem().withName("Инструкция по работе").withIcon(FontAwesome.Icon.faw_question).withSelectable(false).withIdentifier(Constants.MENU_INSTRUCTION));
         }
-        if (!MainApplication.getInstance().getPreferences().vkGroupLink.equals("")) {
+        if (!MainApplication.getInstance().getPreferences().vkGroupLink.isEmpty()) {
             drawer.addItem(new PrimaryDrawerItem().withName("Группа VK").withIcon(FontAwesome.Icon.faw_vk).withSelectable(false).withIdentifier(Constants.MENU_VK_GROUP));
         }
 
-        if (!MainApplication.getInstance().getPreferences().getDispatcherPhone().equals("")) {
+        if (!MainApplication.getInstance().getPreferences().getDispatcherPhone().isEmpty()) {
             drawer.addItem(new PrimaryDrawerItem().withName("Позвонить диспетчеру").withIcon(FontAwesome.Icon.faw_phone).withSelectable(false).withIdentifier(Constants.MENU_DISPATCHING_CALL));
         }
-        if (!MainApplication.getInstance().getPreferences().getSupportPhone().equals("")) {
+        if (!MainApplication.getInstance().getPreferences().getSupportPhone().isEmpty()) {
             drawer.addItem(new PrimaryDrawerItem().withName("Техподдержка").withIcon(R.drawable.baseline_support_24).withSelectable(false).withIdentifier(Constants.MENU_SUPPORT_CALL));
         }
         drawer.addItem(new PrimaryDrawerItem().withName("Настройки").withIcon(FontAwesome.Icon.faw_cog).withSelectable(false).withIdentifier(Constants.MENU_SETTINGS));
@@ -215,14 +212,9 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
             case Constants.MENU_STATISTICS:
                 mainActivity.startActivity(new Intent(mainActivity, StatisticsActivity.class));
                 break;
-            case Constants.MENU_DRIVER_INVITE:
+            case Constants.MENU_INVITE:
                 Intent shareDriverIntent = new Intent(mainActivity, InviteActivity.class);
                 mainActivity.startActivity(shareDriverIntent);
-                break;
-            case Constants.MENU_CLIENT_INVITE:
-                Intent shareClientIntent = new Intent(mainActivity, InviteActivity.class);
-                shareClientIntent.putExtra("type", "client");
-                mainActivity.startActivity(shareClientIntent);
                 break;
             case Constants.MENU_SETTINGS:
                 Intent settingsIntent = new Intent(mainActivity, SettingsActivity.class);

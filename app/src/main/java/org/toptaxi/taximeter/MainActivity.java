@@ -56,7 +56,7 @@ import java.util.concurrent.Executors;
 public class MainActivity extends MainAppCompatActivity implements OnMainDataChangeListener, Orders.OnOrdersChangeListener, OnMapReadyCallback {
     FrameLayout viewCurOrders, viewViewOrder, viewCurOrder, viewGPSError, viewMainData;
     TextView tvGPSStatus, tvNullCurOrderInfo;
-    Button btnCurOrderMainAction, btnCurOrderAction, btnCompleteOrders;
+    Button btnCurOrderMainAction, btnCurOrderAction, btnCompleteOrders, btnOrderViewBack;
     private boolean isShowGPSData = false;
     protected Toolbar mainToolbar;
     MenuItem miGPSFixed, miGPSNotFixed, miGPSOff, miDriverOffline, miDriverOnOrder, miDriverOnLine;
@@ -95,6 +95,13 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         btnCurOrderMainAction = findViewById(R.id.btnCurOrderMainAction);
         btnCurOrderAction = findViewById(R.id.btnCurOrderAction);
         btnCompleteOrders = findViewById(R.id.btnCurOrderCompleteOrders);
+
+        btnOrderViewBack = findViewById(R.id.btnOrderViewBack);
+        btnOrderViewBack.setOnClickListener(v -> {
+            if (MainApplication.getInstance().getMainActivityCurView() == Constants.CUR_VIEW_VIEW_ORDER) {
+                MainApplication.getInstance().setMainActivityCurView(Constants.CUR_VIEW_CUR_ORDERS);
+            }
+        });
 
 
         btnCompleteOrders.setVisibility(View.GONE);
@@ -343,6 +350,7 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                 case Constants.CUR_VIEW_VIEW_ORDER -> {
                     viewViewOrder.setVisibility(View.VISIBLE);
                     viewOrderLastState = MainApplication.getInstance().getViewOrder().getCheck();
+
                     generateViewOrder();
                 }
                 case Constants.CUR_VIEW_CUR_ORDER -> {

@@ -1,41 +1,332 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_share_driver"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_margin"
-    tools:context="org.toptaxi.taximeter.activities.InviteActivity">
-    <ScrollView
+    android:orientation="vertical">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/svShareDriver"
-        android:layout_above="@+id/llInviteButtons">
+        android:layout_weight="@integer/material_motion_duration_long_1"
+        android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="@dimen/activity_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnMinusDayInvite"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/tvInviteCaption"
-                android:textAlignment="center" />
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:textColor="@color/md_black_1000"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/textViewDateInvite"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="20"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Button
+                android:id="@+id/btnPlusDayInvite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:textColor="@color/md_black_1000"
+                android:textStyle="bold" />
         </LinearLayout>
-    </ScrollView>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/activityInviteRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="@dimen/main_margin_padding">
+
+                    <androidx.coordinatorlayout.widget.CoordinatorLayout
+                        android:id="@+id/linerLayoutGuaranteedIncomeActivity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <org.eazegraph.lib.charts.PieChart
+                            android:id="@+id/activityInvitePieChart"
+                            android:layout_width="250dp"
+                            android:layout_height="250dp"
+                            android:layout_gravity="center_horizontal" />
+
+                        <TextView
+                            android:id="@+id/tvAllBonuses"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:textAlignment="center"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/activity_margin" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="5dp"
+                            app:cardBackgroundColor="@color/primaryGreen">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="12dp"
+                                    android:text="Зачислено бонусов за водителей"
+                                    android:textAlignment="center" />
+                                <TextView
+                                    android:id="@+id/tvInviteDriverBonus"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="6dp"
+                                    android:paddingBottom="12dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+
+                                    android:textAlignment="center" />
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="5dp"
+                            app:cardBackgroundColor="@color/primaryYellow">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="12dp"
+                                    android:text="Зачислено бонусов за клиентов"
+                                    android:textAlignment="center" />
+                                <TextView
+                                    android:id="@+id/tvInviteClientBonus"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="6dp"
+                                    android:paddingBottom="12dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+
+                                    android:textAlignment="center" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="5dp"
+                            app:cardBackgroundColor="@color/primaryGreen">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="12dp"
+                                    android:text="Приглашено водителей"
+                                    android:textAlignment="center" />
+                                <TextView
+                                    android:id="@+id/tvInviteDriverCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="6dp"
+                                    android:paddingBottom="12dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                                    android:textAlignment="center" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="5dp"
+                            app:cardBackgroundColor="@color/primaryYellow">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="12dp"
+                                    android:text="Приглашено клиентов"
+                                    android:textAlignment="center" />
+                                <TextView
+                                    android:id="@+id/tvInviteClientCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="6dp"
+                                    android:paddingBottom="12dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+
+                                    android:textAlignment="center" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="5dp"
+                            app:cardBackgroundColor="@color/primaryGreen">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="12dp"
+                                    android:text="Выполнено заказов"
+                                    android:textAlignment="center" />
+                                <TextView
+                                    android:id="@+id/tvInviteDriverOrderCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="6dp"
+                                    android:paddingBottom="12dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+
+                                    android:textAlignment="center" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="5dp"
+                            app:cardBackgroundColor="@color/primaryYellow">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="12dp"
+                                    android:text="Совершенных поездок"
+                                    android:textAlignment="center" />
+                                <TextView
+                                    android:id="@+id/tvInviteClientOrderCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingTop="6dp"
+                                    android:paddingBottom="12dp"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+
+                                    android:textAlignment="center" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+
+
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/activity_margin" />
+
+                    <TextView
+                        android:id="@+id/textViewRulesLinkInvite"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textAlignment="center"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center|bottom"
         android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/llInviteButtons">
+        android:padding="@dimen/main_margin_padding">
+
         <Button
-            android:text="@string/btnShareDriverSendLink"
+            android:id="@+id/btnInvite"
+            style="@style/MainButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btnShareDriverActivityShare"
-            style="@style/MainButton"
-            android:onClick="btnInviteClick"/>
+            android:onClick="btnInviteClick"
+            android:text="@string/btnShareDriverSendLink" />
     </LinearLayout>
-</RelativeLayout>
+
+
+</LinearLayout>

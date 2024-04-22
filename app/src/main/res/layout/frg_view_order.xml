@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <androidx.cardview.widget.CardView
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/button_margin"
-        android:layout_weight="2">
+        android:layout_weight="2"
+        android:padding="@dimen/main_margin_padding">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOrderViewBack"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:layout_gravity="bottom|start"
+            app:icon="@drawable/acq_arrow_back"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp" />
         <fragment
             android:id="@+id/mapViewOrder"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </fragment>
-    </androidx.cardview.widget.CardView>
-    <include layout="@layout/inc_view_order_info"/>
+            android:layout_height="match_parent" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    <include layout="@layout/inc_view_order_info" />
 
 
 </LinearLayout>

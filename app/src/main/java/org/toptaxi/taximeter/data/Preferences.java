@@ -38,12 +38,9 @@ public class Preferences {
     private String dispatcherPhone = "";
     private Integer systemDataTimer = 5;
     public Integer systemTemplateMessagesTimeout = 60;
-    private String driverInviteCaption = "";
-    private String driverInviteText = "";
-    private String clientInviteCaption = "";
-    private String clientInviteText = "";
     private Boolean useRating = false;
     private JSONObject guaranteedIncome;
+    private JSONObject inviteData;
     public Boolean corporateTaxi = false;
     public String corporateTaxiBalanceButtonDialog;
     public String corporateTaxiCheckOrderDialog;
@@ -53,6 +50,7 @@ public class Preferences {
     public String hourInfoText = "";
     private boolean longDistanceMessage = false;
     private final List<TariffPlan> driverTariffPlans;
+
 
 
 
@@ -85,10 +83,6 @@ public class Preferences {
         this.instructionLink = JSONGetString(data, "instruction_link");
         this.vkGroupLink = JSONGetString(data, "vk_group_link");
         this.checkPriorErrorText = JSONGetString(data, "check_prior_error_text");
-        this.driverInviteCaption = JSONGetString(data, "driver_invite_caption");
-        this.driverInviteText = JSONGetString(data, "driver_invite_text");
-        this.clientInviteCaption = JSONGetString(data, "client_invite_caption");
-        this.clientInviteText = JSONGetString(data, "client_invite_text");
         this.useRating = MainUtils.JSONGetBool(data, "use_rating");
         this.dispatcherMessages = JSONGetBool(data, "dispatcher_messages");
         this.hourInfoText = JSONGetString(data, "hour_info_text");
@@ -96,6 +90,9 @@ public class Preferences {
 
         if (data.has("guaranteed_income")){
             this.guaranteedIncome = data.getJSONObject("guaranteed_income");
+        }
+        if (data.has("invite")){
+            this.inviteData = data.getJSONObject("invite");
         }
 
         dispatcherTemplateMessages.clear();
@@ -143,7 +140,7 @@ public class Preferences {
 
     public boolean isShowCorporateTaxiCheckOrderDialog() {
         boolean result = false;
-        if (corporateTaxi && !corporateTaxiCheckOrderDialog.equals("")) {
+        if (corporateTaxi && !corporateTaxiCheckOrderDialog.isEmpty()) {
             // Проверяем, что с поледенго показа прошло более 24 часов
             if (MainUtils.passedTimeHour(corporateTaxiCheckOrderDialogLastShow) > 24) {
                 result = true;
@@ -154,6 +151,13 @@ public class Preferences {
 
     public Boolean isGuaranteedIncome() {
         return guaranteedIncome != null;
+    }
+    public Boolean isInvite() {
+        return inviteData != null;
+    }
+
+    public JSONObject getInviteData() {
+        return inviteData;
     }
 
     public JSONObject getGuaranteedIncome() {
@@ -184,7 +188,7 @@ public class Preferences {
     }
 
     public boolean useUnlimitedTariffPlans() {
-        return driverTariffPlans.size() != 0;
+        return !driverTariffPlans.isEmpty();
     }
 
     public Boolean useRating() {
@@ -195,46 +199,15 @@ public class Preferences {
         return supportPhone;
     }
 
-    public void setSupportPhone(String supportPhone) {
-        this.supportPhone = supportPhone;
-    }
-
     public String getPaymentInstructionLink() {
         if (paymentInstructionLink == null)return null;
-        if (paymentInstructionLink.equals(""))return null;
+        if (paymentInstructionLink.isEmpty())return null;
         return paymentInstructionLink;
     }
 
     public Integer getSystemDataTimer() {
         return systemDataTimer;
     }
-
-    public String getDriverInviteCaption() {
-        return driverInviteCaption;
-    }
-
-    public String getDriverInviteText() {
-        return driverInviteText;
-    }
-
-    public Boolean isDriverInvite() {
-        if (driverInviteText.equals("")) return false;
-        return !driverInviteCaption.equals("");
-    }
-
-    public String getClientInviteCaption() {
-        return clientInviteCaption;
-    }
-
-    public String getClientInviteText() {
-        return clientInviteText;
-    }
-
-    public Boolean isClientInvite() {
-        if (clientInviteText.equals("")) return false;
-        return !clientInviteCaption.equals("");
-    }
-
 
     public String getDispatcherPhone() {
         return dispatcherPhone;

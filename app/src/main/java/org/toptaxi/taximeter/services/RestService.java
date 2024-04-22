@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -38,6 +36,7 @@ public class RestService {
         header = new JSONObject();
         reloadHeader();
         restHost = new ArrayList<>();
+        restHost.add(MainApplication.getInstance().getResources().getString(R.string.mainRestHost));
         restHost.add(MainApplication.getInstance().getResources().getString(R.string.mainRestHost));
         restHost.add(MainApplication.getInstance().getResources().getString(R.string.reserveRestHost));
         restIndex = 0;
@@ -63,54 +62,16 @@ public class RestService {
             header.put("os_name", "android");
             header.put("os_release", Build.VERSION.RELEASE);
             header.put("os_sdk", Build.VERSION.SDK_INT);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (JSONException ignored) {
         }
     }
 
     private String getHeader() {
-
         try {
             header.put("location", MainApplication.getInstance().getLocationService().toJSON());
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (JSONException ignored) {
         }
-
         return Base64.getEncoder().encodeToString(header.toString().getBytes());
-
-    }
-
-    public void httpGetResult(final String path) {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-        executorService.execute(() -> {
-            if (MainApplication.getInstance().getMainActivity() != null) {
-                MainApplication.getInstance().getMainActivity().runOnUiThread(() -> MainApplication.getInstance().getMainActivity().showProgressDialog());
-            }
-
-            JSONObject request = httpGet(path);
-
-            try {
-                if (request.getString("status").equals("OK")) {
-                    if (request.has("result")) {
-                        MainApplication.getInstance().parseData(request.getJSONObject("result"));
-                    }
-                } else {
-                    if (request.has("result")) {
-                        MainApplication.getInstance().showToast(request.getString("result"));
-                    } else {
-                        MainApplication.getInstance().showToast(request.toString());
-                    }
-
-                }
-            } catch (JSONException exception) {
-                exception.printStackTrace();
-            }
-
-            if (MainApplication.getInstance().getMainActivity() != null) {
-                MainApplication.getInstance().getMainActivity().runOnUiThread(() -> MainApplication.getInstance().getMainActivity().dismissProgressDialog());
-            }
-        });
     }
 
     public void serverError(String method, String data) {
@@ -154,16 +115,15 @@ public class RestService {
                 if (mainAppCompatActivity != null) {
                     if (response.has("result")) {
                         String errorText = response.getString("result");
-                        mainAppCompatActivity.runOnUiThread(() -> mainAppCompatActivity.showToast(errorText));
+                        mainAppCompatActivity.showToast(errorText);
                     } else {
-                        JSONObject finalResponse = response;
-                        mainAppCompatActivity.runOnUiThread(() -> mainAppCompatActivity.showToast(finalResponse.toString()));
+                        mainAppCompatActivity.showToast(response.toString());
                     }
                 }
             }
         } catch (JSONException e) {
             if (mainAppCompatActivity != null) {
-                mainAppCompatActivity.runOnUiThread(() -> mainAppCompatActivity.showToast(e.getMessage()));
+                mainAppCompatActivity.showToast(e.getMessage());
             }
         }
 
@@ -269,7 +229,16 @@ public class RestService {
             response = httpClient.newCall(request).execute();
         } catch (Exception exception) {
             if (!url.contains("server_error")) {
-                MainApplication.getInstance().getRestService().serverError("restCallGet", ExceptionUtils.getStackTrace(exception));
+                try {
+                    JSONObject error = new JSONObject();
+                    error.put("method", "restCallGet");
+                    error.put("url", url);
+                    error.put("error", exception.getMessage());
+                    error.put("trace", ExceptionUtils.getStackTrace(exception));
+                    httpPostThread("/server_error", error);
+                } catch (Exception ignored) {
+                }
+
             }
 
         }

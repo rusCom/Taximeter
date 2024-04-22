@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import org.toptaxi.taximeter.MainActivity;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
+import org.toptaxi.taximeter.activities.CheckPhotoActivity;
 import org.toptaxi.taximeter.activities.MessagesActivity;
 import org.toptaxi.taximeter.activities.OrdersOnCompleteActivity;
 import org.toptaxi.taximeter.activities.PriorOrderActivity;
@@ -41,8 +42,7 @@ public class OnMainActionClickListener implements AdapterView.OnItemClickListene
             switch (mainActionItem.getAction()) {
                 case Constants.MAIN_ACTION_GO_ONLINE, Constants.MAIN_ACTION_GO_OFFLINE ->
                         MainApplication.getInstance().getMainActivity().driverGoOffLine();
-                case Constants.MAIN_ACTION_TARIFF_PLAN ->
-                        MainApplication.getInstance().getMainActivity().onTariffPlanClick();
+                case Constants.MAIN_ACTION_TARIFF_PLAN -> MainApplication.getInstance().getMainActivity().onTariffPlanClick();
                 case Constants.MAIN_ACTION_PRIOR_ORDER -> {
                     if (MainApplication.getInstance().getMainAccount().getCheckPriorOrder()) {
                         Intent priorOrders = new Intent(MainApplication.getInstance().getMainActivity(), PriorOrderActivity.class);
@@ -77,29 +77,27 @@ public class OnMainActionClickListener implements AdapterView.OnItemClickListene
                 }
                 case Constants.MAIN_ACTION_ORDERS_COMPLETE ->
                         MainApplication.getInstance().getMainActivity().startActivity(new Intent(MainApplication.getInstance().getMainActivity(), OrdersOnCompleteActivity.class));
-                case Constants.MENU_CLOSE_APPLICATION ->
-                        MainApplication.getInstance().getMainActivity().onBackPressed();
+                case Constants.MENU_CLOSE_APPLICATION -> MainApplication.getInstance().getMainActivity().onBackPressed();
+
             }
         }
     }
 
-    void sendMessageThread(String message){
+    void sendMessageThread(String message) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             MainApplication.getInstance().showProgressDialog();
             JSONObject response = MainApplication.getInstance().getRestService().httpGet("/messages/send?message=" + message);
             MainApplication.getInstance().dismissProgressDialog();
-            if (JSONGetString(response, "status_code").equals("200")){
+            if (JSONGetString(response, "status_code").equals("200")) {
                 try {
                     MainApplication.getInstance().parseData(response.getJSONObject("result"));
                 } catch (JSONException ignored) {
                 }
                 MainApplication.getInstance().showToast("Сообщение доставлено. Ожидайте ответ.");
-            }
-            else if (JSONGetString(response, "status_code").equals("400")){
+            } else if (JSONGetString(response, "status_code").equals("400")) {
                 MainApplication.getInstance().showToast(JSONGetString(response, "result"));
-            }
-            else {
+            } else {
                 MainApplication.getInstance().showToast(response.toString());
             }
         });

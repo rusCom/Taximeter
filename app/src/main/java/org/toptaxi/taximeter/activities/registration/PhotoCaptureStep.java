@@ -57,7 +57,7 @@ public class PhotoCaptureStep extends Step<String> {
             case "drv_license_number_reverse" -> "Водительское удостоверение (Обратная сторона)";
             case "сar_registration_main" -> "Свидетельство о  регистрации ТС";
             case "сar_registration_reverse" -> "Свидетельство о  регистрации ТС (Обратная сторона)";
-            case "self" -> "Селфи";
+            case "self" -> "Селфи с водительским удостоверением в руках";
             default -> captureType;
         };
     }

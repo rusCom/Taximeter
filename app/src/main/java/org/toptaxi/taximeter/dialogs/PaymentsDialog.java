@@ -380,7 +380,7 @@ public class PaymentsDialog {
 
         } catch (RuntimeException exception) {
             MainApplication.getInstance().getRestService().serverError("tinkoffPay", ExceptionUtils.getStackTrace(exception));
-            activity.runOnUiThread(() -> activity.showToast("Ошибка платежной системы. Попробуйте попозже.\n" + exception.getLocalizedMessage()));
+            activity.showToast("Ошибка платежной системы. Попробуйте попозже.\n" + exception.getLocalizedMessage());
         }
 
 

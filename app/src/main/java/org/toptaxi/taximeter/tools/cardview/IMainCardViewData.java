@@ -8,6 +8,9 @@ public interface IMainCardViewData {
     default Integer getImageResourceID(){
         return null;
     }
+    default String getTag(){
+        return null;
+    }
 
 
 }

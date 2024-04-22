@@ -155,7 +155,6 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();

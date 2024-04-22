@@ -4,9 +4,13 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
@@ -36,6 +40,11 @@ public class BalanceActivity extends MainAppCompatActivity implements AbsListVie
         }
 
         setContentView(R.layout.activity_balance);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("История по балансу");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         listView = findViewById(R.id.lvPayments);
 
@@ -81,6 +90,15 @@ public class BalanceActivity extends MainAppCompatActivity implements AbsListVie
         alertDialog.show();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public void onScrollStateChanged(AbsListView absListView, int i) {
@@ -106,7 +124,7 @@ public class BalanceActivity extends MainAppCompatActivity implements AbsListVie
             LogService.getInstance().log("BalanceActivity", "stop load more result = " + result);
             runOnUiThread(() -> {
                 LogService.getInstance().log("BalanceActivity", "runOnUiThread result = " + result);
-                if (result.size() == 0) {
+                if (result.isEmpty()) {
                     listView.removeFooterView(footer);
                 } else {
                     adapter.AppendNewData(result);

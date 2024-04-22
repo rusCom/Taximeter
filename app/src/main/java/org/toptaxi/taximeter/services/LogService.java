@@ -30,7 +30,7 @@ public class LogService {
 
     public void log(String className, String method, String data) {
         if (isLog(className)) {
-            if (data.equals("")) {
+            if (data.isEmpty()) {
                 Log.d("#######", className + "->" + method);
             } else {
                 Log.d("#######",  className + "->" + method + ": " + data);
@@ -39,42 +39,26 @@ public class LogService {
     }
 
     private boolean isLog(String className) {
-        switch (className) {
-            case "SettingsAlarmFragment":
-                return false;
-            case "Preferences":
-                return false;
-            case "Messages":
-                return false;
-            case "LoginActivity":
-                return false;
-            case "Profile":
-                return false;
-            case "BalanceActivity":
-                return false;
-            case "MainActivity":
-                return false;
-            case "MainApplication":
-                return false;
-            case "PriorOrderActivity":
-                return false;
-            case "FirebaseService":
-                return false;
-            case "MainActivityDrawer":
-                return false;
-            case "LocationService":
-                return false;
-            case "StartApplicationActivity":
-                return false;
-            case "RestService":
-                return false;
-            case "MainService":
-                return false;
+        return switch (className) {
+            case "SettingsAlarmFragment" -> false;
+            case "Preferences" -> false;
+            case "Messages" -> false;
+            case "LoginActivity" -> false;
+            case "Profile" -> false;
+            case "BalanceActivity" -> false;
+            case "MainActivity" -> false;
+            case "MainApplication" -> false;
+            case "PriorOrderActivity" -> false;
+            case "FirebaseService" -> false;
+            case "MainActivityDrawer" -> false;
+            case "LocationService" -> false;
+            case "StartApplicationActivity" -> false;
+            case "RestService" -> false;
+            case "MainService" -> false;
+            case "InviteActivity" -> false;
+            case "sys" -> true;
 
-
-            case "sys":
-                return true;
-        }
-        return false;
+            default -> false;
+        };
     }
 }

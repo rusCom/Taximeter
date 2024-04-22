@@ -31,7 +31,7 @@ public class Constants {
     public static final int MENU_THEME                  = 206;
     public static final int MENU_MESSAGES               = 207;
     public static final int MENU_STATISTICS             = 208;
-    public static final int MENU_DRIVER_INVITE          = 209;
+    public static final int MENU_INVITE                 = 209;
     public static final int MENU_HIS_ORDERS             = 210;
     public static final int MENU_TEMPLATE_MESSAGE       = 211;
     public static final int MENU_FAQ                    = 212;

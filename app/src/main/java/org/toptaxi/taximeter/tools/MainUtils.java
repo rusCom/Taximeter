@@ -19,9 +19,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 
 public class MainUtils {
+
+    public static boolean isEmptyString(String string) {
+        return string == null || string.isEmpty();
+    }
     public static Double round(Double d, int precise) {
         BigDecimal bigDecimal = new BigDecimal(d);
         bigDecimal = bigDecimal.setScale(precise, RoundingMode.HALF_UP);
@@ -50,12 +55,17 @@ public class MainUtils {
     public static String getRubSymbol() {
         String result;
         result = String.valueOf(Html.fromHtml("&#x20bd", Html.FROM_HTML_MODE_LEGACY)); // for 24 api and more
-        if (result.trim().equals("")) result = "руб.";
+        if (result.trim().isEmpty()) result = "руб.";
         return result;
     }
 
     public static String getSummaString(int summa) {
         return new DecimalFormat("###,##0").format(summa) + " " + getRubSymbol();
+    }
+
+    public static String getSummaString(Float summa) {
+        LogService.getInstance().log("InviteActivity", summa.toString());
+        return new DecimalFormat("##0.00").format(summa) + " " + getRubSymbol();
     }
 
     public static String getOrderCountName(int count) {
@@ -64,6 +74,50 @@ public class MainUtils {
             case 2, 3, 4, 22, 23, 24, 32, 33, 34, 42, 43, 44 -> "заказа";
             default -> "заказов";
         };
+    }
+
+    public static String getMonthName(LocalDate date){
+        switch (date.getMonthValue()) {
+            case 1 -> {
+                return "Январь";
+            }
+            case 2 -> {
+                return "Февраль";
+            }
+            case 3 -> {
+                return "Март";
+            }
+            case 4 -> {
+                return "Апрель";
+            }
+            case 5 -> {
+                return "Май";
+            }
+            case 6 -> {
+                return "Июнь";
+            }
+            case 7 -> {
+                return "Июль";
+            }
+            case 8 -> {
+                return "Август";
+            }
+            case 9 -> {
+                return "Сентябрь";
+            }
+            case 10 -> {
+                return "Октябрь";
+            }
+            case 11 -> {
+                return "Ноябрь";
+            }
+            case 12 -> {
+                return "Декабрь";
+            }
+
+
+            default -> throw new IllegalStateException("Unexpected value: " + date.getMonthValue());
+        }
 
     }
 
@@ -149,6 +203,16 @@ public class MainUtils {
 
         Calendar result = Calendar.getInstance();
         result.setTimeInMillis(Timestamp.valueOf(stringData).getTime());
+        return result;
+    }
+    public static Float JSONGetFloat(JSONObject data, String field) {
+        Float result = null;
+        if (data.has(field)) {
+            try {
+                result = Float.parseFloat(data.getString(field));
+            } catch (JSONException ignored) {
+            }
+        }
         return result;
     }
 

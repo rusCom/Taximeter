@@ -72,7 +72,7 @@ public class InviteActivity extends MainAppCompatActivity implements SwipeRefres
         btnMinusDay.setText("<<<");
 
         textViewRulesLinkInvite = findViewById(R.id.textViewRulesLinkInvite);
-        String urlLink = JSONGetString(MainApplication.getInstance().getPreferences().getGuaranteedIncome(), "rules");
+        String urlLink = JSONGetString(MainApplication.getInstance().getPreferences().getInviteData(), "rules");
         if (!MainUtils.isEmptyString(urlLink)){
             textViewRulesLinkInvite.setVisibility(View.VISIBLE);
             textViewRulesLinkInvite.setMovementMethod(LinkMovementMethod.getInstance());

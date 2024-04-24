@@ -167,7 +167,7 @@ public class StartApplicationActivity extends AppCompatActivity {
 
                         if (!isFinished) {
                             // TODO когда на сервере переведем получение данных в запрос auth убрать данный пункт
-                            JSONObject data2 = MainApplication.getInstance().getRestService().httpGet("/last/data").getJSONObject("result");
+                            JSONObject data2 = MainApplication.getInstance().getDataRestService().httpGet("/last/data").getJSONObject("result");
                             MainApplication.getInstance().parseData(data2);
                             runOnUiThread(() -> tvAction.setText("Запуск приложения ..."));
 

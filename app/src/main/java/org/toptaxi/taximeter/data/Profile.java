@@ -104,7 +104,6 @@ public class Profile {
             return new DecimalFormat("###,##0.00").format(balance);
         }
         catch (Exception ignored){
-            MainApplication.getInstance().getRestService().serverError("Account.getBalanceString", balance.toString());
         }
         return balance.toString();
     }

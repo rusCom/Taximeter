@@ -74,11 +74,6 @@ public class RestService {
         return Base64.getEncoder().encodeToString(header.toString().getBytes());
     }
 
-    public void serverError(String method, String data) {
-        httpGetThread("/server_error?method=" + method + "&data=" + data);
-    }
-
-
     public void httpGetThread(final String path) {
         new Thread(() -> httpGetHost(path)).start();
     }
@@ -227,20 +222,7 @@ public class RestService {
                     .header("authorization", "Bearer " + getHeader())
                     .build();
             response = httpClient.newCall(request).execute();
-        } catch (Exception exception) {
-            if (!url.contains("server_error")) {
-                try {
-                    JSONObject error = new JSONObject();
-                    error.put("method", "restCallGet");
-                    error.put("url", url);
-                    error.put("error", exception.getMessage());
-                    error.put("trace", ExceptionUtils.getStackTrace(exception));
-                    httpPostThread("/server_error", error);
-                } catch (Exception ignored) {
-                }
-
-            }
-
+        } catch (Exception ignored) {
         }
         return response;
     }

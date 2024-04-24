@@ -87,27 +87,22 @@ public class MainService extends Service {
     private void startDataTask() {
         new Thread(() -> {
             String lastNotificationMessage = "";
-            String driverToken = MainApplication.getInstance().getMainAccount().getToken();
             LogService.getInstance().log("MainService", "startDataTask");
             while (MainApplication.getInstance().isRunning) {
 
                 try {
                     JSONObject data2 = MainApplication.getInstance().getDataRestService().httpGet("/last/data").getJSONObject("result");
-                    if (!JSONGetString(data2, "driver_token").equals(driverToken)) {
-                        MainApplication.getInstance().getRestService().httpGetThread("/server_error?method=data_driver_token");
-                        data2 = MainApplication.getInstance().getDataRestService().httpGet("/last/data").getJSONObject("result");
-                    }
-                    if (JSONGetString(data2, "driver_token").equals(driverToken)) {
-                        if (MainApplication.getInstance().isRunning) {
-                            MainApplication.getInstance().parseData(data2);
-                            String notificationMessage = MainApplication.getInstance().getProfile().getNotificationMessageTitle();
-                            if (!lastNotificationMessage.equals(notificationMessage)) {
-                                lastNotificationMessage = notificationMessage;
-                                sendNotification(notificationMessage);
-                            }
-                            LogService.getInstance().log("MainService", data2.toString());
+
+                    if (MainApplication.getInstance().isRunning) {
+                        MainApplication.getInstance().parseData(data2);
+                        String notificationMessage = MainApplication.getInstance().getProfile().getNotificationMessageTitle();
+                        if (!lastNotificationMessage.equals(notificationMessage)) {
+                            lastNotificationMessage = notificationMessage;
+                            sendNotification(notificationMessage);
                         }
+                        LogService.getInstance().log("MainService", data2.toString());
                     }
+
 
                 } catch (JSONException ignored) {
                 }

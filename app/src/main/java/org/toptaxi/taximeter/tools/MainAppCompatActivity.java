@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -18,8 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
-import org.toptaxi.taximeter.R;
-import org.toptaxi.taximeter.services.LogService;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

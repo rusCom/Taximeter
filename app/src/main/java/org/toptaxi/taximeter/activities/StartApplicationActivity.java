@@ -166,6 +166,7 @@ public class StartApplicationActivity extends AppCompatActivity {
                         }
 
                         if (!isFinished) {
+                            MainApplication.getInstance().parseData(data);
                             // TODO когда на сервере переведем получение данных в запрос auth убрать данный пункт
                             JSONObject data2 = MainApplication.getInstance().getDataRestService().httpGet("/last/data").getJSONObject("result");
                             MainApplication.getInstance().parseData(data2);

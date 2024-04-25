@@ -1,12 +1,10 @@
 package org.toptaxi.taximeter.activities;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -14,41 +12,46 @@ import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.adapters.ListViewMessageAdapter;
 import org.toptaxi.taximeter.data.Messages;
-import org.toptaxi.taximeter.tools.Constants;
-import org.toptaxi.taximeter.tools.LockOrientation;
+import org.toptaxi.taximeter.services.LogService;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
+import org.toptaxi.taximeter.tools.MainUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class MessagesActivity extends AppCompatActivity implements AbsListView.OnScrollListener, Messages.OnMessagesListener {
-    private static String TAG = "#########" + MessagesActivity.class.getName();
+public class MessagesActivity extends MainAppCompatActivity implements AbsListView.OnScrollListener, Messages.OnMessagesListener {
     ListViewMessageAdapter adapter;
     ListView listView;
     EditText edMessage;
     private View footer;
-    LoadMoreAsyncTask loadMoreAsyncTask = new LoadMoreAsyncTask();
-    boolean isFirst = true;
     RelativeLayout rlSendForm;
     MediaPlayer mediaPlayerNewMessage;
+    Boolean isLoadData = false;
+    Boolean isCreateActivity = true;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Утановка текущего поворота экрана
-        new LockOrientation(this).lock();
         setContentView(R.layout.activity_messages);
-        listView = (ListView) findViewById(R.id.lvMessages);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("Чат с диспетчером");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        listView = findViewById(R.id.lvMessages);
 
         footer = getLayoutInflater().inflate(R.layout.item_messages_footer, null);
         listView.addHeaderView(footer);
@@ -57,45 +60,58 @@ public class MessagesActivity extends AppCompatActivity implements AbsListView.O
         listView.setAdapter(adapter);
         listView.setOnScrollListener(this);
 
-        loadMoreAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        LogService.getInstance().log("Messages", "onCreate");
+        updateDataAsync();
 
         mediaPlayerNewMessage = MediaPlayer.create(this, R.raw.incomming_message_frg);
         mediaPlayerNewMessage.setLooping(false);
 
-        edMessage = (EditText) findViewById(R.id.etMessagesMessage);
+        edMessage = findViewById(R.id.etMessagesMessage);
         edMessage.setSingleLine(true);
 
-        edMessage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_NULL
-                        && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    Log.d(TAG, "onSendButtonClick");
-                    btnSendMessageClick(null);
-                }
-
-                return false;
+        edMessage.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_NULL
+                    && event.getAction() == KeyEvent.ACTION_DOWN) {
+                LogService.getInstance().log("Messages", "onSendButtonClick");
+                btnSendMessageClick(null);
             }
+
+            return false;
         });
 
-        rlSendForm = (RelativeLayout) findViewById(R.id.rlActivityMessagesSendForm);
+        rlSendForm = findViewById(R.id.rlActivityMessagesSendForm);
+    }
 
-
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
-        listView.setSelection(listView.getCount());
+        isLoadData = true;
+
+
         MainApplication.getInstance().getMainMessages().setOnMessagesListener(this);
 
+        adapter.notifyDataSetChanged();
+        listView.setSelection(listView.getCount());
+
+        // listView.post(() -> listView.setSelection(listView.getCount() - 1));
+
         // Если телефон диспетчера указан, то значит можно и сообщения отправлять, т.к. диспетчер есть
-        if (!MainApplication.getInstance().getPreferences().getSupportPhone().equals(""))
+        if (!MainApplication.getInstance().getPreferences().getSupportPhone().isEmpty())
             rlSendForm.setVisibility(View.VISIBLE);
         else {
             rlSendForm.setVisibility(View.GONE);
         }
+        isLoadData = false;
     }
 
     @Override
@@ -111,104 +127,88 @@ public class MessagesActivity extends AppCompatActivity implements AbsListView.O
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if ((MainApplication.getInstance().getMainMessages().getCount() < 10)) {
-            listView.removeHeaderView(footer);
-        } else {
-            if ((firstVisibleItem == 0) && (loadMoreAsyncTask.getStatus() == AsyncTask.Status.FINISHED)) {
-                loadMoreAsyncTask = new LoadMoreAsyncTask();
-                loadMoreAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
+
+        if ((firstVisibleItem == 0) && (!isLoadData)) {
+            LogService.getInstance().log("Messages", "onScroll");
+            updateDataAsync();
         }
     }
 
     @Override
     public void OnNewMessage() {
-        runOnUiThread(()->{
+        runOnUiThread(() -> {
             adapter.notifyDataSetChanged();
             listView.setSelection(listView.getCount());
             mediaPlayerNewMessage.start();
         });
     }
 
-    private class LoadMoreAsyncTask extends AsyncTask<Void, Void, Integer> {
-        @Override
-        protected Integer doInBackground(Void... voids) {
-            if (isFirst) {
-                isFirst = false;
-                return -1;
+    void updateDataAsync() {
+        if (isLoadData) return;
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            if (isLoadData) return;
+            isLoadData = true;
+            LogService.getInstance().log("Messages", "updateDataAsync start thread");
 
-            } else {
-                Log.d(TAG, "doInBackground");
-                return MainApplication.getInstance().getMainMessages().LoadMore();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            super.onPostExecute(result);
-            Log.d(TAG, "onPostExecute result = " + result);
-            if (result == 0) {
-                //footer.setVisibility(View.GONE);
-                listView.removeHeaderView(footer);
-            } else if (result > 0) {
-                adapter.notifyDataSetChanged();
-                listView.setSelection(result);
-            }
-
-        }
+            // final ArrayList<Payment> result = adapter.LoadMore();
+            int result = MainApplication.getInstance().getMainMessages().LoadMore();
+            LogService.getInstance().log("Messages", "updateDataAsync stop load more result = " + result);
+            runOnUiThread(() -> {
+                LogService.getInstance().log("Messages", "updateDataAsync runOnUiThread start result = " + result);
+                if (result == 0) {
+                    listView.removeHeaderView(footer);
+                } else if (result > 0) {
+                    adapter.notifyDataSetChanged();
+                    LogService.getInstance().log("Messages", "updateDataAsync runOnUiThread isCreateActivity = " + isCreateActivity);
+                    if (isCreateActivity) {
+                        listView.setSelection(listView.getCount());
+                        isCreateActivity = false;
+                    } else {
+                        listView.setSelection(result);
+                    }
+                }
+                LogService.getInstance().log("Messages", "updateDataAsync runOnUiThread stop");
+                isLoadData = false;
+            });
+        });
     }
+
 
     public void btnSendMessageClick(View view) {
         String Text = ((EditText) findViewById(R.id.etMessagesMessage)).getText().toString();
-        if (!Text.trim().equals("")) {
-            new SendMessageTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, Text);
+        if (!MainUtils.isEmptyString(Text)) {
+            sendMessageAsync(Text);
         }
     }
 
-    private class SendMessageTask extends AsyncTask<String, Void, JSONObject> {
-        ProgressDialog progressDialog;
-
-        SendMessageTask(Context mContext) {
-            progressDialog = new ProgressDialog(mContext);
-            progressDialog.setMessage("Передача данных ...");
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog.show();
-            findViewById(R.id.btnMessagesSend).setEnabled(false);
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... strings) {
-            JSONObject result = null;
+    void sendMessageAsync(String message) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            LogService.getInstance().log("Messages", "sendMessageAsync start thread");
+            runOnUiThread(this::showProgressDialog);
+            isLoadData = true;
             try {
-                result = MainApplication.getInstance().getRestService().httpGet("/last/messages/send?text=" + URLEncoder.encode(strings[0], "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                MainApplication.getInstance().getRestService().httpGet("/messages/send?message=" + URLEncoder.encode(message, "UTF-8"));
+            } catch (UnsupportedEncodingException ignored) {
             }
+
             MainApplication.getInstance().getMainMessages().LoadNew();
-            return result;
+            LogService.getInstance().log("Messages", "sendMessageAsync stop load more result");
+            runOnUiThread(() -> {
+                LogService.getInstance().log("Messages", "sendMessageAsync runOnUiThread start");
+                adapter.notifyDataSetChanged();
+                listView.setSelection(listView.getCount());
 
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-
-            adapter.notifyDataSetChanged();
-            listView.setSelection(listView.getCount());
-
-            findViewById(R.id.btnMessagesSend).setEnabled(true);
-            edMessage.getText().clear();
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow((findViewById(R.id.etMessagesMessage)).getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-
-
-        }
+                findViewById(R.id.btnMessagesSend).setEnabled(true);
+                edMessage.getText().clear();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow((findViewById(R.id.etMessagesMessage)).getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+                LogService.getInstance().log("Messages", "sendMessageAsync runOnUiThread start");
+                isLoadData = false;
+                dismissProgressDialog();
+            });
+        });
     }
-
 }

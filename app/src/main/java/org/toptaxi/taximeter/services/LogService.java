@@ -42,7 +42,7 @@ public class LogService {
         return switch (className) {
             case "SettingsAlarmFragment" -> false;
             case "Preferences" -> false;
-            case "Messages" -> false;
+            case "Messages" -> true;
             case "LoginActivity" -> false;
             case "Profile" -> false;
             case "BalanceActivity" -> false;

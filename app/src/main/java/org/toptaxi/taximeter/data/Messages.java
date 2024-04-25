@@ -1,25 +1,17 @@
 package org.toptaxi.taximeter.data;
 
 import android.app.AlertDialog;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-
-import androidx.core.app.NotificationCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.toptaxi.taximeter.MainActivity;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.activities.MessagesActivity;
@@ -117,6 +109,7 @@ public class Messages {
     }
 
     public void setFromJSON(JSONArray data) throws JSONException {
+        LogService.getInstance().log("Messages", data.toString());
         for (int itemID = 0; itemID < data.length(); itemID++) {
             Message message = new Message(data.getJSONObject(itemID));
             messages.add(message);
@@ -152,7 +145,7 @@ public class Messages {
     public int LoadMore() {
         int resultCount = 0;
         try {
-            JSONObject response = MainApplication.getInstance().getRestService().httpGet("/last/his_messages?last_id=" + getLastID());
+            JSONObject response = MainApplication.getInstance().getRestService().httpGet("/messages?last_id=" + getLastID());
             if (response.getString("status").equals("OK")) {
                 JSONArray result = response.getJSONArray("result");
                 setFromJSON(result);
@@ -165,7 +158,7 @@ public class Messages {
 
     public void LoadNew() {
         try {
-            JSONObject response = MainApplication.getInstance().getRestService().httpGet("/last/his_messages");
+            JSONObject response = MainApplication.getInstance().getRestService().httpGet("/messages");
             if (response.getString("status").equals("OK")) {
                 setFromJSON(response.getJSONArray("result"));
             }

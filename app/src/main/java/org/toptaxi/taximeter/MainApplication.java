@@ -92,9 +92,6 @@ public class MainApplication extends Application {
         super.onTerminate();
     }
 
-
-
-
     public RestService getRestService() {
         return restService;
     }
@@ -206,10 +203,12 @@ public class MainApplication extends Application {
         }
 
 
-
+        /*
         if (dataJSON.has("last_his_messages")) {
             getMainMessages().setFromJSON(dataJSON.getJSONArray("last_his_messages"));
         }
+
+         */
 
         if (dataJSON.has("last_requestUID")) {
             lastRequestUID = dataJSON.getInt("last_requestUID");

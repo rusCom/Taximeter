@@ -3,14 +3,11 @@ package org.toptaxi.taximeter.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.toptaxi.taximeter.MainApplication;
@@ -69,7 +66,7 @@ public class ListViewMessageAdapter extends BaseAdapter {
 
 
         ((TextView)view.findViewById(R.id.tvItemMessageText)).setText(message.Text);
-        ((TextView)view.findViewById(R.id.tvItemMessageRegDate)).setText(message.RegDate);
+        ((TextView)view.findViewById(R.id.tvItemMessageRegDate)).setText(message.vRegDate);
         ((TextView)view.findViewById(R.id.tvItemMessageType)).setText(message.Type);
         if (message.Status == 5){
             ((TextView)view.findViewById(R.id.tvItemMessageText)).setTypeface(((TextView)view.findViewById(R.id.tvItemMessageText)).getTypeface(), Typeface.NORMAL);

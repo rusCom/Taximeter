@@ -19,10 +19,14 @@ import org.toptaxi.taximeter.data.RoutePoint;
 
 public class RoutePointsAdapter extends RecyclerView.Adapter<RoutePointsAdapter.RouteViewHolder> {
     private final Order viewOrder;
+    private boolean isItemClick = true;
 
-    public RoutePointsAdapter(Order order) {
+    public RoutePointsAdapter(Order order, boolean isItemClick) {
         this.viewOrder = order;
+        this.isItemClick = isItemClick;
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -55,6 +59,7 @@ public class RoutePointsAdapter extends RecyclerView.Adapter<RoutePointsAdapter.
     }
 
     private void onItemClick(RoutePoint routePoint) {
+        if (!isItemClick)return;
         final CharSequence[] items = {"Показать маршрут до " + routePoint.getName()};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainApplication.getInstance().getMainActivity());
         builder.setItems(items, (dialog, item) -> {

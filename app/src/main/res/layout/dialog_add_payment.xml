@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/modalBottomAddPayment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Пополнение баланса"/>
+        android:text="Пополнение баланса"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/textView2"
@@ -20,16 +21,16 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Введите или выберите сумму платежа"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
         android:id="@+id/ednPaymentAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:focusable="true"
         android:clickable="true"
-        android:focusableInTouchMode="true"
         android:ems="10"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:inputType="numberSigned" />
 
     <LinearLayout
@@ -51,8 +52,8 @@
             style="@style/MainButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginEnd="@dimen/button_margin"
+            android:layout_weight="1"
             android:text="300" />
 
         <Button
@@ -71,7 +72,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Выберите способ оплаты"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Button
         android:id="@+id/btnSBPPayment"
@@ -80,49 +81,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/button_margin"
         android:backgroundTint="@color/acq_colorFpsBackground"
-        android:text="Оплата через"
-        android:drawableBottom="@mipmap/logo_sbp" />
-
-    <Button
-        android:id="@+id/btnQiwiPayment"
-        style="@style/MainButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/acq_colorQiwiBackground"
-        android:layout_marginTop="@dimen/button_margin"
-        android:text="Mир/Visa/MasterCard" />
+        android:drawableBottom="@mipmap/logo_sbp"
+        android:text="Оплата через" />
 
     <Button
         android:id="@+id/btnTinkoffPayment"
         style="@style/MainButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/primaryYellowDark"
         android:layout_marginTop="@dimen/button_margin"
-        android:text="Mир/Visa/MasterCard" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/tvAnotherPayments"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Другие способы..."
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/colorAccent"
-            android:layout_gravity="left"/>
-        <TextView
-            android:id="@+id/tvDetail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Подробнее..."
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/colorAccent"
-            android:clickable="true"
-            android:layout_gravity="right"/>
-
-    </FrameLayout>
+        android:backgroundTint="@color/primaryYellowDark"
+        android:text="Другие способы" />
 
 
 </LinearLayout>

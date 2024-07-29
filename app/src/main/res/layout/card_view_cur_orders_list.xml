@@ -16,14 +16,14 @@
         android:showDividers="middle">
 
         <LinearLayout
-            android:id="@+id/llViewOrderTitle"
+            android:id="@+id/llOrdersListTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorAccent"
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvOrderDataDistance"
+                android:id="@+id/tvOrdersListDistance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -39,7 +39,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
-                android:id="@+id/tvCurOrdersListPayPercent"
+                android:id="@+id/tvCurOrdersListDispatchingCommission"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -55,7 +55,7 @@
                 android:padding="3dp">
 
                 <TextView
-                    android:id="@+id/tvCurOrdersListCalcType"
+                    android:id="@+id/tvCurOrdersListCost"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

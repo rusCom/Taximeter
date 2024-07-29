@@ -2,20 +2,23 @@ package org.toptaxi.taximeter.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.adapters.HisOrdersAdapters;
 import org.toptaxi.taximeter.data.Order;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 
 import java.util.ArrayList;
 
-public class HisOrdersActivity extends AppCompatActivity implements AbsListView.OnScrollListener {
+public class HisOrdersActivity extends MainAppCompatActivity implements AbsListView.OnScrollListener {
     HisOrdersAdapters adapter;
     ListView listView;
     private View footer;
@@ -25,7 +28,12 @@ public class HisOrdersActivity extends AppCompatActivity implements AbsListView.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_his_orders);
-        listView = (ListView) findViewById(R.id.lvHisOrders);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("История заказов");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        listView = findViewById(R.id.lvHisOrders);
 
         footer = getLayoutInflater().inflate(R.layout.item_messages_footer, listView, false);
         listView.addFooterView(footer);
@@ -40,6 +48,15 @@ public class HisOrdersActivity extends AppCompatActivity implements AbsListView.
             startActivity(intent);
         });
         updateDataAsync();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -62,7 +79,7 @@ public class HisOrdersActivity extends AppCompatActivity implements AbsListView.
             isLoadData = true;
             final ArrayList<Order> result = adapter.LoadMore();
             runOnUiThread(() -> {
-                if (result.size() == 0) {
+                if (result.isEmpty()) {
                     listView.removeFooterView(footer);
                 } else {
                     adapter.AppendNewData(result);

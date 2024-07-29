@@ -61,6 +61,7 @@ public class Constants {
     public static final int ORDER_VIEW_CUR_ORDER        = 3;
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 101;
+    public static final int MY_PERMISSIONS_REQUEST_PERMISSION = 102;
 
 
     public static final int ROUTE_POINT_TYPE_UNKNOWN        = 0;

@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +12,7 @@ import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.data.Order;
-import org.toptaxi.taximeter.services.LogService;
+import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 
 import java.util.ArrayList;
 
@@ -24,8 +23,9 @@ public class HisOrdersAdapters extends BaseAdapter {
     private Integer LastID = 0;
 
 
-    public HisOrdersAdapters(Context mContext) {
-        lInflater = (LayoutInflater) mContext
+
+    public HisOrdersAdapters(MainAppCompatActivity mainAppCompatActivity) {
+        lInflater = (LayoutInflater) mainAppCompatActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         orders = new ArrayList<>();
     }
@@ -74,27 +74,11 @@ public class HisOrdersAdapters extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = lInflater.inflate(R.layout.item_his_orders, parent, false);
+            view = lInflater.inflate(R.layout.card_view_cur_orders_list, parent, false);
         }
 
         Order order = orders.get(position);
-        if (order != null) {
-            ((TextView) view.findViewById(R.id.tvHisOrderDate)).setText(order.getDate());
-            ((TextView) view.findViewById(R.id.tvHisOrderStatus)).setText(order.getStateName());
-            view.findViewById(R.id.llHisOrderCaption).setBackgroundResource(order.getCaptionColor());
-            if (order.getFirstPointInfo() != null) {
-                view.findViewById(R.id.tvHisOrderFirstRoutePoint).setVisibility(View.VISIBLE);
-                ((TextView) view.findViewById(R.id.tvHisOrderFirstRoutePoint)).setText(order.getFirstPointInfo());
-            } else {
-                view.findViewById(R.id.tvHisOrderFirstRoutePoint).setVisibility(View.GONE);
-            }
-            if (order.getLastPointInfo() != null) {
-                view.findViewById(R.id.tvHisOrderLastRoutePoint).setVisibility(View.VISIBLE);
-                ((TextView) view.findViewById(R.id.tvHisOrderLastRoutePoint)).setText(order.getLastPointInfo());
-            } else {
-                view.findViewById(R.id.tvHisOrderLastRoutePoint).setVisibility(View.GONE);
-            }
-        }
+        order.fillListOrderData(view);
 
         return view;
     }

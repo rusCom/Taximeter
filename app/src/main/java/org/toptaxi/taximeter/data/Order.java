@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
 import org.toptaxi.taximeter.adapters.RoutePointsAdapter;
-import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.DateTimeTools;
 import org.toptaxi.taximeter.tools.MainAppCompatActivity;
 import org.toptaxi.taximeter.tools.MainUtils;
@@ -33,7 +32,7 @@ import java.util.Locale;
 
 public class Order {
     protected static String TAG = "#########" + Order.class.getName();
-    private Integer IsFree = 0, Timer, ID, lastRequestUID = 0, State, Check, pickUpDistance;
+    private Integer Timer, ID, lastRequestUID = 0, State, Check, pickUpDistance;
     private String Note = "", ClientPhone = "", MainAction = "", StateName = "";
     private Double cost, dispatchingCommissionSumma;
     private Boolean IsNew = false;
@@ -41,7 +40,7 @@ public class Order {
     private long NewOrderTimer = 15000;
     String GUID;
     public Boolean corporateTaxi = false;
-    private Boolean isHour;
+    private Boolean isHour, isFree;
     public String payment = "", dispatchingName, dispatchingCommissionType;
     public Integer dispatchingCommission;
     private List<RoutePoint> routePoints;
@@ -51,7 +50,6 @@ public class Order {
     }
 
     public void setFromJSON(JSONObject data) throws JSONException {
-        this.IsFree = 0;
 
         GUID = JSONGetString(data, "guid");
         ID = JSONGetInteger(data, "id");
@@ -61,19 +59,21 @@ public class Order {
         dispatchingCommission = JSONGetInteger(data, "dispatching_commission");
         dispatchingCommissionSumma = JSONGetDouble(data, "dispatching_commission_summa");
         dispatchingCommissionType = JSONGetString(data, "dispatching_commission_type", "percent");
-        isHour = JSONGetBool(data, "is_hour");
         pickUpDistance = JSONGetInteger(data, "pick_up_distance");
+
+        isHour = MainUtils.JSONGetBool(data, "is_hour");
+        isFree = MainUtils.JSONGetBool(data, "is_free");
+
+        State = MainUtils.JSONGetInteger(data, "state");
+        StateName = MainUtils.JSONGetString(data, "state_name");
 
 
         if (data.has("phone")) this.ClientPhone = data.getString("phone");
         if (data.has("cost")) this.cost = data.getDouble("cost");
-        if (data.has("state")) this.State = data.getInt("state");
         if (data.has("check")) this.Check = data.getInt("check");
         if (data.has("note")) this.Note = data.getString("note");
         if (data.has("main_action")) this.MainAction = data.getString("main_action");
-        if (data.has("state_name")) this.StateName = data.getString("state_name");
         if (data.has("timer")) this.Timer = data.getInt("timer");
-        if (data.has("is_free")) this.IsFree = data.getInt("is_free");
 
         if (data.has("date")) {
             WorkDate = Calendar.getInstance();
@@ -145,14 +145,54 @@ public class Order {
     }
 
     public int getCaptionColor() {
-        int result = R.color.orderFree;
-        if (IsFree == 1) result = R.color.orderFreePercent;
-        if (payment.equals("corporation")) result = R.color.orderCashless;
-        return result;
+        if (isFree) return R.color.orderFreePercent;
+        if (payment.equals("corporation")) return R.color.orderCashless;
+        
+        return R.color.orderFree;
     }
 
-    public void fillCurOrderViewData(MainAppCompatActivity mainAppCompatActivity, View view) {
-        LogService.getInstance().log("MainActivity", JSONDataToCheckNew);
+    public void fillListOrderData(View view){
+
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrdersListPayType), this.getPayTypeName());
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrdersListCost), this.getCostString());
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvOrdersListDistance), this.getDistanceString());
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrdersListRouteFirstPoint), this.getFirstPointInfo());
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrdersListDispatchingCommission), this.getDispatchingCommission());
+
+
+
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrdersListPriorInfo), this.getPriorInfo());
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvOrderNote), this.getNote());
+        MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvDispatchingName), this.dispatchingName);
+
+        view.findViewById(R.id.tvCurOrdersListRoutePoint).setVisibility(View.GONE);
+        view.findViewById(R.id.tvCurOrdersListRouteLastPoint).setVisibility(View.GONE);
+        if (this.getRouteCount() > 1) {
+            MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrdersListRouteLastPoint), this.getLastPointInfo());
+        }
+        if (this.getRouteCount() == 3) {
+            MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrdersListRoutePoint), this.getSecondPointInfo());
+        }
+        if (this.getRouteCount() > 3) {
+            view.findViewById(R.id.tvCurOrdersListRoutePoint).setVisibility(View.VISIBLE);
+        }
+
+        view.findViewById(R.id.llOrdersListTitle).setBackgroundResource(this.getCaptionColor());
+        
+        if (StateName.equals("Отказ")){
+            view.findViewById(R.id.llOrdersListTitle).setBackgroundResource(R.color.primaryGrayDark);
+            MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvOrdersListDistance), StateName);
+            MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvCurOrdersListDispatchingCommission), null);
+        }
+
+    }
+
+    public void fillCurOrderViewData(MainAppCompatActivity mainAppCompatActivity, View view){
+        fillCurOrderViewData(mainAppCompatActivity, view, true);
+    }
+
+    public void fillCurOrderViewData(MainAppCompatActivity mainAppCompatActivity, View view, boolean isItemClick) {
+        // LogService.getInstance().log("MainActivity", JSONDataToCheckNew);
         view.findViewById(R.id.llCurOrderTitleEx).setVisibility(View.GONE);
         // Заголовок
         view.findViewById(R.id.llOrderDataTitle).setBackgroundResource(getCaptionColor());
@@ -172,12 +212,18 @@ public class Order {
         MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvOrderDataClientPhone), ClientPhone);
         MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvOrderDataDispatchingName), dispatchingName);
 
-        RoutePointsAdapter viewOrderPointsAdapter = new RoutePointsAdapter(this);
+        RoutePointsAdapter viewOrderPointsAdapter = new RoutePointsAdapter(this, isItemClick);
 
         RecyclerView rvViewOrderRoutePoints = view.findViewById(R.id.rvOrderDataRoutePoints);
         rvViewOrderRoutePoints.setLayoutManager(new LinearLayoutManager(view.getContext()));
         rvViewOrderRoutePoints.setAdapter(viewOrderPointsAdapter);
         viewOrderPointsAdapter.notifyItemRangeInserted(0, getRouteCount());
+
+        if (StateName.equals("Отказ")){
+            view.findViewById(R.id.llOrderDataTitle).setBackgroundResource(R.color.primaryGrayDark);
+            MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvOrderDataDistance), StateName);
+            MainUtils.TextViewSetTextOrGone(view.findViewById(R.id.tvOrderDataDispatchingCommission), null);
+        }
 
     }
 
@@ -287,7 +333,7 @@ public class Order {
 
     public LatLng getPoint() {
         if (routePoints != null)
-            if (routePoints.size() > 0) {
+            if (!routePoints.isEmpty()) {
                 return routePoints.get(0).getLatLng();
             }
         return null;
@@ -295,7 +341,7 @@ public class Order {
 
     public String getFirstPointInfo() {
         if (routePoints != null)
-            if (routePoints.size() > 0) {
+            if (!routePoints.isEmpty()) {
                 return routePoints.get(0).getName();
             }
         return null;
@@ -335,7 +381,7 @@ public class Order {
     public RoutePoint getRoutePoint(int itemID) {
         if (itemID == routePoints.size()) return null;
         if (routePoints.size() < itemID) return null;
-        if (routePoints.size() == 0) return null;
+        if (routePoints.isEmpty()) return null;
         return routePoints.get(itemID);
     }
 

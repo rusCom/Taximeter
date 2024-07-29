@@ -2,7 +2,6 @@ package org.toptaxi.taximeter.services;
 
 import android.os.Build;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +32,7 @@ public class RestService {
 
     public RestService() {
         httpClient = new OkHttpClient();
+
         header = new JSONObject();
         reloadHeader();
         restHost = new ArrayList<>();

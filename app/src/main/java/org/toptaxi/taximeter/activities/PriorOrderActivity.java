@@ -2,8 +2,11 @@ package org.toptaxi.taximeter.activities;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,13 +35,14 @@ public class PriorOrderActivity extends MainAppCompatActivity implements Recycle
     Calendar ServerDate;
     SimpleDateFormat simpleDateFormat;
     private Timer mTimer;
+    ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prior_order);
 
-        rvPriorOrders = (RecyclerView)findViewById(R.id.rvPriorOrders);
+        rvPriorOrders = findViewById(R.id.rvPriorOrders);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvPriorOrders.setLayoutManager(llm);
         curOrdersAdapter = new RVCurOrdersAdapter(1);
@@ -47,7 +51,13 @@ public class PriorOrderActivity extends MainAppCompatActivity implements Recycle
 
         ServerDate = MainApplication.getInstance().getServerDate();
         simpleDateFormat = new SimpleDateFormat("HH:mm:ss dd.MM:yyyy", Locale.getDefault());
-        setTitle(simpleDateFormat.format(ServerDate.getTime()));
+        // setTitle(simpleDateFormat.format(ServerDate.getTime()));
+
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(simpleDateFormat.format(ServerDate.getTime()));
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -120,12 +130,21 @@ public class PriorOrderActivity extends MainAppCompatActivity implements Recycle
         curOrdersAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     class MyTimerTask extends TimerTask {
         @Override
         public void run() {
             ServerDate.add(Calendar.SECOND, 1);
             final String strDate = simpleDateFormat.format(ServerDate.getTime());
-            runOnUiThread(() -> setTitle(strDate));
+            runOnUiThread(() -> actionBar.setTitle(strDate));
         }
     }
 }

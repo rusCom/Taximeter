@@ -31,7 +31,7 @@ import org.toptaxi.taximeter.activities.settings.SettingsActivity;
 import org.toptaxi.taximeter.activities.StatisticsActivity;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
-import org.toptaxi.taximeter.dialogs.PaymentsDialog;
+import org.toptaxi.taximeter.dialogs.PaymentsDialogKT;
 
 public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
     MainActivity mainActivity;
@@ -117,7 +117,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
 
         drawer.addItem(new DividerDrawerItem());
         if (MainApplication.getInstance().getProfile().isBalanceShow()){
-            if (PaymentsDialog.getInstance().getPaymentsAvailable()){
+            if (PaymentsDialogKT.INSTANCE.getPaymentsAvailable()){
                 drawer.addItem(new PrimaryDrawerItem().withName("Пополнить баланс").withIcon(FontAwesome.Icon.faw_credit_card).withSelectable(false).withIdentifier(Constants.MENU_PAYMENT));
             }
             if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink()!= null) {
@@ -238,7 +238,7 @@ public class MainActivityDrawer implements Drawer.OnDrawerItemClickListener {
                 mainActivity.goToURL(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
                 break;
             case Constants.MENU_PAYMENT:
-                PaymentsDialog.getInstance().showPaymentDialog(mainActivity);
+                PaymentsDialogKT.INSTANCE.showPaymentDialog(mainActivity);
                 break;
             case Constants.MENU_INSTRUCTION:
                 mainActivity.goToURL(MainApplication.getInstance().getPreferences().instructionLink);

@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,10 +20,11 @@ import org.toptaxi.taximeter.MainApplication;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainAppCompatActivity extends AppCompatActivity {
+public class MainAppCompatActivity extends MainAppCompatActivityKt {
     ProgressDialog progressDialog;
     protected boolean isCheckProfileAuth = true;
     ProgressBar progressBar;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

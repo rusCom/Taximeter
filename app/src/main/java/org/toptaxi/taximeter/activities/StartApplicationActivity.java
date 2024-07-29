@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
@@ -63,10 +64,14 @@ public class StartApplicationActivity extends AppCompatActivity {
         checkPermissions();
     }
 
+    private void checkPermissions() {
+        checkPermissions(true);
+    }
+
 
     @SuppressLint("SetTextI18n")
-    private void checkPermissions() {
-        Boolean startApplication = true;
+    private void checkPermissions(boolean isChecked) {
+        boolean startApplication = true;
         tvAction.setText("Проверка подключения к Сети Интернет");
         if (!isNetworkAvailable()) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -93,6 +98,26 @@ public class StartApplicationActivity extends AppCompatActivity {
             });
             dialog.show();
             startApplication = false;
+        }
+
+
+        if ((isChecked) && (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2)) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                LogService.getInstance().log("sys", "permission not granted");
+                ActivityResultLauncher<String[]> permissionRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                    // Log.i("PERMISSIONS", String.format("POST_NOTIFICATIONS=%s", result.get(Manifest.permission.POST_NOTIFICATIONS)));
+                    LogService.getInstance().log("sys", "POST_NOTIFICATIONS=" + result.get(Manifest.permission.POST_NOTIFICATIONS));
+                    checkPermissions(false);
+                });
+                permissionRequest.launch(new String[]{Manifest.permission.POST_NOTIFICATIONS});
+                /*
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        Constants.MY_PERMISSIONS_REQUEST_PERMISSION);
+
+                 */
+                return;
+            }
+
         }
 
 
@@ -138,13 +163,12 @@ public class StartApplicationActivity extends AppCompatActivity {
                     runOnUiThread(() -> tvAction.setText("Обработка данных ..."));
 
                     if (data.has("reg_state")) {
-                        if (data.getString("reg_state").equals("new")){
+                        if (data.getString("reg_state").equals("new")) {
                             Intent intent = new Intent(this, RegistrationMainActivity.class);
                             intent.putExtra("json_data", data.toString());
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
-                        }
-                        else {
+                        } else {
                             Intent intent = new Intent(this, RegistrationStateActivity.class);
                             intent.putExtra("json_data", data.toString());
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -340,7 +364,6 @@ public class StartApplicationActivity extends AppCompatActivity {
     private void showNewNecessaryVersionDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setCancelable(false);
-
         alertDialog.setMessage("Для корректной работы приложения необходимо обновить приложение");
         alertDialog.setNegativeButton("Отмена", (dialogInterface, i) -> onBackPressed());
 
@@ -364,6 +387,13 @@ public class StartApplicationActivity extends AppCompatActivity {
             }
             checkPermissions();
         }
+        if (requestCode == Constants.MY_PERMISSIONS_REQUEST_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Для корректной работы приложения необходимо дать разрешение на показ уведомлений", Toast.LENGTH_LONG).show();
+            }
+            checkPermissions(false);
+        }
+
 
     }
 

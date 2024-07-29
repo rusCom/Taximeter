@@ -18,7 +18,7 @@ import org.toptaxi.taximeter.adapters.ListViewPaymentAdapter;
 import org.toptaxi.taximeter.data.Payment;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.MainAppCompatActivity;
-import org.toptaxi.taximeter.dialogs.PaymentsDialog;
+import org.toptaxi.taximeter.dialogs.PaymentsDialogKT;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -59,10 +59,9 @@ public class BalanceActivity extends MainAppCompatActivity implements AbsListVie
         if (viewType.equals("main")) {
             findViewById(R.id.btnPaymentInstruction).setVisibility(View.GONE);
             findViewById(R.id.btnPaymentInstructionCorporate).setVisibility(View.GONE);
-
-            if (PaymentsDialog.getInstance().getPaymentsAvailable()) {
+            if (PaymentsDialogKT.INSTANCE.getPaymentsAvailable()) {
                 findViewById(R.id.btnPaymentInstruction).setVisibility(View.VISIBLE);
-                findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> PaymentsDialog.getInstance().showPaymentDialog(this));
+                findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> PaymentsDialogKT.INSTANCE.showPaymentDialog(this));
             } else if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink() != null) {
                 findViewById(R.id.btnPaymentInstruction).setVisibility(View.VISIBLE);
                 findViewById(R.id.btnPaymentInstruction).setOnClickListener(view -> goToURL(MainApplication.getInstance().getPreferences().getPaymentInstructionLink()));

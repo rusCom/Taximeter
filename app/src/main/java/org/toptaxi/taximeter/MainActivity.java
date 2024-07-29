@@ -37,7 +37,7 @@ import org.toptaxi.taximeter.data.Order;
 import org.toptaxi.taximeter.data.Orders;
 import org.toptaxi.taximeter.data.SupportContactItem;
 import org.toptaxi.taximeter.data.TariffPlan;
-import org.toptaxi.taximeter.dialogs.PaymentsDialog;
+import org.toptaxi.taximeter.dialogs.PaymentsDialogKT;
 import org.toptaxi.taximeter.services.LocationService;
 import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.Constants;
@@ -185,8 +185,8 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setMessage("Для продолжения работы и возможности принятия заказов необходимо пополнить баланс");
         alertDialog.setPositiveButton("Пополнить", (dialogInterface, i) -> {
-            if (PaymentsDialog.getInstance().getPaymentsAvailable()) {
-                PaymentsDialog.getInstance().showPaymentDialog(this);
+            if (PaymentsDialogKT.INSTANCE.getPaymentsAvailable()) {
+                PaymentsDialogKT.INSTANCE.showPaymentDialog(this);
             } else if (MainApplication.getInstance().getPreferences().getPaymentInstructionLink() != null) {
                 goToURL(MainApplication.getInstance().getPreferences().getPaymentInstructionLink());
             } else {

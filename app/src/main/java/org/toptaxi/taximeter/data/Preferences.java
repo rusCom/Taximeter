@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
-import org.toptaxi.taximeter.dialogs.PaymentsDialog;
+import org.toptaxi.taximeter.dialogs.PaymentsDialogKT;
 import org.toptaxi.taximeter.tools.MainUtils;
 
 import java.util.ArrayList;
@@ -134,7 +134,7 @@ public class Preferences {
         }
 
         if (data.has("available_payments")) {
-            PaymentsDialog.getInstance().setPreferences(data.getJSONObject("available_payments"));
+            PaymentsDialogKT.INSTANCE.setPreferences(data.getJSONObject("available_payments"));
         }
     }
 

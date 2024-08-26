@@ -167,7 +167,7 @@ public class Messages {
     }
 
     public Integer checkSendingTemplateMessage(String message){
-        Integer result = 0;
+        int result = 0;
         for (Map.Entry<Long, String> pair: sentTemplateMessages.entrySet()) {
             if (pair.getValue().equals(message)){
                 if (MainUtils.passedTimeSek(pair.getKey()) < MainApplication.getInstance().getPreferences().systemTemplateMessagesTimeout){

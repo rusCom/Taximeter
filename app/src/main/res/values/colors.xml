@@ -35,6 +35,7 @@
     <color name="divider">#B6B6B6</color>
 
     <color name="acq_colorButtonDisable">#08001024</color>
-    <color name="acq_colorFpsBackground">#0F0738</color>
-    <color name="acq_colorQiwiBackground">#FF8C00</color>
+    <color name="acq_colorSBPBackground">#0F0738</color>
+    <color name="acq_colorOtherBackground">#FF8C00</color>
+    <color name="acq_colorYandexBackground">#FFC806</color>
 </resources>

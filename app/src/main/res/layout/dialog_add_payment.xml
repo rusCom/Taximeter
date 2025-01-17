@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Введите или выберите сумму платежа"
+        android:text="Введите или выберите сумму"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
@@ -71,7 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Выберите способ оплаты"
+        android:text="Выберите способ пополнения"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Button
@@ -80,9 +80,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/button_margin"
-        android:backgroundTint="@color/acq_colorFpsBackground"
+        android:backgroundTint="@color/acq_colorSBPBackground"
         android:drawableBottom="@mipmap/logo_sbp"
-        android:text="Оплата через" />
+        android:textColor="@color/primaryGray"
+        android:text="Пополнение через"/>
 
     <Button
         android:id="@+id/btnTinkoffPayment"
@@ -90,8 +91,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/button_margin"
-        android:backgroundTint="@color/primaryYellowDark"
-        android:text="Другие способы" />
+        android:backgroundTint="@color/acq_colorOtherBackground"
+        android:text="Картой любого банка" />
+
+    <Button
+        android:id="@+id/btnYandexProPayment"
+        style="@style/MainButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/button_margin"
+        android:backgroundTint="@color/acq_colorYandexBackground"
+        android:drawableLeft="@mipmap/ic_yandex_pro_logo"
+        android:text="С баланса Яндекс Про" />
 
 
 </LinearLayout>

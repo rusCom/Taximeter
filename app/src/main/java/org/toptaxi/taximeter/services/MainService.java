@@ -1,7 +1,5 @@
 package org.toptaxi.taximeter.services;
 
-import static org.toptaxi.taximeter.tools.MainUtils.JSONGetString;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;

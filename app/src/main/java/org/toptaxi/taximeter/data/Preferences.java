@@ -45,11 +45,14 @@ public class Preferences {
     public String corporateTaxiBalanceButtonDialog;
     public String corporateTaxiCheckOrderDialog;
     public String corporateTaxiContactPhone;
-    public Long corporateTaxiCheckOrderDialogLastShow;
+
     public Boolean dispatcherMessages = false;
     public String hourInfoText = "";
     private boolean longDistanceMessage = false;
     private final List<TariffPlan> driverTariffPlans;
+
+    public Long showBatteryPermissionDialogLastShow;
+    public Long corporateTaxiCheckOrderDialogLastShow;
 
 
 
@@ -138,10 +141,20 @@ public class Preferences {
         }
     }
 
+    public Long getLong(String preferenceName){
+        return sPref.getLong(preferenceName, 0);
+    }
+
+    public void setLong(String preferenceName, Long value){
+        SharedPreferences.Editor editor = sPref.edit();
+        editor.putLong(preferenceName, value);
+        editor.apply();
+    }
+
     public boolean isShowCorporateTaxiCheckOrderDialog() {
         boolean result = false;
         if (corporateTaxi && !corporateTaxiCheckOrderDialog.isEmpty()) {
-            // Проверяем, что с поледенго показа прошло более 24 часов
+            // Проверяем, что с последнего показа прошло более 24 часов
             if (MainUtils.passedTimeHour(corporateTaxiCheckOrderDialogLastShow) > 24) {
                 result = true;
             }

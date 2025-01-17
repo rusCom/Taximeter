@@ -27,11 +27,13 @@ import java.util.concurrent.atomic.AtomicReference
 object PaymentsDialogKT {
 
     private var tbank = false;
+    private var yandexPro = false;
     private var tbank_commission = 0;
 
     fun setPreferences(data: JSONObject) {
         tbank_commission = MainUtils.JSONGetInteger(data, "tbank_commission", 0)
         tbank = MainUtils.JSONGetBool(data, "tbank", false)
+        yandexPro = MainUtils.JSONGetBool(data, "yandex_pro", false)
     }
 
     fun getPaymentsAvailable(): Boolean {
@@ -47,8 +49,13 @@ object PaymentsDialogKT {
 
         val buttonSPBPayment = bottomSheetView.findViewById<Button>(R.id.btnSBPPayment)
         val buttonTinkoffPayment = bottomSheetView.findViewById<Button>(R.id.btnTinkoffPayment)
+        val btnYandexProPayment = bottomSheetView.findViewById<Button>(R.id.btnYandexProPayment)
 
         val ednPaymentAmount = bottomSheetView.findViewById<EditText>(R.id.ednPaymentAmount)
+
+        if (!yandexPro){
+            btnYandexProPayment.visibility = View.GONE;
+        }
 
 
         bottomSheetView.findViewById<View>(R.id.btnPayment100).setOnClickListener { ednPaymentAmount.setText("100") }
@@ -79,12 +86,27 @@ object PaymentsDialogKT {
 
         val sbpShowMessage = AtomicReference(false)
 
+        btnYandexProPayment.setOnClickListener {
+            activity.runOnUiThread {
+                val builder = AlertDialog.Builder(activity)
+                builder.setMessage("Перевод средств на баланс aTaxi с баланса Яндекс Про. Для подключения обратитесь в ТехПоддержку.")
+                builder.setCancelable(true)
+                builder.setPositiveButton("Подключить") { dialog: DialogInterface, _: Int ->
+                    dialog.dismiss()
+                    MainUtils.onSupportContactClick(activity);
+
+                }
+                builder.setNegativeButton("Отмена") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+                builder.show()
+            }
+        }
+
 
         buttonSPBPayment.setOnClickListener {
             val amountString = ednPaymentAmount.text.toString()
             if (amountString == "") {
                 ednPaymentAmount.requestFocus()
-                ednPaymentAmount.error = "Введите сумму платежа"
+                ednPaymentAmount.error = "Введите сумму пополнения"
                 return@setOnClickListener
             }
 
@@ -98,7 +120,7 @@ object PaymentsDialogKT {
                     if (!sbpShowMessage.get() && showMessage) {
                         activity.runOnUiThread {
                             val builder = AlertDialog.Builder(activity)
-                            builder.setMessage("Комиссия при оплате через СПБ или картой любого банка $tbank_commission%.")
+                            builder.setMessage("Комиссия при пополнении через СПБ или картой любого банка $tbank_commission%.")
                             builder.setCancelable(true)
                             builder.setPositiveButton("Понятно") { dialog: DialogInterface, _: Int ->
                                 sbpShowMessage.set(true)
@@ -133,7 +155,7 @@ object PaymentsDialogKT {
             val amountString = ednPaymentAmount.text.toString()
             if (amountString == "") {
                 ednPaymentAmount.requestFocus()
-                ednPaymentAmount.error = "Введите сумму платежа"
+                ednPaymentAmount.error = "Введите сумму пополнения"
                 return@setOnClickListener
             }
 
@@ -148,7 +170,7 @@ object PaymentsDialogKT {
                     if (!tinkoffShowMessage.get() && showMessage) {
                         activity.runOnUiThread {
                             val builder = AlertDialog.Builder(activity)
-                            builder.setMessage("Оплата картой любого банка. Комиссия $tbank_commission%.")
+                            builder.setMessage("Пополнение картой любого банка. Комиссия $tbank_commission%.")
                             builder.setCancelable(true)
                             builder.setPositiveButton("Понятно") { dialog: DialogInterface, _: Int ->
                                 sbpShowMessage.set(true)

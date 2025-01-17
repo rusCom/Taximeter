@@ -3,26 +3,77 @@ package org.toptaxi.taximeter.tools;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.toptaxi.taximeter.data.SupportContactItem;
 import org.toptaxi.taximeter.services.LogService;
+import org.toptaxi.taximeter.tools.bottomsheets.MainBottomSheetRecycler;
+import org.toptaxi.taximeter.tools.cardview.IMainCardViewData;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainUtils {
+
+    public static void onSupportContactClick(MainAppCompatActivity appCompatActivity) {
+        List<SupportContactItem> supportContactItemList = new ArrayList<>();
+        supportContactItemList.add(new SupportContactItem("phone"));
+        supportContactItemList.add(new SupportContactItem("whatsapp"));
+        supportContactItemList.add(new SupportContactItem("telegram"));
+        ArrayList<IMainCardViewData> cards = new ArrayList<>(supportContactItemList);
+        MainBottomSheetRecycler myBottomSheetFragment = new MainBottomSheetRecycler(
+                cards,
+                mainCardViewData -> {
+                    SupportContactItem supportContactItem = (SupportContactItem) mainCardViewData;
+                    supportContactItem.onClick(appCompatActivity);
+                }
+        );
+        myBottomSheetFragment.show(appCompatActivity.getSupportFragmentManager(), myBottomSheetFragment.getTag());
+    }
+
+    public static void scaleButtonDrawables(Button btn, double fitFactor) {
+        Drawable[] drawables = btn.getCompoundDrawables();
+
+        for (int i = 0; i < drawables.length; i++) {
+            if (drawables[i] != null) {
+                int imgWidth = drawables[i].getIntrinsicWidth();
+                int imgHeight = drawables[i].getIntrinsicHeight();
+                if ((imgHeight > 0) && (imgWidth > 0)) {    //might be -1
+                    float scale;
+                    if ((i == 0) || (i == 2)) { //left or right -> scale height
+                        scale = (float) (btn.getHeight() * fitFactor) / imgHeight;
+                    } else { //top or bottom -> scale width
+                        scale = (float) (btn.getWidth() * fitFactor) / imgWidth;
+                    }
+                    if (scale < 1.0) {
+                        Rect rect = drawables[i].getBounds();
+                        int newWidth = (int)(imgWidth * scale);
+                        int newHeight = (int)(imgHeight * scale);
+                        rect.left = rect.left + (int)(0.5 * (imgWidth - newWidth));
+                        rect.top = rect.top + (int)(0.5 * (imgHeight - newHeight));
+                        rect.right = rect.left + newWidth;
+                        rect.bottom = rect.top + newHeight;
+                        drawables[i].setBounds(rect);
+                    }
+                }
+            }
+        }
+    }
 
     public static boolean isEmptyString(String string) {
         return string == null || string.isEmpty();

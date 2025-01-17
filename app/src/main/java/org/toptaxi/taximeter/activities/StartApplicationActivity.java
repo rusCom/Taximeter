@@ -16,18 +16,22 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.waseemsabir.betterypermissionhelper.BatteryPermissionHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +53,8 @@ public class StartApplicationActivity extends AppCompatActivity {
 
     boolean isFinished = false;
     boolean isShowNewVersionDialog = false;
+    boolean isShowBatteryPermissionDialog = false;
+    private final BatteryPermissionHelper batteryPermissionHelper = BatteryPermissionHelper.Companion.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,8 @@ public class StartApplicationActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.tvSplashVersion)).setText(MainApplication.getInstance().getAppVersion());
 
         checkPermissions();
+
+        getOnBackPressedDispatcher().addCallback(this,onBackPressedCallback);
     }
 
     private void checkPermissions() {
@@ -76,7 +84,7 @@ public class StartApplicationActivity extends AppCompatActivity {
         if (!isNetworkAvailable()) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
             alertDialog.setMessage("Для работы программы необходимо подключение к интернет. Проверьте подключение и попробуйте еще раз.");
-            alertDialog.setPositiveButton("Ok", (dialogInterface, i) -> onBackPressed());
+            alertDialog.setPositiveButton("Ok", (dialogInterface, i) -> getOnBackPressedDispatcher().onBackPressed());
             alertDialog.create();
             alertDialog.show();
             startApplication = false;
@@ -94,7 +102,7 @@ public class StartApplicationActivity extends AppCompatActivity {
             dialog.setPositiveButton("Открыть настройки", (paramDialogInterface, paramInt) -> {
                 Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(myIntent);
-                onBackPressed();
+                getOnBackPressedDispatcher().onBackPressed();
             });
             dialog.show();
             startApplication = false;
@@ -124,7 +132,7 @@ public class StartApplicationActivity extends AppCompatActivity {
         LogService.getInstance().log(this, "checkPermissions", "startInit");
 
         if (startApplication) {
-            if (MainApplication.getInstance().isMainServiceStart()) { // Если сервис уже запущен, значит само приложение так же уже работает, пожтому просто запускаем
+            if (MainApplication.getInstance().isMainServiceStart()) { // Если сервис уже запущен, значит само приложение так же уже работает, поэтому просто запускаем
                 if (!MainApplication.getInstance().getMainAccount().isParsedData) {
                     try {
                         JSONObject result = MainApplication.getInstance().getRestService().httpGet("/profile/auth");
@@ -147,6 +155,25 @@ public class StartApplicationActivity extends AppCompatActivity {
 
         executorService.execute(() -> {
             LogService.getInstance().log("StartApplicationActivity", "start auth");
+
+            runOnUiThread(() -> tvAction.setText("Проверка контроля фоновой активности ..."));
+            if (!isShowBatteryPermissionDialog){
+                String packageName = getPackageName();
+                PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                if (!pm.isIgnoringBatteryOptimizations(packageName)){
+                    // проверяем, что последний запрос был более суток назад
+                    Long lastTime = MainApplication.getInstance().getPreferences().getLong("ShowBatteryPermissionDialog");
+                    if (MainUtils.passedTimeHour(lastTime) > 24) {
+                        boolean isBatteryPermissionAvailable = batteryPermissionHelper.isBatterySaverPermissionAvailable(this, /* onlyIfSupported */ true);
+                        if (isBatteryPermissionAvailable){
+                            runOnUiThread(this::showBatteryPermissionDialog);
+                            isFinished = true;
+                        }
+                        MainApplication.getInstance().getPreferences().setLong("ShowBatteryPermissionDialog", System.currentTimeMillis());
+                    }
+
+                }
+            }
 
 
             runOnUiThread(() -> tvAction.setText("Запуск приложения ..."));
@@ -241,20 +268,22 @@ public class StartApplicationActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        MainApplication.getInstance().stopMainService();
-        isFinished = true;
-        finish();
-    }
+
+    OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            MainApplication.getInstance().stopMainService();
+            isFinished = true;
+            finish();
+        }
+    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.ACTIVITY_LOGIN) {
             if (resultCode == RESULT_CANCELED) {
-                onBackPressed();
+                getOnBackPressedDispatcher().onBackPressed();
             } else checkPermissions();
         }
 
@@ -268,7 +297,7 @@ public class StartApplicationActivity extends AppCompatActivity {
                     MainApplication.getInstance().getFirebaseService().getNewPushToken();
                     auth();
                 } else {
-                    onBackPressed();
+                    getOnBackPressedDispatcher().onBackPressed();
                 }
             });
 
@@ -284,12 +313,12 @@ public class StartApplicationActivity extends AppCompatActivity {
             Intent callIntent = new Intent(Intent.ACTION_DIAL);
             callIntent.setData(Uri.parse("tel:" + phone));
             startActivity(callIntent);
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
         });
 
         builder.setNegativeButton("Отмена", (dialog, which) -> {
             dialog.dismiss();
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
         });
         builder.show();
     }
@@ -304,9 +333,7 @@ public class StartApplicationActivity extends AppCompatActivity {
             MainApplication.getInstance().getRestService().httpGet("/profile/document/accept?doc_type=" + doc_type);
             if (isFinished) return;
             auth();
-
         });
-
     }
 
     private void showDocumentDialog(JSONObject data) {
@@ -334,9 +361,28 @@ public class StartApplicationActivity extends AppCompatActivity {
 
         builder.setNegativeButton("Отмена", (dialog, which) -> {
             dialog.dismiss();
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
         });
         builder.show();
+    }
+
+
+    private void showBatteryPermissionDialog(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setMessage("Для корректной работы приложения необходимо отключить \"Контроль фоновой активности\" переключив в режим \"Нет ограничений\".");
+        alertDialog.setNegativeButton("Позже", (dialogInterface, i) -> {
+            isShowBatteryPermissionDialog = true;
+            isFinished = false;
+            auth();
+
+        });
+        alertDialog.setPositiveButton("Открыть настройки", (paramDialogInterface, paramInt) -> {
+            batteryPermissionHelper.getPermission(this, /* open */ true, /* newTask */ true);
+            getOnBackPressedDispatcher().onBackPressed();
+        });
+        alertDialog.setCancelable(false);
+        alertDialog.create();
+        alertDialog.show();
     }
 
     private void showNewDesirableVersionDialog() {
@@ -355,8 +401,9 @@ public class StartApplicationActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse("market://details?id=org.toptaxi.taximeter"));
             startActivity(intent);
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
         });
+        alertDialog.setCancelable(false);
         alertDialog.create();
         alertDialog.show();
     }
@@ -365,14 +412,15 @@ public class StartApplicationActivity extends AppCompatActivity {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setCancelable(false);
         alertDialog.setMessage("Для корректной работы приложения необходимо обновить приложение");
-        alertDialog.setNegativeButton("Отмена", (dialogInterface, i) -> onBackPressed());
+        alertDialog.setNegativeButton("Отмена", (dialogInterface, i) -> getOnBackPressedDispatcher().onBackPressed());
 
         alertDialog.setPositiveButton("Обновить", (dialogInterface, i) -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse("market://details?id=org.toptaxi.taximeter"));
             startActivity(intent);
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
         });
+        alertDialog.setCancelable(false);
         alertDialog.create();
         alertDialog.show();
     }
@@ -414,6 +462,4 @@ public class StartApplicationActivity extends AppCompatActivity {
         }
         return false;
     }
-
-
 }

@@ -25,8 +25,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.toptaxi.taximeter.MainApplication;
 import org.toptaxi.taximeter.R;
-import org.toptaxi.taximeter.services.LogService;
 import org.toptaxi.taximeter.tools.MainUtils;
+import org.toptaxi.taximeter.tools.StepProgressView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +36,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import params.com.stepprogressview.StepProgressView;
+
 
 public class GuaranteedIncomeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     SwipeRefreshLayout swipeRefreshLayout;

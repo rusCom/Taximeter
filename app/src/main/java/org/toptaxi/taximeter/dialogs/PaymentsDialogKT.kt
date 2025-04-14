@@ -3,12 +3,14 @@ package org.toptaxi.taximeter.dialogs
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import androidx.browser.customtabs.CustomTabsIntent
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.json.JSONObject
 import org.toptaxi.taximeter.MainApplication
@@ -27,17 +29,24 @@ import java.util.concurrent.atomic.AtomicReference
 object PaymentsDialogKT {
 
     private var tbank = false;
+    private var sbp = false;
+    private var sbp_tbank = false;
+    private var tinkoff = false;
     private var yandexPro = false;
-    private var tbank_commission = 0;
+    private var commission = 0;
 
     fun setPreferences(data: JSONObject) {
-        tbank_commission = MainUtils.JSONGetInteger(data, "tbank_commission", 0)
+        commission = MainUtils.JSONGetInteger(data, "commission", 0)
         tbank = MainUtils.JSONGetBool(data, "tbank", false)
+        sbp = MainUtils.JSONGetBool(data, "sbp", false)
+        sbp_tbank = MainUtils.JSONGetBool(data, "sbp_tbank", false)
+        tinkoff = MainUtils.JSONGetBool(data, "tinkoff", false)
+
         yandexPro = MainUtils.JSONGetBool(data, "yandex_pro", false)
     }
 
     fun getPaymentsAvailable(): Boolean {
-        return tbank
+        return tbank || sbp || tinkoff || sbp_tbank
     }
 
 
@@ -48,13 +57,28 @@ object PaymentsDialogKT {
             .inflate(R.layout.dialog_add_payment, activity.findViewById(R.id.modalBottomAddPayment))
 
         val buttonSPBPayment = bottomSheetView.findViewById<Button>(R.id.btnSBPPayment)
-        val buttonTinkoffPayment = bottomSheetView.findViewById<Button>(R.id.btnTinkoffPayment)
+        val btnSBPTBankPayment = bottomSheetView.findViewById<Button>(R.id.btnSBPTBankPayment)
+        val buttonTBankPayment = bottomSheetView.findViewById<Button>(R.id.btnTinkoffPayment)
+        val buttonTinkoffPayment = bottomSheetView.findViewById<Button>(R.id.btnTBankPayment)
         val btnYandexProPayment = bottomSheetView.findViewById<Button>(R.id.btnYandexProPayment)
+
 
         val ednPaymentAmount = bottomSheetView.findViewById<EditText>(R.id.ednPaymentAmount)
 
-        if (!yandexPro){
-            btnYandexProPayment.visibility = View.GONE;
+        if (!sbp) {
+            buttonSPBPayment.visibility = View.GONE
+        }
+        if (!sbp_tbank) {
+            btnSBPTBankPayment.visibility = View.GONE
+        }
+        if (!tbank) {
+            buttonTBankPayment.visibility = View.GONE
+        }
+        if (!tinkoff) {
+            buttonTinkoffPayment.visibility = View.GONE
+        }
+        if (!yandexPro) {
+            btnYandexProPayment.visibility = View.GONE
         }
 
 
@@ -101,8 +125,7 @@ object PaymentsDialogKT {
             }
         }
 
-
-        buttonSPBPayment.setOnClickListener {
+        buttonTBankPayment.setOnClickListener {
             val amountString = ednPaymentAmount.text.toString()
             if (amountString == "") {
                 ednPaymentAmount.requestFocus()
@@ -114,13 +137,111 @@ object PaymentsDialogKT {
             val executorService = Executors.newSingleThreadExecutor()
             executorService.execute {
                 val response =
+                    MainApplication.getInstance().restService.httpGet(activity, "/payments/order?amount=$amountInteger&source=tbank")
+                if (MainUtils.JSONGetString(response, "status") == "OK") {
+                    val showMessage = MainUtils.JSONGetBool(response, "result_message")
+                    if (!sbpShowMessage.get() && showMessage) {
+                        activity.runOnUiThread {
+                            val builder = AlertDialog.Builder(activity)
+                            builder.setMessage("Комиссия при пополнении через СПБ или картой любого банка $commission%.")
+                            builder.setCancelable(true)
+                            builder.setPositiveButton("Понятно") { dialog: DialogInterface, _: Int ->
+                                sbpShowMessage.set(true)
+                                dialog.dismiss()
+                                bottomSheetDialog.dismiss()
+                                tBankPay(
+                                    activity,
+                                    MainUtils.JSONGetString(response, "result_PaymentURL")
+                                )
+                            }
+                            builder.setNegativeButton("Отмена") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+                            builder.show()
+                        }
+                    } else {
+                        bottomSheetDialog.dismiss()
+                        tBankPay(
+                            activity,
+                            MainUtils.JSONGetString(response, "result_PaymentURL")
+                        )
+                    }
+                }
+            }
+        }
+
+        btnSBPTBankPayment.setOnClickListener {
+            val amountString = ednPaymentAmount.text.toString()
+            if (amountString == "") {
+                ednPaymentAmount.requestFocus()
+                ednPaymentAmount.error = "Введите сумму пополнения"
+                return@setOnClickListener
+            }
+
+            val amountInteger = amountString.toInt() * 100
+
+            if (amountInteger < 1000) {
+                ednPaymentAmount.requestFocus()
+                ednPaymentAmount.error = "Сумма пополнения через СБП не может быть меньше 10 руб."
+                return@setOnClickListener
+            }
+            val executorService = Executors.newSingleThreadExecutor()
+            executorService.execute {
+                val response =
+                    MainApplication.getInstance().restService.httpGet(activity, "/payments/order?amount=$amountInteger&source=sbp_tbank")
+                if (MainUtils.JSONGetString(response, "status") == "OK") {
+                    val showMessage = MainUtils.JSONGetBool(response, "result_message")
+                    if (!sbpShowMessage.get() && showMessage) {
+                        activity.runOnUiThread {
+                            val builder = AlertDialog.Builder(activity)
+                            builder.setMessage("Комиссия при пополнении через СПБ или картой любого банка $commission%.")
+                            builder.setCancelable(true)
+                            builder.setPositiveButton("Понятно") { dialog: DialogInterface, _: Int ->
+                                sbpShowMessage.set(true)
+                                dialog.dismiss()
+                                bottomSheetDialog.dismiss()
+                                tBankPay(
+                                    activity,
+                                    MainUtils.JSONGetString(response, "result_PaymentURL")
+                                )
+                            }
+                            builder.setNegativeButton("Отмена") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+                            builder.show()
+                        }
+                    } else {
+                        bottomSheetDialog.dismiss()
+                        tBankPay(
+                            activity,
+                            MainUtils.JSONGetString(response, "result_PaymentURL")
+                        )
+                    }
+                }
+            }
+        }
+
+
+        buttonSPBPayment.setOnClickListener {
+            val amountString = ednPaymentAmount.text.toString()
+            if (amountString == "") {
+                ednPaymentAmount.requestFocus()
+                ednPaymentAmount.error = "Введите сумму пополнения"
+                return@setOnClickListener
+            }
+
+            val amountInteger = amountString.toInt() * 100
+            if (amountInteger < 1000) {
+                ednPaymentAmount.requestFocus()
+                ednPaymentAmount.error = "Сумма пополнения через СБП не может быть меньше 10 руб."
+                return@setOnClickListener
+            }
+            val executorService = Executors.newSingleThreadExecutor()
+            executorService.execute {
+                val response =
                     MainApplication.getInstance().restService.httpGet(activity, "/payments/order?amount=$amountInteger&source=sbp")
                 if (MainUtils.JSONGetString(response, "status") == "OK") {
                     val showMessage = MainUtils.JSONGetBool(response, "result_message")
                     if (!sbpShowMessage.get() && showMessage) {
                         activity.runOnUiThread {
                             val builder = AlertDialog.Builder(activity)
-                            builder.setMessage("Комиссия при пополнении через СПБ или картой любого банка $tbank_commission%.")
+                            builder.setMessage("Комиссия при пополнении через СПБ или картой любого банка $commission%.")
                             builder.setCancelable(true)
                             builder.setPositiveButton("Понятно") { dialog: DialogInterface, _: Int ->
                                 sbpShowMessage.set(true)
@@ -170,7 +291,7 @@ object PaymentsDialogKT {
                     if (!tinkoffShowMessage.get() && showMessage) {
                         activity.runOnUiThread {
                             val builder = AlertDialog.Builder(activity)
-                            builder.setMessage("Пополнение картой любого банка. Комиссия $tbank_commission%.")
+                            builder.setMessage("Пополнение картой любого банка. Комиссия $commission%.")
                             builder.setCancelable(true)
                             builder.setPositiveButton("Понятно") { dialog: DialogInterface, _: Int ->
                                 sbpShowMessage.set(true)
@@ -202,11 +323,13 @@ object PaymentsDialogKT {
             }
         }
 
-
-
-
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
+    }
+
+    private fun tBankPay(activity: MainAppCompatActivity, paymentURL: String) {
+        val customTabsIntent = CustomTabsIntent.Builder().build()
+        customTabsIntent.launchUrl(activity, Uri.parse(paymentURL))
     }
 
     private fun sbpPay(
@@ -230,7 +353,7 @@ object PaymentsDialogKT {
             orderOptions {
                 orderId = orderID
                 amount = Money.ofCoins(summa)
-                title = "Пополнение баланса aTaxi.Водитель"
+                title = "Оплата за доступ к ПО aTaxi.Водитель"
                 recurrentPayment = false
             }
         }
@@ -258,7 +381,7 @@ object PaymentsDialogKT {
             orderOptions {
                 orderId = orderID
                 amount = Money.ofCoins(summa)
-                title = "Пополнение баланса aTaxi.Водитель"
+                title = "Оплата за доступ к ПО aTaxi.Водитель"
                 recurrentPayment = false
             }
             customerOptions {

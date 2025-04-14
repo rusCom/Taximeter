@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.FirebaseApp;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,12 +43,17 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import io.appmetrica.analytics.AppMetrica;
+import io.appmetrica.analytics.AppMetricaConfig;
+
 public class MainApplication extends Application {
     protected static String TAG = "#########" + MainApplication.class.getName();
     protected static MainApplication mainApplication;
+
     public static MainApplication getInstance() {
         return mainApplication;
     }
+
     private Integer MainActivityCurView;
     private OnMainDataChangeListener onMainDataChangeListener;
     private OnPriorOrdersChange onPriorOrdersChange;
@@ -76,6 +83,13 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         LogService.getInstance().log(this, "onCreate");
+
+        // Init FirebaseApp for all processes
+        FirebaseApp.initializeApp(this);
+        // Then activate AppMetrica SDK
+        AppMetricaConfig config = AppMetricaConfig.newConfigBuilder("2955ad76-2b52-442b-80f7-6cde25d5ad26").build();
+        AppMetrica.activate(this, config);
+
         mainApplication = this;
         MainActivityCurView = Constants.CUR_VIEW_CUR_ORDERS;
 
@@ -175,7 +189,7 @@ public class MainApplication extends Application {
             getMainAccount().parseData(dataJSON.getJSONObject("last_account"));
         }
 
-        if (isNewData(dataJSON,"profile"))
+        if (isNewData(dataJSON, "profile"))
             getProfile().parseData(dataJSON.getJSONObject("profile"));
 
         if (isNewData(dataJSON, "last_prior_orders")) {
@@ -185,20 +199,20 @@ public class MainApplication extends Application {
             }
         }
 
-        if (isNewData(dataJSON, "last_orders_complete")){
+        if (isNewData(dataJSON, "last_orders_complete")) {
             getCompleteOrders().setFromJSONPrior(dataJSON.getJSONArray("last_orders_complete"));
             LogService.getInstance().log(this, "parserData", "completeOrdersCount = " + getCompleteOrders().getCount());
             if ((onCompleteOrdersChange != null)) {
                 uiHandler.post(() -> onCompleteOrdersChange.OnCompleteOrdersChange());
             }
-            if (getMainActivity() != null){
-                if ((getMainActivityCurView() == Constants.CUR_VIEW_CUR_ORDER) && (getCurOrder().getMainAction().equals("set_order_done"))){
+            if (getMainActivity() != null) {
+                if ((getMainActivityCurView() == Constants.CUR_VIEW_CUR_ORDER) && (getCurOrder().getMainAction().equals("set_order_done"))) {
                     getMainActivity().onCompleteOrdersChange(getCompleteOrders().getCount());
                 }
             }
         }
 
-        if (dataJSON.has("last_orders")){
+        if (dataJSON.has("last_orders")) {
             getCurOrders().setFromJSON(dataJSON.getJSONArray("last_orders"));
         }
 
@@ -219,10 +233,6 @@ public class MainApplication extends Application {
         if (dataJSON.has("last_messages")) {
             getMainMessages().OnNewMessages(dataJSON.getJSONArray("last_messages"));
         }
-
-
-
-
 
 
         if (dataJSON.has("last_cur_order")) {

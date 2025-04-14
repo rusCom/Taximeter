@@ -32,6 +32,13 @@ public class MainAppCompatActivity extends MainAppCompatActivityKt {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // Утановка текущего поворота экрана
         new LockOrientation(this).lock();
+        /*
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            getWindow().setNavigationBarContrastEnforced(true);
+        }
+
+         */
+
     }
 
     @Override

@@ -86,6 +86,26 @@
         android:text="Пополнение через"/>
 
     <Button
+        android:id="@+id/btnSBPTBankPayment"
+        style="@style/MainButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/button_margin"
+        android:backgroundTint="@color/acq_colorSBPBackground"
+        android:drawableBottom="@mipmap/logo_sbp"
+        android:textColor="@color/primaryGray"
+        android:text="Пополнение через"/>
+
+    <Button
+        android:id="@+id/btnTBankPayment"
+        style="@style/MainButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/button_margin"
+        android:backgroundTint="@color/acq_colorOtherBackground"
+        android:text="Картой любого банка" />
+
+    <Button
         android:id="@+id/btnTinkoffPayment"
         style="@style/MainButton"
         android:layout_width="match_parent"

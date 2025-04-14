@@ -12,17 +12,19 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+        android:maxSdkVersion="29" />
 
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:launchMode="singleTask"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
@@ -31,7 +33,7 @@
         <activity
             android:name=".activities.registration.RegistrationStateActivity"
             android:exported="false"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.registration.RegistrationMainActivity"
             android:exported="false"
@@ -42,7 +44,8 @@
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
             android:name=".activities.GuaranteedIncomeActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/AppTheme.Android15"/>
         <activity
             android:name=".activities.AboutActivity"
             android:exported="false"
@@ -57,9 +60,9 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".activities.LoginActivity"
@@ -67,18 +70,29 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.NewOrderActivity" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="payment"
+                    android:scheme="ataxitaximeter" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.NewOrderActivity" android:theme="@style/AppTheme.Android15"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".activities.MessagesActivity" />
-        <activity android:name=".activities.PriorOrderActivity" />
-        <activity android:name=".activities.BalanceActivity" />
-        <activity android:name=".activities.StatisticsActivity" />
-        <activity android:name=".activities.InviteActivity" />
+        <activity android:name=".activities.MessagesActivity" android:theme="@style/AppTheme.Android15"/>
+        <activity android:name=".activities.PriorOrderActivity" android:theme="@style/AppTheme.Android15"/>
+        <activity android:name=".activities.BalanceActivity" android:theme="@style/AppTheme.Android15"/>
+        <activity android:name=".activities.StatisticsActivity" android:theme="@style/AppTheme.Android15"/>
+        <activity android:name=".activities.InviteActivity" android:theme="@style/AppTheme.Android15"/>
 
         <service
             android:name=".services.MainService"
@@ -96,8 +110,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activities.HisOrdersActivity" />
-        <activity android:name=".activities.HisOrderActivity" />
+        <activity android:name=".activities.HisOrdersActivity" android:theme="@style/AppTheme.Android15"/>
+        <activity android:name=".activities.HisOrderActivity" android:theme="@style/AppTheme.Android15"/>
         <activity
             android:name=".activities.OrdersOnCompleteActivity"
             android:theme="@style/AppTheme.NoActionBar" />

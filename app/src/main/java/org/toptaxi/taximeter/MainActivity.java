@@ -401,10 +401,10 @@ public class MainActivity extends MainAppCompatActivity implements OnMainDataCha
                         TariffPlan tariffPlan = (TariffPlan) mainCardViewData;
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainApplication.getInstance().getMainActivity());
                         alertDialog.setTitle("Покупка смены");
-                        alertDialog.setMessage("Купить смену \"" + tariffPlan.Name + "\" за " +
-                                MainUtils.getSummaString(tariffPlan.Cost) + "?");
+                        alertDialog.setMessage("Купить смену \"" + tariffPlan.name + "\" за " +
+                                MainUtils.getSummaString(tariffPlan.cost) + "?");
                         alertDialog.setPositiveButton("Да", (dialogInterface, i1) -> {
-                            httpGetResult("/tariff/activate?tariff_id=" + tariffPlan.ID);
+                            httpGetResult("/tariff/activate?tariff_id=" + tariffPlan.getID());
                         });
                         alertDialog.setNegativeButton("Нет", null);
                         alertDialog.create();

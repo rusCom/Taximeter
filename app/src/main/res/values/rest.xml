@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="mainRestHost">http://api.ataxi24.ru:7580/ataxi/taximeter</string>
+    <string name="mainRestHost">https://api.ataxi24.ru:7543/ataxi/taximeter</string>
     <string name="reserveRestHost">http://62.133.173.81:7580/ataxi/taximeter</string>
-    <string name="mainRestHost1">http://192.168.31.222:7580/ataxi/taximeter</string>
 </resources>
